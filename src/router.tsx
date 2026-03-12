@@ -19,9 +19,9 @@ import Reports from "@/pages/reports"
 import Settings from "@/pages/settings"
 import Notifications from "@/pages/notifications"
 import Referrals from "@/pages/referrals"
-
 // Protected Route Component
 import { ProtectedRoute } from "@/components/ProtectedRoute"
+import ConfirmSignUpPage from "./pages/auth/ConfirmSignUpPage"
 
 export default function Router() {
   return (
@@ -31,6 +31,7 @@ export default function Router() {
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/confirm-signup" element={<ConfirmSignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verify-totp" element={<TotpVerificationPage />} />

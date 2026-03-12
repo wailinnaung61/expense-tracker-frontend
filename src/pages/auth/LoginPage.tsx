@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signInSchema, type SignInFormData } from '@/types/auth'
@@ -7,13 +7,18 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'react-toastify'
 import { useAuth } from '@/contexts/AuthContext'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import spinnerGif from '@/assets/Spinner.gif'
+import { authService } from '@/services/authService'
+
 export default function LoginPage() {
-  const { login } = useAuth()
+  const { login, fetchUser } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [showPassword, setShowPassword] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const callbackProcessed = useRef(false)
 
   const {
     register,
@@ -25,6 +30,46 @@ export default function LoginPage() {
     },
   })
 
+
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const code = searchParams.get('code')
+    const state = searchParams.get('state')
+    
+    if (code && state && !callbackProcessed.current) {
+      callbackProcessed.current = true
+      setIsGoogleLoading(true)
+      handleGoogleCallback(code)
+    }
+  }, [searchParams])
+
+  const handleGoogleCallback = async (code: string) => {
+    setIsGoogleLoading(true)
+    try {
+      const response = await authService.handleGoogleCallback(code)
+      
+      // Check if MFA is required
+      if (response.requiresMfa) {
+        toast.info('Two-factor authentication required')
+        navigate('/verify-totp', {
+          state: {
+            session: response.mfaChallenge
+          }
+        })
+        return
+      }
+      
+      // Fetch user data after successful login
+      await fetchUser()
+      navigate('/', { replace: true })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Google login failed')
+      // Clear the URL parameters
+      navigate('/login', { replace: true })
+    } finally {
+      setIsGoogleLoading(false)
+    }
+  }
 
   const onSubmit = async (data: SignInFormData) => {
     try {
@@ -48,9 +93,26 @@ export default function LoginPage() {
     }
   }
 
-  const handleOAuthLogin = (provider: string) => {
-    toast.info(`${provider} login coming soon...`)
-    // TODO: Implement OAuth login
+  const handleGoogleLogin = async () => {
+    try {
+      setIsGoogleLoading(true)
+      const { authorizationUrl } = await authService.getGoogleAuthUrl()
+      
+      // Open Google OAuth in the same window
+      window.location.href = authorizationUrl
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to initiate Google login')
+      setIsGoogleLoading(false)
+    }
+  }
+
+  // Show blank white page during OAuth callback processing
+  if (isGoogleLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        {/* Blank white page */}
+      </div>
+    )
   }
 
   return (
@@ -60,7 +122,7 @@ export default function LoginPage() {
 
           {/* Logo */}
           <div className="flex justify-center mb-1">
-            <div className="w-15 h-15 rounded-full bg-linear-to-br from-blue-100 to-indigo-300 shadow-lg"></div>
+            <div className="w-15 h-15 rounded-full bg-linear-to-br from-blue-300 to-indigo-400 shadow-lg"></div>
           </div>
 
           {/* Heading */}
@@ -74,7 +136,8 @@ export default function LoginPage() {
             type="button"
             variant="outline"
             className="w-full h-9 border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-sm transition-all shadow-sm rounded-2xl"
-            onClick={() => handleOAuthLogin('Google')}
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading}
           >
             <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
               <path
@@ -94,8 +157,15 @@ export default function LoginPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continue with Google
-          </Button>
+        {isGoogleLoading ? (
+          <>
+            <img src={spinnerGif} alt="Loading" className="w-5 h-5 mr-2" />
+            Loading...
+          </>
+        ) : (
+          'Continue with Google'
+        )}          
+        </Button>
         </div>
 
           {/* Divider */}

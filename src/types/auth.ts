@@ -65,6 +65,10 @@ export const signUpSchema = z.object({
   path: ["confirmPassword"],
 })
 
+export const confirmSignUpSchema = z.object({
+  code: z.string().length(6, 'Confirmation code must be 6 digits'),
+})
+
 export const totpSchema = z.object({
   code: z.string().length(6, 'TOTP code must be 6 digits'),
 })
@@ -74,6 +78,7 @@ export const forgotPasswordSchema = z.object({
 })
 
 export const resetPasswordSchema = z.object({
+  code: z.string().length(6, 'Confirmation code must be 6 digits'),
   newPassword: z.string().min(8, "Password must be at least 8 characters")
   .regex(/[0-9]/, "Use a number")
   .regex(/[a-z]/, "Use a lowercase letter")
@@ -101,6 +106,7 @@ export const changePasswordSchema = z.object({
 export type SignInFormData = z.infer<typeof signInSchema>
 export type SignUpFormData = z.infer<typeof signUpSchema>
 export type TotpFormData = z.infer<typeof totpSchema>
+export type ConfirmSignUpFormData = z.infer<typeof confirmSignUpSchema>
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>

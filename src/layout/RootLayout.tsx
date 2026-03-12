@@ -1,8 +1,18 @@
-import { Outlet, Link } from "react-router-dom"
+import { Outlet, Link, useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 
 export default function RootLayout() {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/login', { replace: true })
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -38,7 +48,7 @@ export default function RootLayout() {
                 {user?.currency || 'JPY'}
               </span>
               <button
-                onClick={() => logout()}
+                onClick={handleLogout}
                 className="text-sm text-gray-600 hover:text-gray-900"
               >
                 Logout

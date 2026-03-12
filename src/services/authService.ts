@@ -48,13 +48,13 @@ export const authService = {
   },
 
   // Resend confirmation email
-  async resendConfirmation(email: string): Promise<{ message: string }> {
-    return apiClient.post('/api/Auth/resend-confirmation', { email })
+  async resendConfirmation(username: string): Promise<{ message: string }> {
+    return apiClient.post('/api/Auth/resend-confirmation', { username })
   },
 
   // Confirm email
-  async confirm(token: string): Promise<{ message: string }> {
-    return apiClient.post('/api/Auth/confirm', { token })
+  async confirm(username: string, confirmationCode: string): Promise<{ message: string }> {
+    return apiClient.post('/api/Auth/confirm', { username, confirmationCode })
   },
 
   // Refresh token
@@ -70,12 +70,12 @@ export const authService = {
   },
 
   // Forgot password
-  async forgotPassword(email: string): Promise<{ message: string }> {
-    return apiClient.post('/api/Auth/forgot-password', { email })
+  async forgotPassword(usernameOrEmail: string): Promise<{ message: string }> {
+    return apiClient.post('/api/Auth/forgot-password', { usernameOrEmail })
   },
 
   // Reset password
-  async resetPassword(data: { token: string; newPassword: string; confirmPassword: string }): Promise<{ message: string }> {
+  async resetPassword(data: { usernameOrEmail: string; confirmationCode: string; newPassword: string; }): Promise<{ message: string }> {
     return apiClient.post('/api/Auth/reset-password', data)
   },
 
@@ -86,11 +86,40 @@ export const authService = {
 
   // Sign out
   async signOut(): Promise<void> {
+    const token = this.getAccessToken()
+    
+    // Clear tokens first to ensure user is logged out even if API fails
+    this.clearTokens()
+    
     try {
-      await apiClient.post('/api/Auth/signout')
-    } finally {
-      this.clearTokens()
+      // Only call API if we have a token
+      if (token) {
+        await apiClient.post('/api/Auth/signout')
+      }
+    } catch (error) {
+      // Ignore errors - user is already logged out locally
+      console.error('Sign out API call failed:', error)
     }
+  },
+
+  // Google OAuth
+  async getGoogleAuthUrl(): Promise<{ authorizationUrl: string }> {
+    const redirectUri = import.meta.env.VITE_REDIRECT_URI
+    return apiClient.get<{ authorizationUrl: string }>('/api/Auth/google/url', { redirectUri })
+  },
+
+  async handleGoogleCallback(authorizationCode: string): Promise<LoginResponse> {
+    const redirectUri = import.meta.env.VITE_REDIRECT_URI
+    const response = await apiClient.post<LoginResponse>('/api/Auth/google/callback', {
+      authorizationCode,
+      redirectUri,
+    })
+    
+    // Store tokens if no MFA required
+    if (!response.requiresMfa && response.tokens) {
+      this.storeTokens(response.tokens)
+    }
+    return response
   },
 
   // Token management

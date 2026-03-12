@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
@@ -8,14 +8,19 @@ import { Label } from '@/components/ui/label'
 import { signUpSchema, type SignUpFormData } from '@/types/auth'
 import { toast } from 'react-toastify'
 import { authService } from '@/services/authService'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import spinnerGif from '@/assets/Spinner.gif'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function SignUpPage() {
+  const { fetchUser } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const callbackProcessed = useRef(false)
 
   const {
     register,
@@ -31,6 +36,49 @@ export default function SignUpPage() {
     },
   })
 
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const code = searchParams.get('code')
+    const state = searchParams.get('state')
+    
+    if (code && state && !callbackProcessed.current) {
+      callbackProcessed.current = true
+      setIsGoogleLoading(true)
+      handleGoogleCallback(code)
+    }
+  }, [searchParams])
+
+  const handleGoogleCallback = async (code: string) => {
+    setIsGoogleLoading(true)
+    try {
+      const response = await authService.handleGoogleCallback(code)
+      
+      // Check if MFA is required
+      if (response.requiresMfa) {
+        toast.info('Two-factor authentication required')
+        navigate('/verify-totp', {
+          state: {
+            session: response.mfaChallenge
+          }
+        })
+        return
+      }
+      
+      // Fetch user data after successful signup
+      await fetchUser()
+      
+      // Success - redirect to home
+      toast.success('Sign up successful!')
+      navigate('/', { replace: true })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Google sign up failed')
+      // Clear the URL parameters
+      navigate('/signup', { replace: true })
+    } finally {
+      setIsGoogleLoading(false)
+    }
+  }
+
   const onSubmit = async (data: SignUpFormData) => {
     try {
       const response = await authService.signUp({
@@ -39,15 +87,36 @@ export default function SignUpPage() {
         password: data.password
       })
       toast.success(response.message || 'Sign up successful!')
-      navigate('/login', { replace: true })
+      navigate('/confirm-signup', { 
+        state: { username: data.userName },
+        replace: true 
+      })
     } catch (error) {
       console.error('Sign up failed:', error)
       toast.error(error instanceof Error ? error.message : 'Sign up failed')
     }
   }
 
-  const handleOAuthSignUp = (provider: string) => {
-    toast.info(`${provider} sign up coming soon...`)
+  const handleGoogleSignUp = async () => {
+    try {
+      setIsGoogleLoading(true)
+      const { authorizationUrl } = await authService.getGoogleAuthUrl()
+      
+      // Open Google OAuth in the same window
+      window.location.href = authorizationUrl
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to initiate Google sign up')
+      setIsGoogleLoading(false)
+    }
+  }
+
+  // Show blank white page during OAuth callback processing
+  if (isGoogleLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        {/* Blank white page */}
+      </div>
+    )
   }
 
   return (
@@ -57,7 +126,7 @@ export default function SignUpPage() {
 
           {/* Logo */}
           <div className="flex justify-center mb-1">
-            <div className="w-15 h-15 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 shadow-lg"></div>
+            <div className="w-15 h-15 rounded-full bg-linear-to-br from-blue-300 to-indigo-400 shadow-lg"></div>
           </div>
 
           {/* Heading */}
@@ -71,7 +140,8 @@ export default function SignUpPage() {
               type="button"
               variant="outline"
               className="w-full h-9 border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-gray-700 font-medium text-sm transition-all shadow-sm rounded-2xl"
-              onClick={() => handleOAuthSignUp('Google')}
+              onClick={handleGoogleSignUp}
+              disabled={isGoogleLoading}
             >
               <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                 <path
@@ -91,8 +161,15 @@ export default function SignUpPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Continue with Google
-            </Button>
+          {isGoogleLoading ? (
+            <>
+              <img src={spinnerGif} alt="Loading" className="w-5 h-5 mr-2" />
+              Loading...
+            </>
+          ) : (
+          'Continue with Google'
+          )}                
+        </Button>
           </div>
 
           {/* Divider */}
