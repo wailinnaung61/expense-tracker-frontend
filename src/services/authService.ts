@@ -13,8 +13,10 @@ export interface SignInData {
 }
 
 export interface VerifyTotpData {
-  code: string
   session: string
+  username: string
+  totpCode: string
+
 }
 
 export const authService = {
@@ -32,7 +34,7 @@ export const authService = {
 
   // Verify TOTP code for MFA
   async verifyTotp(data: VerifyTotpData): Promise<VerifyTotpResponse> {
-    const response = await apiClient.post<VerifyTotpResponse>('/api/Auth/verify-totp', data)
+    const response = await apiClient.post<VerifyTotpResponse>('/api/Auth/mfa/verify', data)
     this.storeTokens(response.tokens)
     return response
   },
@@ -82,6 +84,11 @@ export const authService = {
   // Change password
   async changePassword(data: { currentPassword: string; newPassword: string; confirmPassword: string }): Promise<{ message: string }> {
     return apiClient.post('/api/Auth/change-password', data)
+  },
+
+  // Disable MFA with backup code
+  async disableMfaWithBackup(data: { username: string; backupCode: string }): Promise<{ message: string }> {
+    return apiClient.post('/api/Auth/mfa/disable-with-backup', data)
   },
 
   // Sign out

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'react-toastify'
 import { authService } from '@/services/authService'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Shield } from 'lucide-react'
 import spinnerGif from '@/assets/Spinner.gif'
 import { useAuth } from '@/contexts/AuthContext'
@@ -19,6 +19,7 @@ export default function TotpVerificationPage() {
   // Get session from navigation state
   const session = location.state?.session
   const email = location.state?.email
+  const userName = location.state?.userName
 
   const {
     register,
@@ -37,8 +38,9 @@ export default function TotpVerificationPage() {
   const onSubmit = async (data: TotpFormData) => {
     try {
       await authService.verifyTotp({
-        code: data.code,
-        session,
+        session: session,
+        username: userName,
+        totpCode: data.code,
       })
       
       // Fetch user data after successful MFA verification
@@ -58,7 +60,7 @@ export default function TotpVerificationPage() {
           
           {/* Icon */}
           <div className="flex justify-center mb-1">
-            <div className="flex h-15 w-15 items-center justify-center rounded-full bg-linear-to-br from-blue-300 to-indigo-400 shadow-lg">
+            <div className="flex h-15 w-15 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-blue-600 shadow-lg">
               <Shield className="h-8 w-8 text-white" />
             </div>
           </div>
@@ -80,7 +82,7 @@ export default function TotpVerificationPage() {
           {/* TOTP Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="code" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="code">
                 Verification Code
               </Label>
               <Input
@@ -88,7 +90,7 @@ export default function TotpVerificationPage() {
                 type="text"
                 maxLength={6}
                 placeholder="000000"
-                className="h-10 text-center text-xl tracking-widest rounded-2xl"
+                variant="code"
                 {...register('code')}
                 autoComplete="off"
                 autoFocus
@@ -100,7 +102,9 @@ export default function TotpVerificationPage() {
 
             <Button 
               type="submit" 
-              className="w-full h-9 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/30 transition-all rounded-2xl"
+              variant="gradient"
+              size="sm"
+              className="w-full"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -129,6 +133,19 @@ export default function TotpVerificationPage() {
             <p className="text-xs text-gray-600">
               <strong>Need help?</strong> Open your authenticator app (e.g., Google Authenticator, 
               Authy) and enter the 6-digit code shown for Expense Tracker.
+            </p>
+          </div>
+
+          {/* Lost Access Link */}
+          <div className="mt-4 text-center">
+            <p className="text-xs text-gray-600">
+              Lost access to your authenticator?{' '}
+              <Link
+                to="/disable-mfa"
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Use backup code
+              </Link>
             </p>
           </div>
 

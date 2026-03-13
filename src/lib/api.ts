@@ -10,34 +10,115 @@ export class ApiError extends Error {
   }
 }
 
+// Token refresh state
+let isRefreshing = false;
+let refreshPromise: Promise<void> | null = null;
+
 export const apiClient = {
+  async refreshToken(): Promise<void> {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/Auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+      // Refresh failed, clear tokens and redirect to login
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('idToken');
+      localStorage.removeItem('refreshToken');
+      window.location.href = '/auth/login';
+      throw new Error('Token refresh failed');
+    }
+
+    const data = await response.json();
+    if (data.tokens) {
+      localStorage.setItem('accessToken', data.tokens.accessToken);
+      localStorage.setItem('idToken', data.tokens.idToken);
+      localStorage.setItem('refreshToken', data.tokens.refreshToken);
+    }
+  },
+
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    ...(options.headers as Record<string, string>),
-  };
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(options.headers as Record<string, string>),
+    };
 
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Request failed" }));
+    // Handle 401 Unauthorized - token expired
+    // Only auto-refresh for protected endpoints, not auth endpoints
+    const authEndpointsToExclude = [
+      '/api/Auth/signup',
+      '/api/Auth/resend-confirmation',
+      '/api/Auth/confirm',
+      '/api/Auth/signin',
+      '/api/Auth/refresh',
+      '/api/Auth/forgot-password',
+      '/api/Auth/reset-password',
+      '/api/Auth/verify-totp',
+      '/api/Auth/mfa/verify',
+      '/api/Auth/mfa/disable-with-backup',
+      '/api/Auth/google/url',
+      '/api/Auth/google/callback',
+    ];
+    
+    const shouldRefresh = response.status === 401 && 
+      !authEndpointsToExclude.includes(endpoint);
 
-    throw new ApiError(
-      response.status,
-      error.message || `HTTP ${response.status}`
-    );
-  }
+    if (shouldRefresh) {
+      // If already refreshing, wait for it to complete
+      if (isRefreshing && refreshPromise) {
+        await refreshPromise;
+        // Retry the original request with the new token
+        return this.request<T>(endpoint, options);
+      }
+
+      // Start the refresh process
+      isRefreshing = true;
+      refreshPromise = this.refreshToken()
+        .finally(() => {
+          isRefreshing = false;
+          refreshPromise = null;
+        });
+
+      try {
+        await refreshPromise;
+        // Retry the original request with the new token
+        return this.request<T>(endpoint, options);
+      } catch (error) {
+        // Refresh failed, error already handled in refreshToken()
+        throw error;
+      }
+    }
+
+    if (!response.ok) {
+      const error = await response
+        .json()
+        .catch(() => ({ message: "Request failed" }));
+
+      throw new ApiError(
+        response.status,
+        error.message || `HTTP ${response.status}`
+      );
+    }
 
   // Handle empty responses (204 No Content, etc.)
   const contentType = response.headers.get('content-type')

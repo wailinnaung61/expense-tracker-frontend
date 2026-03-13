@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
           
           {/* Icon */}
           <div className="flex justify-center mb-1">
-            <div className="flex h-15 w-15 items-center justify-center rounded-full bg-linear-to-br from-blue-300 to-indigo-400 shadow-lg">
+            <div className="flex h-15 w-15 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-blue-600 shadow-lg">
               <Lock className="h-8 w-8 text-white" />
             </div>
           </div>
@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Confirmation Code Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="code" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="code">
                 Confirmation Code
               </Label>
               <Input
@@ -93,7 +93,7 @@ export default function ResetPasswordPage() {
                 type="text"
                 maxLength={6}
                 placeholder="000000"
-                className="h-9 text-center text-lg tracking-widest rounded-2xl"
+                variant="code"
                 {...register('code')}
                 autoComplete="off"
                 autoFocus
@@ -105,7 +105,7 @@ export default function ResetPasswordPage() {
 
             {/* New Password Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="newPassword" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="newPassword">
                 New Password
               </Label>
               <div className="relative">
@@ -113,7 +113,7 @@ export default function ResetPasswordPage() {
                   id="newPassword"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter new password"
-                  className="h-9 text-sm rounded-2xl pr-10"
+                  className="pr-10"
                   {...register('newPassword')}
                 />
                 <button
@@ -131,7 +131,7 @@ export default function ResetPasswordPage() {
 
             {/* Confirm Password Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="confirmPassword">
                 Confirm Password
               </Label>
               <div className="relative">
@@ -139,7 +139,7 @@ export default function ResetPasswordPage() {
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm new password"
-                  className="h-9 text-sm rounded-2xl pr-10"
+                  className="pr-10"
                   {...register('confirmPassword')}
                 />
                 <button
@@ -157,7 +157,9 @@ export default function ResetPasswordPage() {
 
             <Button 
               type="submit" 
-              className="w-full h-9 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/30 transition-all rounded-2xl"
+              variant="gradient"
+              size="sm"
+              className="w-full"
               disabled={isSubmitting}
             >
               {isSubmitting ? (

@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
-import RootLayout from "./layout/RootLayout"
-import AuthLayout from "./layout/AuthLayout"
+import Index from "./components/layout/Index"
+import AuthLayout from "./components/layout/AuthLayout"
 
 // Auth Pages
 import LoginPage from "@/pages/auth/LoginPage"
@@ -8,6 +8,7 @@ import SignUpPage from "@/pages/auth/SignUpPage"
 import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage"
 import ResetPasswordPage from "@/pages/auth/ResetPasswordPage"
 import TotpVerificationPage from "@/pages/auth/TotpVerificationPage"
+import DisableMfaPage from "@/pages/auth/DisableMfaPage"
 
 // Dashboard Pages
 import Home from "@/pages/home"
@@ -35,15 +36,16 @@ export default function Router() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verify-totp" element={<TotpVerificationPage />} />
+          <Route path="/disable-mfa" element={<DisableMfaPage />} />
         </Route>
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route element={<RootLayout />}>
+          <Route element={<Index />}>
             <Route path="/" element={<Home />} />
-            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/tranaction" element={<Expenses />} />
             <Route path="/budget" element={<Budget />} />
-            <Route path="/savings" element={<Savings />} />
+            <Route path="/saving" element={<Savings />} />
             <Route path="/accounts" element={<Accounts />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/settings" element={<Settings />} />

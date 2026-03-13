@@ -8,7 +8,7 @@ export function ProtectedRoute() {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-white">
-        <img src={spinnerGif} alt="Loading..." className="w-12 h-12" />
+        <img src={spinnerGif} alt="Loading..." className="w-20 h-20" />
       </div>
     )
   }

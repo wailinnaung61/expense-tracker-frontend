@@ -126,7 +126,7 @@ export default function SignUpPage() {
 
           {/* Logo */}
           <div className="flex justify-center mb-1">
-            <div className="w-15 h-15 rounded-full bg-linear-to-br from-blue-300 to-indigo-400 shadow-lg"></div>
+            <div className="w-15 h-15 rounded-full bg-linear-to-br from-blue-500 to-blue-600 shadow-lg"></div>
           </div>
 
           {/* Heading */}
@@ -186,13 +186,12 @@ export default function SignUpPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Username Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="userName" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="userName">
                 Username
               </Label>
               <Input
                 id="userName"
                 type="text"
-                className="h-9 text-sm rounded-2xl"
                 {...register('userName')}
               />
               {errors.userName && (
@@ -202,13 +201,12 @@ export default function SignUpPage() {
 
             {/* Email Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email">
                 Email Address
               </Label>
               <Input
                 id="email"
                 type="email"
-                className="h-9 text-sm rounded-2xl"
                 {...register('email')}
               />
               {errors.email && (
@@ -218,14 +216,14 @@ export default function SignUpPage() {
 
             {/* Password Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="password">
                 Password
               </Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  className="h-9 pr-10 text-sm rounded-2xl"
+                  className="pr-10"
                   {...register('password')}
                 />
                 <button
@@ -247,14 +245,14 @@ export default function SignUpPage() {
 
             {/* Confirm Password Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="confirmPassword">
                 Confirm Password
               </Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  className="h-9 pr-10 text-sm rounded-2xl"
+                  className="pr-10"
                   {...register('confirmPassword')}
                 />
                 <button
@@ -277,7 +275,9 @@ export default function SignUpPage() {
             {/* Sign Up Button */}
             <Button
               type="submit"
-              className="w-full h-9 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/30 transition-all rounded-2xl"
+              variant="gradient"
+              size="sm"
+              className="w-full"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -297,7 +297,7 @@ export default function SignUpPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full h-9 border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-sm transition-all rounded-2xl"
+              className="w-full h-8 border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-sm transition-all rounded-2xl"
               onClick={() => navigate('/login')}
             >
               Log in

@@ -29,7 +29,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null)
       authService.clearTokens()
     }
-    console.log('User data fetched:', user)
   }
 
   // Initialize auth state on mount

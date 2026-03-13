@@ -103,6 +103,11 @@ export const changePasswordSchema = z.object({
   path: ["confirmPassword"],
 })
 
+export const disableMfaSchema = z.object({
+  username: z.string().min(1, 'Username is required'),
+  backupCode: z.string().min(1, 'Backup code is required'),
+})
+
 export type SignInFormData = z.infer<typeof signInSchema>
 export type SignUpFormData = z.infer<typeof signUpSchema>
 export type TotpFormData = z.infer<typeof totpSchema>
@@ -110,3 +115,4 @@ export type ConfirmSignUpFormData = z.infer<typeof confirmSignUpSchema>
 export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>
+export type DisableMfaFormData = z.infer<typeof disableMfaSchema>

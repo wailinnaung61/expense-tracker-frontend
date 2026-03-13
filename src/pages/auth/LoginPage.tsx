@@ -122,7 +122,7 @@ export default function LoginPage() {
 
           {/* Logo */}
           <div className="flex justify-center mb-1">
-            <div className="w-15 h-15 rounded-full bg-linear-to-br from-blue-300 to-indigo-400 shadow-lg"></div>
+            <div className="w-15 h-15 rounded-full bg-linear-to-br from-blue-500 to-blue-600 shadow-lg"></div>
           </div>
 
           {/* Heading */}
@@ -238,7 +238,9 @@ export default function LoginPage() {
             {/* Login Button */}
             <Button
               type="submit"
-              className="w-full h-9 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/30 transition-all rounded-2xl"
+              variant="gradient"
+              size="sm"
+              className="w-full"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -258,7 +260,7 @@ export default function LoginPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full h-9 border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-sm transition-all rounded-2xl"
+              className="w-full h-8 border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-sm transition-all rounded-2xl"
               onClick={() => navigate('/signup')}
             >
               Sign up
