@@ -27,7 +27,7 @@ const defaultConfig = {
   // Color configuration
   colors: {
     // Default primary color (#11B989 - teal/green)
-    defaultPrimaryColor: "teal",
+    defaultPrimaryColor: "blue",
 
     // Available color options
     availableColors: [

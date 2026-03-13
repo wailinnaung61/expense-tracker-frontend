@@ -58,13 +58,14 @@ export default function ForgotPasswordPage() {
           {/* Forgot Password Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email">
+              <Label htmlFor="email" className="!text-gray-900">
                 Email Address
               </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
+                className="!bg-white !text-gray-900 !border-gray-300"
                 {...register('email')}
                 autoFocus
               />

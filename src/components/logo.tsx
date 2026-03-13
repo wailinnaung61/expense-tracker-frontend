@@ -13,7 +13,6 @@ interface LogoProps {
 
 export function Logo({
   className = "",
-  size = "default",
   textSize = "3xl",
   showText = true,
   firstPart = "Expense",
@@ -21,12 +20,6 @@ export function Logo({
   href = "/",
   noLink = false,
 }: LogoProps) {
-  const logoSizes: Record<string, string> = {
-    small: "h-5 w-5",
-    default: "h-8 w-8",
-    large: "h-10 w-10",
-  };
-
   const content = (
     <>
       <div className="w-9 h-9 rounded-full bg-linear-to-br from-blue-500 to-blue-600 shadow-lg"></div>

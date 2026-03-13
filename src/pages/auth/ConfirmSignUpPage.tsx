@@ -80,7 +80,7 @@ export default function ConfirmSignUpPage() {
           {/* Confirmation Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5 mb-4">
-              <Label htmlFor="code">
+              <Label htmlFor="code" className="!text-gray-900">
                 Confirmation Code
               </Label>
               <Input
@@ -89,6 +89,7 @@ export default function ConfirmSignUpPage() {
                 maxLength={6}
                 placeholder="000000"
                 variant="code"
+                className="!bg-white !text-gray-900 !border-gray-300"
                 {...register('code')}
                 autoComplete="off"
                 autoFocus

@@ -186,12 +186,13 @@ export default function SignUpPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Username Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="userName">
+              <Label htmlFor="userName" className="text-gray-900!">
                 Username
               </Label>
               <Input
                 id="userName"
                 type="text"
+                className="bg-white! text-gray-900! border-gray-300!"
                 {...register('userName')}
               />
               {errors.userName && (
@@ -201,12 +202,13 @@ export default function SignUpPage() {
 
             {/* Email Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="email">
+              <Label htmlFor="email" className="text-gray-900!">
                 Email Address
               </Label>
               <Input
                 id="email"
                 type="email"
+                className="bg-white! text-gray-900! border-gray-300!"
                 {...register('email')}
               />
               {errors.email && (
@@ -216,14 +218,14 @@ export default function SignUpPage() {
 
             {/* Password Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="password">
+              <Label htmlFor="password" className="text-gray-900!">
                 Password
               </Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  className="pr-10"
+                  className="pr-10 bg-white! text-gray-900! border-gray-300!"
                   {...register('password')}
                 />
                 <button
@@ -245,14 +247,14 @@ export default function SignUpPage() {
 
             {/* Confirm Password Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword">
+              <Label htmlFor="confirmPassword" className="text-gray-900!">
                 Confirm Password
               </Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  className="pr-10"
+                  className="pr-10 bg-white! text-gray-900! border-gray-300!"
                   {...register('confirmPassword')}
                 />
                 <button

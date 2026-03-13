@@ -20,16 +20,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   // Fetch user data from /api/auth/me
-  const fetchUser = async () => {
-    try {
-      const userData = await authService.getMe()
-      setUser(userData)
-    } catch (error) {
-      console.error('Failed to fetch user:', error)
-      setUser(null)
+const fetchUser = async () => {
+  try {
+    const userData = await authService.getMe()
+    setUser(userData)
+  } catch (error: any) {
+    console.error('Failed to fetch user:', error)
+    setUser(null)
+    if (error?.status === 401 || error?.status === 403) {
       authService.clearTokens()
     }
   }
+}
 
   // Initialize auth state on mount
   useEffect(() => {

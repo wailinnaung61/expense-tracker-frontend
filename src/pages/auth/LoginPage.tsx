@@ -182,13 +182,13 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Email Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-900!">
                 Username or Email Address
               </Label>
               <Input
                 id="email"
                 type="text"
-                className="h-9 text-sm rounded-2xl"
+                className="h-9 text-sm rounded-2xl bg-white! text-gray-900! border-gray-300!"
                 {...register('email')}
               />
             {errors.email && (
@@ -198,14 +198,14 @@ export default function LoginPage() {
 
             {/* Password Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="password" className="text-sm font-medium text-gray-900!">
                 Password
               </Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  className="h-9 pr-10 text-sm rounded-2xl"
+                  className="h-9 pr-10 text-sm rounded-2xl bg-white! text-gray-900! border-gray-300!"
                   {...register('password')}
                 />
                 <button

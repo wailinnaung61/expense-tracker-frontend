@@ -114,7 +114,7 @@ export function NavigationItems({
             {active && !isCollapsed && !mobile && (
               <span
                 className={cn(
-                  "absolute top-0 bottom-0 w-1 bg-accent",
+                  "absolute top-0 bottom-0 w-1 bg-primary",
                   direction === "rtl"
                     ? "right-0 rounded-l-full"
                     : "left-0 rounded-r-full"
@@ -125,7 +125,7 @@ export function NavigationItems({
               className={cn(
                 "h-5 w-5 size-5 shrink-0 opacity-80 group-hover:opacity-100",
                 direction === "rtl" ? "me-3" : "ms-3",
-                active ? "text-sidebar-primary" : "",
+                active ? "text-primary" : "",
                 !active && "group-hover:text-accent-foreground"
               )}
             />
@@ -133,7 +133,7 @@ export function NavigationItems({
               <span
                 className={cn(
                   "truncate",
-                  active ? "text-sidebar-primary" : "",
+                  active ? "text-primary font-semibold" : "",
                   !active && "group-hover:text-accent-foreground"
                 )}
               >

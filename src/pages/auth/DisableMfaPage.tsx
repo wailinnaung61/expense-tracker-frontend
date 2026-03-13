@@ -63,13 +63,14 @@ export default function DisableMfaPage() {
           {/* Disable MFA Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="username">
+              <Label htmlFor="username" className="!text-gray-900">
                 Username
               </Label>
               <Input
                 id="username"
                 type="text"
                 placeholder="Enter your username"
+                className="!bg-white !text-gray-900 !border-gray-300"
                 {...register('username')}
                 autoFocus
               />
@@ -79,7 +80,7 @@ export default function DisableMfaPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="backupCode">
+              <Label htmlFor="backupCode" className="!text-gray-900">
                 Backup Code
               </Label>
               <Input
@@ -87,6 +88,7 @@ export default function DisableMfaPage() {
                 type="text"
                 placeholder="Enter your backup code"
                 variant="mono"
+                className="!bg-white !text-gray-900 !border-gray-300"
                 {...register('backupCode')}
               />
               {errors.backupCode && (

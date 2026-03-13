@@ -12,14 +12,14 @@ import DisableMfaPage from "@/pages/auth/DisableMfaPage"
 
 // Dashboard Pages
 import Home from "@/pages/home"
-import Expenses from "@/pages/expenses"
+import Tranactions from "@/pages/tranactions"
 import Budget from "@/pages/budget"
 import Savings from "@/pages/savings"
 import Accounts from "@/pages/accounts"
 import Reports from "@/pages/reports"
 import Settings from "@/pages/settings"
-import Notifications from "@/pages/notifications"
-import Referrals from "@/pages/referrals"
+import Investments from "@/pages/investments"
+import Categories from "@/pages/categories"
 // Protected Route Component
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import ConfirmSignUpPage from "./pages/auth/ConfirmSignUpPage"
@@ -43,14 +43,14 @@ export default function Router() {
         <Route element={<ProtectedRoute />}>
           <Route element={<Index />}>
             <Route path="/" element={<Home />} />
-            <Route path="/tranaction" element={<Expenses />} />
+            <Route path="/expenseCategory" element={<Categories />} />
             <Route path="/budget" element={<Budget />} />
+            <Route path="/tranaction" element={<Tranactions />} />
             <Route path="/saving" element={<Savings />} />
-            <Route path="/accounts" element={<Accounts />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/referrals" element={<Referrals />} />
+            <Route path="/investment" element={<Investments />} />
+            <Route path="/report" element={<Reports />} />
+            <Route path="/user" element={<Accounts />} />
+            <Route path="/setting" element={<Settings />} />
           </Route>
         </Route>
 

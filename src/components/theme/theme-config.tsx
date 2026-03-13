@@ -21,9 +21,9 @@ import {
   Sun,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-type ThemeValue = "light" | "dark" | "system";
+type ThemeValue = "light" | "dark";
 type LayoutValue = "vertical" | "horizontal";
 type DirectionValue = "ltr" | "rtl";
 type PrimaryColor = "teal" | "pink" | "blue" | "purple" | "red" | "orange" | "cyan" | "rose" | "indigo" | "amber";
@@ -43,44 +43,12 @@ const COLOR_OPTIONS: { key: PrimaryColor; bg: string }[] = [
 
 export function ThemeConfig() {
   const { theme, setTheme } = useTheme();
-  const { layout, setLayout, direction, setDirection, config } = useThemeContext();
+  const { layout, setLayout, direction, setDirection, primaryColor, setPrimaryColor, config } = useThemeContext();
   const [open, setOpen] = useState(false);
-  const [primaryColor, setPrimaryColor] = useState<PrimaryColor>(
-    (config.colors?.defaultPrimaryColor as PrimaryColor) || "teal"
-  );
 
   const handleThemeChange = (value: ThemeValue) => setTheme(value);
   const handleLayoutChange = (value: LayoutValue) => setLayout(value);
   const handleDirectionChange = (value: DirectionValue) => setDirection(value);
-
-  const setColorClass = (color: PrimaryColor) => {
-    const root = document.documentElement;
-    root.classList.remove(...COLOR_OPTIONS.map((c) => `theme-${c.key}`));
-    root.classList.add(`theme-${color}`);
-  };
-
-  const handleColorChange = (color: PrimaryColor) => {
-    setPrimaryColor(color);
-    document.documentElement.style.setProperty("--primary", `var(--${color})`);
-    document.documentElement.style.setProperty("--primary-foreground", `var(--${color}-foreground)`);
-    setColorClass(color);
-  };
-
-  useEffect(() => {
-    const savedColor =
-      (localStorage.getItem("primaryColor") as PrimaryColor) ||
-      (config.colors?.defaultPrimaryColor as PrimaryColor) ||
-      "teal";
-    setPrimaryColor(savedColor);
-    handleColorChange(savedColor);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config.colors?.defaultPrimaryColor]);
-
-  useEffect(() => {
-    localStorage.setItem("primaryColor", primaryColor);
-  }, [primaryColor]);
-
-  const activeBg = COLOR_OPTIONS.find((c) => c.key === primaryColor)?.bg ?? "#11B989";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -88,10 +56,6 @@ export function ThemeConfig() {
         <Button variant="ghost" size="icon" className="text-foreground hover:text-primary relative">
           <Settings className="h-5 w-5" />
           <span className="sr-only">Settings</span>
-          <span
-            className="absolute -top-0.5 -inset-e-0.5 h-1.5 w-1.5 rounded-full"
-            style={{ backgroundColor: activeBg }}
-          />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-90 p-4">
@@ -122,16 +86,22 @@ export function ThemeConfig() {
               {COLOR_OPTIONS.map(({ key, bg }) => (
                 <button
                   key={key}
-                  onClick={() => handleColorChange(key)}
+                  onClick={() => setPrimaryColor(key)}
                   style={{ backgroundColor: bg }}
                   className={cn(
-                    "w-7 h-7 rounded-full border-2 transition-transform hover:scale-110",
+                    "w-8 h-8 rounded-full border-2 transition-all hover:scale-110 relative",
                     primaryColor === key
-                      ? "border-white scale-110 ring-2 ring-offset-1 ring-white/40"
-                      : "border-transparent"
+                      ? "border-foreground scale-110 ring-2 ring-offset-2 ring-foreground/30 shadow-lg"
+                      : "border-muted-foreground/20 hover:border-foreground/40"
                   )}
                   aria-label={`${key} theme color`}
-                />
+                >
+                  {primaryColor === key && (
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="w-2 h-2 rounded-full bg-white shadow-md" />
+                    </span>
+                  )}
+                </button>
               ))}
             </div>
           </div>

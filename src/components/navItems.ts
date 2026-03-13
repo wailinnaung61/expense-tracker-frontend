@@ -1,7 +1,6 @@
 import {
   Home,
   LayoutDashboard,
-  Receipt,
   TrendingUp,
   PiggyBank,
   Wallet,

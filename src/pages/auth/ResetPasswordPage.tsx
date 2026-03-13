@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Confirmation Code Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="code">
+              <Label htmlFor="code" className="text-gray-900!">
                 Confirmation Code
               </Label>
               <Input
@@ -94,6 +94,7 @@ export default function ResetPasswordPage() {
                 maxLength={6}
                 placeholder="000000"
                 variant="code"
+                className="bg-white! text-gray-900! border-gray-300!"
                 {...register('code')}
                 autoComplete="off"
                 autoFocus
@@ -105,7 +106,7 @@ export default function ResetPasswordPage() {
 
             {/* New Password Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="newPassword">
+              <Label htmlFor="newPassword" className="text-gray-900!">
                 New Password
               </Label>
               <div className="relative">
@@ -113,7 +114,7 @@ export default function ResetPasswordPage() {
                   id="newPassword"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter new password"
-                  className="pr-10"
+                  className="pr-10 bg-white! text-gray-900! border-gray-300!"
                   {...register('newPassword')}
                 />
                 <button
@@ -131,7 +132,7 @@ export default function ResetPasswordPage() {
 
             {/* Confirm Password Field */}
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword">
+              <Label htmlFor="confirmPassword" className="text-gray-900!">
                 Confirm Password
               </Label>
               <div className="relative">
@@ -139,7 +140,7 @@ export default function ResetPasswordPage() {
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm new password"
-                  className="pr-10"
+                  className="pr-10 bg-white! text-gray-900! border-gray-300!"
                   {...register('confirmPassword')}
                 />
                 <button
