@@ -4,6 +4,8 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './components/theme/theme-provider'
 import App from './App.tsx'
 import './globals.css'
+// Initialize i18n
+import './i18n/config'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,3 +1,5 @@
+import Swal from 'sweetalert2';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 
 export class ApiError extends Error {
@@ -18,8 +20,11 @@ export const apiClient = {
   async refreshToken(): Promise<void> {
     const refreshToken = localStorage.getItem('refreshToken');
     if (!refreshToken) {
+      console.error('❌ No refresh token available');
       throw new Error('No refresh token available');
     }
+
+    console.log('🔄 Attempting to refresh access token...');
 
     const response = await fetch(`${API_BASE_URL}/api/Auth/refresh`, {
       method: 'POST',
@@ -30,19 +35,36 @@ export const apiClient = {
     });
 
     if (!response.ok) {
-      // Refresh failed, clear tokens and redirect to login
+      console.error('❌ Refresh token failed:', response.status, response.statusText);
+      
+      // Refresh failed, clear tokens and show session expired message
       localStorage.removeItem('accessToken');
       localStorage.removeItem('idToken');
       localStorage.removeItem('refreshToken');
+      
+      // Show session expired alert
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Session Expired',
+        text: 'Your session has expired. Please login again.',
+        confirmButtonText: 'Login',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+      
       window.location.href = '/auth/login';
       throw new Error('Token refresh failed');
     }
 
     const data = await response.json();
     if (data.tokens) {
+      console.log('✅ Access token refreshed successfully');
       localStorage.setItem('accessToken', data.tokens.accessToken);
       localStorage.setItem('idToken', data.tokens.idToken);
       localStorage.setItem('refreshToken', data.tokens.refreshToken);
+    } else {
+      console.error('❌ No tokens in refresh response');
+      throw new Error('No tokens in refresh response');
     }
   },
 
@@ -70,6 +92,7 @@ export const apiClient = {
       '/api/Auth/resend-confirmation',
       '/api/Auth/confirm',
       '/api/Auth/signin',
+      '/api/Auth/signout',
       '/api/Auth/refresh',
       '/api/Auth/forgot-password',
       '/api/Auth/reset-password',
@@ -84,10 +107,14 @@ export const apiClient = {
       !authEndpointsToExclude.includes(endpoint);
 
     if (shouldRefresh) {
+      console.log('⚠️ 401 Unauthorized detected, attempting token refresh for:', endpoint);
+      
       // If already refreshing, wait for it to complete
       if (isRefreshing && refreshPromise) {
+        console.log('⏳ Already refreshing, waiting...');
         await refreshPromise;
         // Retry the original request with the new token
+        console.log('🔁 Retrying request after refresh completed');
         return this.request<T>(endpoint, options);
       }
 
@@ -102,9 +129,11 @@ export const apiClient = {
       try {
         await refreshPromise;
         // Retry the original request with the new token
+        console.log('🔁 Retrying original request with new token');
         return this.request<T>(endpoint, options);
       } catch (error) {
         // Refresh failed, error already handled in refreshToken()
+        console.error('❌ Refresh failed, user will be redirected to login');
         throw error;
       }
     }

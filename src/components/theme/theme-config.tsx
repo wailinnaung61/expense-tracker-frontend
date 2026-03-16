@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -31,7 +32,7 @@ type PrimaryColor = "teal" | "pink" | "blue" | "purple" | "red" | "orange" | "cy
 const COLOR_OPTIONS: { key: PrimaryColor; bg: string }[] = [
   { key: "teal",   bg: "#11B989" },
   { key: "pink",   bg: "#ec4899" },
-  { key: "blue",   bg: "#3b82f6" },
+  { key: "blue",   bg: "#155dfc" },
   { key: "purple", bg: "#a855f7" },
   { key: "red",    bg: "#ef4444" },
   { key: "orange", bg: "#f97316" },
@@ -61,6 +62,9 @@ export function ThemeConfig() {
       <DialogContent className="sm:max-w-90 p-4">
         <DialogHeader>
           <DialogTitle className="text-base">Appearance</DialogTitle>
+          <DialogDescription>
+            Customize the theme, layout, and appearance settings.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="py-4 space-y-6">

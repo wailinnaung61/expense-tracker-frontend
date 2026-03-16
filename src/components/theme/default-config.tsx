@@ -33,7 +33,7 @@ const defaultConfig = {
     availableColors: [
       { name: "slate", value: "#f8fafc", foreground: "#1e293b" },
       { name: "pink", value: "#ec4899", foreground: "#ffffff" },
-      { name: "blue", value: "#3b82f6", foreground: "#ffffff" },
+      { name: "blue", value: "#155dfc", foreground: "#ffffff" },
       { name: "teal", value: "#157942", foreground: "#ffffff" },
       { name: "purple", value: "#980ffa", foreground: "#ffffff" },
       { name: "red", value: "#ef4444", foreground: "#ffffff" },

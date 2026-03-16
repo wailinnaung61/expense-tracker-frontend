@@ -12,8 +12,8 @@ type PrimaryColor = "teal" | "pink" | "blue" | "purple" | "red" | "orange" | "cy
 
 const COLOR_OPTIONS: { key: PrimaryColor; bg: string }[] = [
   { key: "teal",   bg: "#11B989" },
-  { key: "pink",   bg: "#ec4899" },
-  { key: "blue",   bg: "#3b82f6" },
+  { key: "pink",   bg: "#ec4899" }, 
+  { key: "blue",   bg: "#155dfc" },
   { key: "purple", bg: "#a855f7" },
   { key: "red",    bg: "#ef4444" },
   { key: "orange", bg: "#f97316" },
