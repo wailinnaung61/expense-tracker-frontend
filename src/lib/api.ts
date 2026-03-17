@@ -19,41 +19,73 @@ let refreshPromise: Promise<void> | null = null;
 export const apiClient = {
   async refreshToken(): Promise<void> {
     const refreshToken = localStorage.getItem('refreshToken');
-    if (!refreshToken) {
-      console.error('❌ No refresh token available');
-      throw new Error('No refresh token available');
+    const username = localStorage.getItem('username');
+    
+    if (!refreshToken || !username) {
+      console.error('❌ No refresh token or username available - redirecting to login');
+      
+      // Clear all tokens
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('idToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('username');
+      
+      // Redirect directly to login without showing alert
+      window.location.href = '/auth/login';
+      throw new Error('No refresh token or username available');
     }
 
-    console.log('🔄 Attempting to refresh access token...');
+    console.log('🔄 Attempting to refresh access token for user:', username);
 
     const response = await fetch(`${API_BASE_URL}/api/Auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ refreshToken }),
+      body: JSON.stringify({ refreshToken, username }),
     });
 
     if (!response.ok) {
       console.error('❌ Refresh token failed:', response.status, response.statusText);
       
-      // Refresh failed, clear tokens and show session expired message
+      // Get error details from server response
+      let errorMessage = 'Your session has expired. Please login again.';
+      let errorTitle = 'Session Expired';
+      
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+        
+        // Use more specific title based on status code
+        if (response.status === 400) {
+          errorTitle = 'Refresh Token Failed';
+          errorMessage = errorData.message || 'Invalid or expired refresh token. Please login again.';
+        }
+      } catch (e) {
+        // If parsing fails, use default message
+        console.error('Failed to parse error response:', e);
+      }
+      
+      // Refresh failed, clear tokens and show error message
       localStorage.removeItem('accessToken');
       localStorage.removeItem('idToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('username');
       
-      // Show session expired alert
+      // Show error alert with actual message from server
       await Swal.fire({
         icon: 'warning',
-        title: 'Session Expired',
-        text: 'Your session has expired. Please login again.',
+        title: errorTitle,
+        text: errorMessage,
         confirmButtonText: 'Login',
         allowOutsideClick: false,
         allowEscapeKey: false,
       });
       
       window.location.href = '/auth/login';
-      throw new Error('Token refresh failed');
+      throw new Error(`Token refresh failed: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -159,14 +191,23 @@ export const apiClient = {
   return text ? JSON.parse(text) : ({} as T)
 },
 
-  get<T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>) {
+  get<T>(endpoint: string, params?: Record<string, any>) {
     let url = endpoint
     
     if (params) {
       const queryParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          queryParams.append(key, String(value))
+          // Handle nested objects (e.g., pagination)
+          if (typeof value === 'object' && !Array.isArray(value)) {
+            Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+              if (nestedValue !== undefined && nestedValue !== null) {
+                queryParams.append(`${key}.${nestedKey}`, String(nestedValue))
+              }
+            })
+          } else {
+            queryParams.append(key, String(value))
+          }
         }
       })
       const queryString = queryParams.toString()

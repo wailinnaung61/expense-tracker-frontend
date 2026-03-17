@@ -102,7 +102,6 @@ export function ThemeConfig() {
                 >
                   {primaryColor === key && (
                     <span className="absolute inset-0 flex items-center justify-center">
-                      <span className="w-2 h-2 rounded-full bg-white shadow-md" />
                     </span>
                   )}
                 </button>

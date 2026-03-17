@@ -35,4 +35,12 @@ export const categoryService = {
   deleteCategory(id: string) {
     return apiClient.delete(`/api/ExpenseCategory/${id}`);
   },
+
+  //Get categories by type (for dropdowns, etc.)
+  getCategoriesByType(params?: CategoryListParams) {
+    return apiClient.get<ExpenseCategory>(
+      "/api/ExpenseCategory/list",
+      params as Record<string, string | number | boolean | undefined>
+    );
+  },
 };

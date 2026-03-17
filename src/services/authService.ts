@@ -27,6 +27,8 @@ export const authService = {
     // If no MFA required, store tokens immediately
     if (!response.requiresMfa && response.tokens) {
       this.storeTokens(response.tokens)
+      // Store username for refresh token requests
+      localStorage.setItem('username', data.usernameOrEmail)
     }
     console.log('Sign in response:', response);
     return response
@@ -36,6 +38,8 @@ export const authService = {
   async verifyTotp(data: VerifyTotpData): Promise<VerifyTotpResponse> {
     const response = await apiClient.post<VerifyTotpResponse>('/api/Auth/mfa/verify', data)
     this.storeTokens(response.tokens)
+    // Store username for refresh token requests
+    localStorage.setItem('username', data.username)
     return response
   },
 
@@ -57,18 +61,6 @@ export const authService = {
   // Confirm email
   async confirm(username: string, confirmationCode: string): Promise<{ message: string }> {
     return apiClient.post('/api/Auth/confirm', { username, confirmationCode })
-  },
-
-  // Refresh token
-  async refresh(): Promise<LoginResponse> {
-    const refreshToken = localStorage.getItem('refreshToken')
-    const response = await apiClient.post<LoginResponse>('/api/Auth/refresh', {
-      refreshToken,
-    })
-    if (response.tokens) {
-      this.storeTokens(response.tokens)
-    }
-    return response
   },
 
   // Forgot password
@@ -140,6 +132,7 @@ export const authService = {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('idToken')
     localStorage.removeItem('refreshToken')
+    localStorage.removeItem('username')
   },
 
   getAccessToken(): string | null {

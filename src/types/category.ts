@@ -35,8 +35,10 @@ export interface UpdateCategoryRequest {
 export interface CategoryListParams {
   type?: TransactionType | string;
   keyword?: string;
-  pageNumber?: number;
-  pageSize?: number;
+  pagination?: {
+    pageNumber?: number;
+    pageSize?: number;
+  };
 }
 
 export interface PaginatedResponse<T> {

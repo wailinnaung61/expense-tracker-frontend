@@ -9,7 +9,6 @@ interface AuthContextType {
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<LoginResponse>
   logout: () => Promise<void>
-  refreshToken: () => Promise<void>
   fetchUser: () => Promise<void>
 }
 
@@ -24,6 +23,8 @@ const fetchUser = async () => {
   try {
     const userData = await authService.getMe()
     setUser(userData)
+    // Store username for refresh token requests (needed for Google OAuth and page reload)
+    localStorage.setItem('username', userData.userName)
   } catch (error: any) {
     console.error('Failed to fetch user:', error)
     setUser(null)
@@ -63,13 +64,6 @@ const fetchUser = async () => {
     setUser(null)
   }
 
-  const refreshToken = async () => {
-    const response = await authService.refresh()
-    if (!response.requiresMfa && response.tokens) {
-      await fetchUser()
-    }
-  }
-
   return (
     <AuthContext.Provider
       value={{
@@ -78,7 +72,6 @@ const fetchUser = async () => {
         isAuthenticated: !!user,
         login,
         logout,
-        refreshToken,
         fetchUser,
       }}
     >

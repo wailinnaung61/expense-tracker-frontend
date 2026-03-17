@@ -16,7 +16,7 @@ export default function Categories() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | null>(null); 
 
   const pageSize = 10;
 
@@ -24,8 +24,10 @@ export default function Categories() {
     setLoading(true);
     try {
       const params: any = {
-        pageNumber: currentPage,
-        pageSize,
+        pagination: {
+          pageNumber: currentPage,
+          pageSize,
+        },
       };
 
       if (type !== "all") {
@@ -37,24 +39,10 @@ export default function Categories() {
       }
 
       const response = await categoryService.getCategories(params);
-      
-      // Debug: Check for duplicate categoryIds
-      const ids = response.items.map(c => c.categoryId);
-      const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
-      if (duplicates.length > 0) {
-        console.error('⚠️ Duplicate category IDs found:', duplicates);
-        console.error('Full response:', response.items);
-      }
-      
-      // Remove duplicates (keep first occurrence)
-      const uniqueCategories = response.items.filter(
-        (category, index, self) => 
-          index === self.findIndex(c => c.categoryId === category.categoryId)
-      );
-      
-      setCategories(uniqueCategories);
+      setCategories(response.items);
       setTotalPages(response.totalPages);
     } catch (error: any) {
+      console.error("Error fetching categories:", error);
       Swal.fire({
         icon: "error",
         title: "Error",

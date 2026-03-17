@@ -98,15 +98,16 @@ export function CategoriesTable({
   }
 
   return (
+   <div className="p-4 border rounded-lg shadow-sm">
     <div className="space-y-4">
       <div className="border rounded-lg overflow-x-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-accent text-accent-foreground">
             <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead className="hidden sm:table-cell">Type</TableHead>
-              <TableHead className="hidden md:table-cell">Status</TableHead>
-              <TableHead className="hidden lg:table-cell">Created</TableHead>
+              <TableHead className="px-4 py-2 font-medium">Category</TableHead>
+              <TableHead className="hidden sm:table-cell px-4 py-2 font-medium">Type</TableHead>
+              <TableHead className="hidden md:table-cell px-4 py-2 font-medium">Status</TableHead>
+              <TableHead className="hidden lg:table-cell px-4 py-2 font-medium">Created</TableHead>
               <TableHead className="w-12.5"></TableHead>
             </TableRow>
           </TableHeader>
@@ -191,17 +192,60 @@ export function CategoriesTable({
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <Button
-                key={i}
-                variant={currentPage === i + 1 ? "default" : "outline"}
-                size="sm"
-                onClick={() => onPageChange(i + 1)}
-                className="px-2 py-2"
-              >
-                {i + 1}
-              </Button>
-            ))}
+            
+            {/* Smart pagination logic */}
+            {(() => {
+              const pages: (number | string)[] = [];
+              const showEllipsisStart = currentPage > 3;
+              const showEllipsisEnd = currentPage < totalPages - 2;
+
+              // Always show first page
+              pages.push(1);
+
+              // Show ellipsis after first page
+              if (showEllipsisStart) {
+                pages.push('...');
+              }
+
+              // Show pages around current page
+              const start = Math.max(2, currentPage - 1);
+              const end = Math.min(totalPages - 1, currentPage + 1);
+              
+              for (let i = start; i <= end; i++) {
+                if (i !== 1 && i !== totalPages) {
+                  pages.push(i);
+                }
+              }
+
+              // Show ellipsis before last page
+              if (showEllipsisEnd) {
+                pages.push('...');
+              }
+
+              // Always show last page (if more than 1 page)
+              if (totalPages > 1) {
+                pages.push(totalPages);
+              }
+
+              return pages.map((page, idx) =>
+                typeof page === 'number' ? (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => onPageChange(page)}
+                    className="px-2 py-2 min-w-8"
+                  >
+                    {page}
+                  </Button>
+                ) : (
+                  <span key={`ellipsis-${idx}`} className="px-2 py-1 text-muted-foreground">
+                    {page}
+                  </span>
+                )
+              );
+            })()}
+
             <Button
               variant="outline"
               size="sm"
@@ -215,5 +259,6 @@ export function CategoriesTable({
         </div>
       )}
     </div>
+  </div>
   );
 }
