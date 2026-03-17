@@ -40,10 +40,10 @@ const getTypeLabel = (type: TransactionType): string => {
 
 const getTypeBadgeClass = (type: TransactionType): string => {
   const classes: Record<number, string> = {
-    0: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-    1: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    2: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-    3: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+    0: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    1: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+    2: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+    3: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
   };
   return classes[type] || "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400";
 };

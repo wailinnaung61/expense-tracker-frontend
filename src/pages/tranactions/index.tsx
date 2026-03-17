@@ -1,8 +1,8 @@
 import ClientTransactionStats from "@/components/tranactions/client-transaction-stats"
 import { ExpensesHeader } from "@/components/tranactions/tranactions-header"
-import { TransactionFilters } from "@/components/tranactions/transaction-filters"
-import TransactionsTable from "@/components/tranactions/transactions"
-import type { Transaction } from "@/types/transaction"
+import { TransactionFilters } from "@/components/tranactions/tranaction-filters"
+import TransactionsTable from "@/components/tranactions/tranactions"
+import type { Transaction, TransactionListParams } from "@/types/transaction"
 import type { ExpenseCategory } from "@/types/category"
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
@@ -10,8 +10,10 @@ import spinnerGif from "@/assets/Spinner.gif";
 import { transactionService } from "@/services/tranactionService"
 import { categoryService } from "@/services/categoryService"
 import { AddTransactionDialog } from "@/components/tranactions/add-transaction-dialog"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function Tranactions() {
+  const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,6 +27,7 @@ export default function Tranactions() {
   const [totalPages, setTotalPages] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [statsRefreshKey, setStatsRefreshKey] = useState(0);
 
   const pageSize = 10;
   
@@ -38,8 +41,8 @@ export default function Tranactions() {
           },
         });
         setCategories(response.items);
-      } catch (error: any) {
-        console.error("Error fetching categories:", error);
+      } catch (error) {
+        // Silent fail - categories will be empty array
       }
     };
     fetchCategories();
@@ -48,7 +51,7 @@ export default function Tranactions() {
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const params: any = {
+      const params: TransactionListParams = {
         pagination: {
           pageNumber: currentPage,
           pageSize,
@@ -76,13 +79,13 @@ export default function Tranactions() {
       setTransactions(response.items);
       setTotalPages(response.totalPages);
       
-    } catch (error: any) {
-      console.error("Error fetching transactions:", error);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to fetch transactions";
       Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: error.message || "Failed to fetch transactions",
-            });
+        icon: "error",
+        title: "Error",
+        text: message,
+      });
     } finally {
       setLoading(false);
     }
@@ -138,6 +141,18 @@ export default function Tranactions() {
 
   const handleDialogSuccess = () => {
     fetchTransactions();
+    // Small delay to ensure backend has processed the aggregation
+    setTimeout(() => {
+      setStatsRefreshKey(prev => prev + 1);
+    }, 500);
+  };
+
+  const handleDeleteSuccess = () => {
+    fetchTransactions();
+    // Small delay to ensure backend has processed the aggregation
+    setTimeout(() => {
+      setStatsRefreshKey(prev => prev + 1);
+    }, 500);
   };
 
   return (
@@ -172,12 +187,13 @@ export default function Tranactions() {
               currentPage={currentPage}
               onPageChange={handlePageChange}
               onEdit={handleEditClick}
-              onDelete={fetchTransactions}
+              onDelete={handleDeleteSuccess}
+              currency={user?.currency || "USD"}
             />
           )}
         </div>
         <div className="col-span-12 xl:col-span-4 xl:order-1 sticky top-12">
-          <ClientTransactionStats />
+          <ClientTransactionStats refreshKey={statsRefreshKey} />
         </div>
       </div>
 

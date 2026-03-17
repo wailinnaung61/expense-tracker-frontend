@@ -30,7 +30,6 @@ export const authService = {
       // Store username for refresh token requests
       localStorage.setItem('username', data.usernameOrEmail)
     }
-    console.log('Sign in response:', response);
     return response
   },
 

@@ -107,12 +107,12 @@ export function AddTransactionDialog({
         const response = await categoryService.getCategories({
           pagination: {
             pageNumber: 1,
-            pageSize: 100,
+            pageSize: 999999999, // Fetch all categories for the dropdown
           },
         });
        setCategories(response.items || []);
       } catch (error) {
-        console.error("Failed to fetch categories", error);
+        // Silent fail - categories will be  empty array
       }
     };
 
@@ -233,8 +233,8 @@ export function AddTransactionDialog({
       // Upload file to S3 if a new file is selected
       if (selectedFile) {
         try {
-          const userId = localStorage.getItem('userId');
-          const uploadResult = await s3Service.uploadReceipt(selectedFile, userId || undefined);
+          const username = localStorage.getItem('username');
+          const uploadResult = await s3Service.uploadReceipt(selectedFile, username || undefined);
           uploadedImageUrl = uploadResult.url;
         } catch (uploadError: any) {
           setUploading(false);
@@ -253,9 +253,9 @@ export function AddTransactionDialog({
         amount: Number(data.amount),
         tranactionDate: data.tranactionDate.toISOString(),
         status: Number(data.status) as PaymentStatus,
-        description: data.description?.trim() || undefined,
-        note: data.note?.trim() || undefined,
-        imageUrl: uploadedImageUrl?.trim() || undefined,
+        description: data.description?.trim() || "",
+        note: data.note?.trim() || "",
+        imageUrl: uploadedImageUrl?.trim() || "",
       };
 
       if (transaction) {

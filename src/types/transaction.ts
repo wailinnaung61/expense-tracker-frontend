@@ -35,7 +35,7 @@ export interface CreateTransactionRequest {
     type: TransactionType;
     categoryId: string;
     amount: number;
-    tranactionDate: string; // Note: Backend typo
+    tranactionDate: string;
     status: PaymentStatus;
     description?: string;
     merchant?: string;

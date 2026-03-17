@@ -1,5 +1,11 @@
-import TransactionStats from "./transaction-stats";
+import TransactionStats from "./tranaction-stats";
+import { useAuth } from "@/contexts/AuthContext";
 
-export default function ClientTransactionStats() {
-  return <TransactionStats />;
+interface ClientTransactionStatsProps {
+  refreshKey?: number;
+}
+
+export default function ClientTransactionStats({ refreshKey }: ClientTransactionStatsProps) {
+  const { user } = useAuth();
+  return <TransactionStats currency={user?.currency || "USD"} refreshKey={refreshKey} />;
 }

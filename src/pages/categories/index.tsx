@@ -41,12 +41,12 @@ export default function Categories() {
       const response = await categoryService.getCategories(params);
       setCategories(response.items);
       setTotalPages(response.totalPages);
-    } catch (error: any) {
-      console.error("Error fetching categories:", error);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to fetch categories";
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error.message || "Failed to fetch categories",
+        text: message,
       });
     } finally {
       setLoading(false);

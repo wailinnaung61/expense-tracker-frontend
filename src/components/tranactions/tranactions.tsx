@@ -20,6 +20,7 @@ import { TransactionType, PaymentStatus } from "@/types/transaction";
 import { format } from "date-fns";
 import Swal from "sweetalert2";
 import { transactionService } from "@/services/tranactionService";
+import { formatCurrency } from "@/lib/utils";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -29,6 +30,7 @@ interface TransactionsTableProps {
   onPageChange: (page: number) => void;
   onEdit: (transaction: Transaction) => void;
   onDelete: () => void;
+  currency?: string;
 }
 
 export default function TransactionsTable({
@@ -39,6 +41,7 @@ export default function TransactionsTable({
   onPageChange,
   onEdit,
   onDelete,
+  currency = "USD",
 }: TransactionsTableProps) {
 
   const getCategoryById = (categoryId: string) => {
@@ -46,10 +49,7 @@ export default function TransactionsTable({
   };
 
   const formatAmount = (amount: number, type: number) => {
-    const formattedAmount = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
+    const formattedAmount = formatCurrency(amount, currency);
 
     return type === TransactionType.Income
       ? `+${formattedAmount}`
@@ -85,12 +85,13 @@ export default function TransactionsTable({
   const handleDelete = async (transactionId: string) => {
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      text: "Do you want to delete this transaction? This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
       confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
     });
 
     if (result.isConfirmed) {
@@ -150,14 +151,14 @@ export default function TransactionsTable({
         <Table className="w-full table-auto text-sm text-left">
           <TableHeader className="bg-accent text-accent-foreground">
             <TableRow>
-              <TableHead className="px-4 py-2 font-medium">
-                Description
-              </TableHead>
               <TableHead className="px-4 py-2 font-medium">Category</TableHead>
               <TableHead className="px-4 py-2 font-medium">Type</TableHead>
               <TableHead className="px-4 py-2 font-medium">Date</TableHead>
               <TableHead className="px-4 py-2 font-medium">Amount</TableHead>
               <TableHead className="px-4 py-2 font-medium">Status</TableHead>
+              <TableHead className="px-4 py-2 font-medium">
+                Description
+              </TableHead>
               <TableHead className="px-4 py-2 font-medium">Note</TableHead>
               <TableHead className="px-4 py-2 font-medium text-right">
                 Action
@@ -176,9 +177,6 @@ export default function TransactionsTable({
                 const category = getCategoryById(transaction.categoryId);
                 return (
                   <TableRow key={transaction.tranactionId}>
-                    <TableCell className="px-4 py-3">
-                      {transaction.description || "No description"}
-                    </TableCell>
                     <TableCell className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         {category && (
@@ -219,6 +217,9 @@ export default function TransactionsTable({
                       <span className={`px-2 py-1 rounded-full text-xs ${getStatusStyle(transaction.status)}`}>
                         {getStatusLabel(transaction.status)}
                       </span>
+                    </TableCell>
+                    <TableCell className="px-4 py-3 max-w-xs truncate">
+                      {transaction.description || "No description"}
                     </TableCell>
                     <TableCell className="px-4 py-3 max-w-xs truncate">
                       {transaction.note || "-"}

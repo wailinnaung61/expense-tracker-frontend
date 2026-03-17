@@ -21,15 +21,15 @@ export const s3Service = {
   /**
    * Upload a receipt image to S3
    * @param file - The file to upload
-   * @param userId - User ID for organizing files
+   * @param username - Username for organizing files
    * @returns Promise with the uploaded file URL and key
    */
-  async uploadReceipt(file: File, userId?: string): Promise<UploadResult> {
+  async uploadReceipt(file: File, username?: string): Promise<UploadResult> {
     // Generate unique filename
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
     const fileExtension = file.name.split('.').pop();
-    const folder = userId ? `receipts/${userId}` : 'receipts/anonymous';
+    const folder = username ? `receipts/${username}` : 'receipts/anonymous';
     const key = `${folder}/${timestamp}-${randomString}.${fileExtension}`;
 
     // Validate file type
@@ -45,14 +45,15 @@ export const s3Service = {
     }
 
     try {
+      // Convert File to ArrayBuffer for browser compatibility
+      const arrayBuffer = await file.arrayBuffer();
+      
       // Upload to S3
       const command = new PutObjectCommand({
         Bucket: BUCKET_NAME,
         Key: key,
-        Body: file,
+        Body: new Uint8Array(arrayBuffer),
         ContentType: file.type,
-        // Make the file publicly readable (or use signed URLs for private access)
-        ACL: 'public-read',
       });
 
       await s3Client.send(command);

@@ -89,13 +89,16 @@ export const apiClient = {
     }
 
     const data = await response.json();
-    if (data.tokens) {
+    
+    const tokens = data.tokens || data;
+    
+    if (tokens.accessToken && tokens.idToken && tokens.refreshToken) {
       console.log('✅ Access token refreshed successfully');
-      localStorage.setItem('accessToken', data.tokens.accessToken);
-      localStorage.setItem('idToken', data.tokens.idToken);
-      localStorage.setItem('refreshToken', data.tokens.refreshToken);
+      localStorage.setItem('accessToken', tokens.accessToken);
+      localStorage.setItem('idToken', tokens.idToken);
+      localStorage.setItem('refreshToken', tokens.refreshToken);
     } else {
-      console.error('❌ No tokens in refresh response');
+      console.error('❌ No tokens in refresh response', data);
       throw new Error('No tokens in refresh response');
     }
   },
