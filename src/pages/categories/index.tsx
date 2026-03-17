@@ -3,8 +3,8 @@ import { CategoriesHeader } from "@/components/categories/categories-header";
 import { CategoriesTable } from "@/components/categories/categories";
 import { CategoryFilters } from "@/components/categories/category-filters";
 import { categoryService } from "@/services/categoryService";
-import type { ExpenseCategory } from "@/types/category";
-import { useEffect, useState } from "react";
+import type { ExpenseCategory, CategoryListParams } from "@/types/category";
+import { useEffect, useState, useCallback } from "react";
 import Swal from "sweetalert2";
 import spinnerGif from "@/assets/Spinner.gif";
 
@@ -20,10 +20,10 @@ export default function Categories() {
 
   const pageSize = 10;
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const params: any = {
+      const params: CategoryListParams = {
         pagination: {
           pageNumber: currentPage,
           pageSize,
@@ -51,39 +51,39 @@ export default function Categories() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, type, keyword]);
 
   useEffect(() => {
     fetchCategories();
-  }, [currentPage, type, keyword]);
+  }, [fetchCategories]);
 
-  const handleTypeChange = (newType: string) => {
+  const handleTypeChange = useCallback((newType: string) => {
     setType(newType);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleKeywordChange = (newKeyword: string) => {
+  const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  const handleAddClick = () => {
+  const handleAddClick = useCallback(() => {
     setSelectedCategory(null);
     setDialogOpen(true);
-  };
+  }, []);
 
-  const handleEditClick = (category: ExpenseCategory) => {
+  const handleEditClick = useCallback((category: ExpenseCategory) => {
     setSelectedCategory(category);
     setDialogOpen(true);
-  };
+  }, []);
 
-  const handleDialogSuccess = () => {
+  const handleDialogSuccess = useCallback(() => {
     fetchCategories();
-  };
+  }, [fetchCategories]);
 
   return (
     <div className="space-y-6">

@@ -144,36 +144,37 @@ export default function TransactionsTable({
     }
   };
 
+  if (transactions.length === 0) {
+    return (
+      <div className="border rounded-lg p-8 text-center">
+        <p className="text-muted-foreground">No transactions found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 border rounded-lg shadow-sm">
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <Table className="w-full table-auto text-sm text-left">
-          <TableHeader className="bg-accent text-accent-foreground">
-            <TableRow>
-              <TableHead className="px-4 py-2 font-medium">Category</TableHead>
-              <TableHead className="px-4 py-2 font-medium">Type</TableHead>
-              <TableHead className="px-4 py-2 font-medium">Date</TableHead>
-              <TableHead className="px-4 py-2 font-medium">Amount</TableHead>
-              <TableHead className="px-4 py-2 font-medium">Status</TableHead>
-              <TableHead className="px-4 py-2 font-medium">
-                Description
-              </TableHead>
-              <TableHead className="px-4 py-2 font-medium">Note</TableHead>
-              <TableHead className="px-4 py-2 font-medium text-right">
-                Action
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions.length === 0 ? (
+      <div className="space-y-4">
+        <div className="border rounded-lg overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-accent text-accent-foreground">
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                  No transactions found
-                </TableCell>
+                <TableHead className="px-4 py-2 font-medium">Category</TableHead>
+                <TableHead className="px-4 py-2 font-medium">Type</TableHead>
+                <TableHead className="px-4 py-2 font-medium">Date</TableHead>
+                <TableHead className="px-4 py-2 font-medium">Amount</TableHead>
+                <TableHead className="px-4 py-2 font-medium">Status</TableHead>
+                <TableHead className="px-4 py-2 font-medium">
+                  Description
+                </TableHead>
+                <TableHead className="px-4 py-2 font-medium">Note</TableHead>
+                <TableHead className="px-4 py-2 font-medium text-right">
+                  Action
+                </TableHead>
               </TableRow>
-            ) : (
-              transactions.map((transaction) => {
+            </TableHeader>
+            <TableBody>
+              {transactions.map((transaction) => {
                 const category = getCategoryById(transaction.categoryId);
                 return (
                   <TableRow key={transaction.tranactionId}>
@@ -264,18 +265,17 @@ export default function TransactionsTable({
                     </TableCell>
                   </TableRow>
                 );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              })}
+            </TableBody>
+          </Table>
+        </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex flex-wrap justify-between items-center mt-4">
-          <span className="text-sm text-muted-foreground mb-1 md:mb-0">
-            Page {currentPage} of {totalPages}
-          </span>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex flex-wrap justify-between items-center">
+            <span className="text-sm text-muted-foreground mb-1 md:mb-0">
+              Page {currentPage} of {totalPages}
+            </span>
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -284,38 +284,62 @@ export default function TransactionsTable({
               onClick={() => onPageChange(currentPage - 1)}
               className="px-1 py-2 rtl:rotate-180"
             >
-              <ChevronLeft />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .filter((page) => {
-                // Show first page, last page, current page, and pages around current
-                return (
-                  page === 1 ||
-                  page === totalPages ||
-                  Math.abs(page - currentPage) <= 1
-                );
-              })
-              .map((page, index, array) => {
-                // Add ellipsis if there's a gap
-                const prevPage = array[index - 1];
-                const showEllipsis = prevPage && page - prevPage > 1;
-                
-                return (
-                  <div key={page} className="flex gap-2">
-                    {showEllipsis && (
-                      <span className="px-2 py-2 text-muted-foreground">...</span>
-                    )}
-                    <Button
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => onPageChange(page)}
-                      className="px-3 py-2"
-                    >
-                      {page}
-                    </Button>
-                  </div>
-                );
-              })}
+            
+            {/* Smart pagination logic */}
+            {(() => {
+              const pages: (number | string)[] = [];
+              const showEllipsisStart = currentPage > 3;
+              const showEllipsisEnd = currentPage < totalPages - 2;
+
+              // Always show first page
+              pages.push(1);
+
+              // Show ellipsis after first page
+              if (showEllipsisStart) {
+                pages.push('...');
+              }
+
+              // Show pages around current page
+              const start = Math.max(2, currentPage - 1);
+              const end = Math.min(totalPages - 1, currentPage + 1);
+              
+              for (let i = start; i <= end; i++) {
+                if (i !== 1 && i !== totalPages) {
+                  pages.push(i);
+                }
+              }
+
+              // Show ellipsis before last page
+              if (showEllipsisEnd) {
+                pages.push('...');
+              }
+
+              // Always show last page (if more than 1 page)
+              if (totalPages > 1) {
+                pages.push(totalPages);
+              }
+
+              return pages.map((page, idx) =>
+                typeof page === 'number' ? (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => onPageChange(page)}
+                    className="px-2 py-2 min-w-8"
+                  >
+                    {page}
+                  </Button>
+                ) : (
+                  <span key={`ellipsis-${idx}`} className="px-2 py-1 text-muted-foreground">
+                    {page}
+                  </span>
+                )
+              );
+            })()}
+
             <Button
               variant="outline"
               size="sm"
@@ -323,11 +347,12 @@ export default function TransactionsTable({
               onClick={() => onPageChange(currentPage + 1)}
               className="px-1 py-2 rtl:rotate-180"
             >
-              <ChevronRight />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
       )}
     </div>
+  </div>
   );
 }

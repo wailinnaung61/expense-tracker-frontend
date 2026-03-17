@@ -4,13 +4,14 @@ import { TransactionFilters } from "@/components/tranactions/tranaction-filters"
 import TransactionsTable from "@/components/tranactions/tranactions"
 import type { Transaction, TransactionListParams } from "@/types/transaction"
 import type { ExpenseCategory } from "@/types/category"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Swal from "sweetalert2";
 import spinnerGif from "@/assets/Spinner.gif";
 import { transactionService } from "@/services/tranactionService"
 import { categoryService } from "@/services/categoryService"
 import { AddTransactionDialog } from "@/components/tranactions/add-transaction-dialog"
 import { useAuth } from "@/contexts/AuthContext"
+import { format, startOfMonth, endOfMonth } from "date-fns";
 
 export default function Tranactions() {
   const { user } = useAuth();
@@ -21,8 +22,18 @@ export default function Tranactions() {
   const [status, setStatus] = useState<string>("all");
   const [categoryId, setCategoryId] = useState<string>("all");
   const [keyword, setKeyword] = useState<string>("");
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  
+  // Memoize current month range
+  const currentMonthRange = useMemo(() => {
+    const now = new Date();
+    return {
+      start: format(startOfMonth(now), "yyyy-MM-dd"),
+      end: format(endOfMonth(now), "yyyy-MM-dd"),
+    };
+  }, []);
+  
+  const [startDate, setStartDate] = useState<string>(currentMonthRange.start);
+  const [endDate, setEndDate] = useState<string>(currentMonthRange.end);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -48,7 +59,7 @@ export default function Tranactions() {
     fetchCategories();
   }, []);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     setLoading(true);
     try {
       const params: TransactionListParams = {
@@ -89,71 +100,69 @@ export default function Tranactions() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, type, status, categoryId, keyword, startDate, endDate]);
 
   useEffect(() => {
     fetchTransactions();
-  }, [currentPage, type, status, categoryId, keyword, startDate, endDate]);
+  }, [fetchTransactions]);
 
-    const handleTypeChange = (newType: string) => {
+  const handleTypeChange = useCallback((newType: string) => {
     setType(newType);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleStatusChange = (newStatus: string) => {
+  const handleStatusChange = useCallback((newStatus: string) => {
     setStatus(newStatus);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleCategoryChange = (newCategoryId: string) => {
+  const handleCategoryChange = useCallback((newCategoryId: string) => {
     setCategoryId(newCategoryId);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleKeywordChange = (newKeyword: string) => {
+  const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleStartDateChange = (newStartDate: string) => {
+  const handleStartDateChange = useCallback((newStartDate: string) => {
     setStartDate(newStartDate);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleEndDateChange = (newEndDate: string) => {
+  const handleEndDateChange = useCallback((newEndDate: string) => {
     setEndDate(newEndDate);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  const handleAddClick = () => {
+  const handleAddClick = useCallback(() => {
     setSelectedTransaction(null);
     setDialogOpen(true);
-  };
+  }, []);
   
-  const handleEditClick = (transaction: Transaction) => {
+  const handleEditClick = useCallback((transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setDialogOpen(true);
-  };
+  }, []);
 
-  const handleDialogSuccess = () => {
-    fetchTransactions();
-    // Small delay to ensure backend has processed the aggregation
-    setTimeout(() => {
-      setStatsRefreshKey(prev => prev + 1);
-    }, 500);
-  };
+  const handleDialogSuccess = useCallback(() => {
+    setCurrentPage(1); // Reset to first page
+    // Clear date filters to ensure new transaction is visible
+    setStartDate("");
+    setEndDate("");
+    // fetchTransactions will be called automatically by useEffect when state changes
+    setStatsRefreshKey(prev => prev + 1);
+  }, []);
 
-  const handleDeleteSuccess = () => {
+  const handleDeleteSuccess = useCallback(() => {
     fetchTransactions();
-    // Small delay to ensure backend has processed the aggregation
-    setTimeout(() => {
-      setStatsRefreshKey(prev => prev + 1);
-    }, 500);
-  };
+    setStatsRefreshKey(prev => prev + 1);
+  }, [fetchTransactions]);
 
   return (
     <div className="space-y-6">

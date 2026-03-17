@@ -10,10 +10,11 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { aggregationService } from "@/services/aggregationService";
 import type { ExpenseBreakdown } from "@/types/aggregation";
 import { formatCurrency } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, addMonths, subMonths } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
+import { Loader2 } from "lucide-react";
 
 interface TransactionStatsProps {
   currency?: string;
@@ -39,55 +40,116 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   const [data, setData] = useState<ExpenseBreakdown | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  const fetchExpenseBreakdown = async (date: Date) => {
-    setLoading(true);
+  const fetchExpenseBreakdown = useCallback(async (date: Date, isRetry = false) => {
+    if (!isRetry) {
+      setLoading(true);
+      setRetryCount(0);
+    }
     setError(null);
     try {
       const monthStr = format(date, "yyyy-MM");
       const breakdown = await aggregationService.getExpenseBreakdown(monthStr);
       setData(breakdown);
+      setRetryCount(0);
     } catch (err: any) {
       console.error("Failed to fetch expense breakdown:", err);
       setError(err.message || "Failed to load data");
       setData(null);
     } finally {
-      setLoading(false);
+      if (!isRetry) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
 
+  // Initial fetch when month changes
   useEffect(() => {
     fetchExpenseBreakdown(currentMonth);
-  }, [currentMonth, refreshKey]);
+  }, [currentMonth, fetchExpenseBreakdown]);
 
-  const handlePreviousMonth = () => {
-    setCurrentMonth(subMonths(currentMonth, 1));
-  };
+  // Smart retry for lambda eventual consistency when refreshKey changes
+  // Real-world pattern: AWS Lambda aggregations are eventually consistent
+  // - Try immediately (might be cached or fast execution)
+  // - Retry after 1s (lambda cold start or processing time)
+  // - Final retry after 3s total (ensure we get updated data)
+  useEffect(() => {
+    if (refreshKey === 0) return; // Skip on initial mount
 
-  const handleNextMonth = () => {
-    setCurrentMonth(addMonths(currentMonth, 1));
-  };
+    let timer1: number;
+    let timer2: number;
+    
+    const delayedRefresh = async () => {
+      // Show syncing indicator for entire retry period
+      setRetryCount(1);
+      
+      // First immediate attempt
+      await fetchExpenseBreakdown(currentMonth, true);
+      
+      // Retry after 1 second (lambda might still be processing)
+      timer1 = setTimeout(async () => {
+        await fetchExpenseBreakdown(currentMonth, true);
+        
+        // Final retry after 2 more seconds if needed
+        timer2 = setTimeout(async () => {
+          await fetchExpenseBreakdown(currentMonth, true);
+          setRetryCount(0); // Done with all retries
+        }, 2000);
+      }, 1000);
+    };
 
-  const handleCurrentMonth = () => {
+    delayedRefresh();
+
+    return () => {
+      if (timer1) clearTimeout(timer1);
+      if (timer2) clearTimeout(timer2);
+      setRetryCount(0);
+    };
+  }, [refreshKey, currentMonth, fetchExpenseBreakdown]);
+
+  const handlePreviousMonth = useCallback(() => {
+    setCurrentMonth(prev => subMonths(prev, 1));
+  }, []);
+
+  const handleNextMonth = useCallback(() => {
+    setCurrentMonth(prev => addMonths(prev, 1));
+  }, []);
+
+  const handleCurrentMonth = useCallback(() => {
     setCurrentMonth(new Date());
-  };
+  }, []);
 
-  const isCurrentMonth = format(currentMonth, "yyyy-MM") === format(new Date(), "yyyy-MM");
+  const isCurrentMonth = useMemo(() => 
+    format(currentMonth, "yyyy-MM") === format(new Date(), "yyyy-MM"),
+    [currentMonth]
+  );
 
   // Transform data for pie chart with colors
-  const chartData = data?.categories.map((cat, index) => ({
-    name: cat.categoryName,
-    value: cat.amount,
-    color: COLORS[index % COLORS.length],
-    percentage: cat.percentage,
-  })) || [];
+  const chartData = useMemo(() => 
+    data?.categories.map((cat, index) => ({
+      name: cat.categoryName,
+      value: cat.amount,
+      color: COLORS[index % COLORS.length],
+      percentage: cat.percentage,
+    })) || [],
+    [data]
+  );
 
   return (
     <Card className="sticky top-12">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Expense Breakdown</CardTitle>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <CardTitle>Expense Breakdown</CardTitle>
+              {retryCount > 0 && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Syncing...</span>
+                </div>
+              )}
+            </div>
             <CardDescription>
               {format(currentMonth, "MMMM yyyy")} spending by category
             </CardDescription>
@@ -160,7 +222,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="text-3xl font-bold">
+                <div className="text-2xl font-bold">
                   {formatCurrency(data.totalExpenses, currency)}
                 </div>
                 <div className="text-xs text-muted-foreground">Total Expenses</div>
