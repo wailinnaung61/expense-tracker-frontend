@@ -8,9 +8,10 @@ import defaultConfig from "./default-config";
 
 // Define allowed direction type
 type Direction = "ltr" | "rtl";
-type PrimaryColor = "teal" | "pink" | "blue" | "purple" | "red" | "orange" | "cyan" | "rose" | "indigo" | "amber";
+type PrimaryColor = "sky" | "teal" | "pink" | "blue" | "purple" | "red" | "orange" | "cyan" | "rose" | "indigo" | "amber";
 
 const COLOR_OPTIONS: { key: PrimaryColor; bg: string }[] = [
+  { key: "sky",    bg: "#0284c7" },
   { key: "teal",   bg: "#11B989" },
   { key: "pink",   bg: "#ec4899" }, 
   { key: "blue",   bg: "#155dfc" },
@@ -40,7 +41,7 @@ const ThemeContext = createContext<ThemeContextType>({
   setLayout: () => {},
   direction: defaultConfig.defaultDirection as Direction,
   setDirection: () => {},
-  primaryColor: (defaultConfig.colors?.defaultPrimaryColor as PrimaryColor) || "teal",
+  primaryColor: (defaultConfig.colors?.defaultPrimaryColor as PrimaryColor) || "sky",
   setPrimaryColor: () => {},
   config: defaultConfig,
 });
@@ -70,7 +71,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     defaultConfig.defaultDirection as Direction
   );
   const [primaryColor, setPrimaryColorState] = useState<PrimaryColor>(
-    (defaultConfig.colors?.defaultPrimaryColor as PrimaryColor) || "teal"
+    (defaultConfig.colors?.defaultPrimaryColor as PrimaryColor) || "sky"
   );
   const [mounted, setMounted] = useState(false);
 
@@ -109,7 +110,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         applyColorTheme(savedColor);
       } else {
         // Apply default color on first load
-        const defaultColor = (defaultConfig.colors?.defaultPrimaryColor as PrimaryColor) || "teal";
+        const defaultColor = (defaultConfig.colors?.defaultPrimaryColor as PrimaryColor) || "sky";
         applyColorTheme(defaultColor);
       }
     } catch (error) {

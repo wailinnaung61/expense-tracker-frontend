@@ -47,7 +47,7 @@ export function DesktopSidebar({
         >
           {isCollapsed
             ? <Logo showText={false} />
-            : <Logo size="small" textSize="lg" />}
+            : <Logo textSize="lg" />}
         </div>
 
         {/* Scrollable Nav Area */}

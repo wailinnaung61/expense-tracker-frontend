@@ -4,9 +4,9 @@ import { useAuth } from "@/contexts/AuthContext"
 export default function AuthLayout() {
   const { isAuthenticated } = useAuth()
 
-  // If already logged in, redirect to home
+  // If already logged in, redirect to dashboard
   if (isAuthenticated) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/dashboard" replace />
   }
 
   return (

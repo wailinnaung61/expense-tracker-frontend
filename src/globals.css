@@ -11,7 +11,10 @@
 
 @layer utilities {
   .auth-bg {
-    background: linear-gradient(to bottom right, #d1fae5, #6ee7b7, #a7f3d0);
+    background: linear-gradient(to bottom right, #bae6fd, #67e8f9, #5eead4);
+  }
+  :root.theme-sky .auth-bg {
+    background: linear-gradient(to bottom right, #bae6fd, #67e8f9, #5eead4);
   }
   :root.theme-teal .auth-bg {
     background: linear-gradient(to bottom right, #d1fae5, #6ee7b7, #a7f3d0);
@@ -42,6 +45,326 @@
   }
   :root.theme-amber .auth-bg {
     background: linear-gradient(to bottom right, #fef3c7, #fcd34d, #fde68a);
+  }
+
+  /* Blob animations for landing page */
+  @keyframes blob {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  /* Floating animation */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Gradient animation */
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  /* Fade In Animations - smooth page load transitions */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInZoom {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Bounce subtle */
+  @keyframes bounce-subtle {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-bounce-subtle {
+    animation: bounce-subtle 2s ease-in-out infinite;
+  }
+
+  /* Shimmer effect */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 3s infinite;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    background-size: 1000px 100%;
+  }
+
+  /* Slide up on scroll */
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-on-scroll {
+    animation: slide-up 0.6s ease-out forwards;
+  }
+
+  /* Pulse glow */
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(14, 165, 233, 0.8);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Rotate continuous */
+  @keyframes rotate-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-rotate-slow {
+    animation: rotate-slow 20s linear infinite;
+  }
+
+  /* Scale pulse */
+  @keyframes scale-pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  .animate-scale-pulse {
+    animation: scale-pulse 3s ease-in-out infinite;
+  }
+
+  /* Carousel smooth fade with enhanced transitions */
+  @keyframes carousel-fade-1 {
+    0%, 30% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      z-index: 10;
+      filter: blur(0px);
+    }
+    33.33% {
+      opacity: 0;
+      transform: translateY(-30px) scale(0.9);
+      z-index: 0;
+      filter: blur(10px);
+    }
+    36.66%, 96.66% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+      z-index: 0;
+      filter: blur(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      z-index: 10;
+      filter: blur(0px);
+    }
+  }
+
+  @keyframes carousel-fade-2 {
+    0%, 30% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+      z-index: 0;
+      filter: blur(10px);
+    }
+    33.33%, 63.33% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      z-index: 10;
+      filter: blur(0px);
+    }
+    66.66% {
+      opacity: 0;
+      transform: translateY(-30px) scale(0.9);
+      z-index: 0;
+      filter: blur(10px);
+    }
+    70%, 100% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+      z-index: 0;
+      filter: blur(10px);
+    }
+  }
+
+  @keyframes carousel-fade-3 {
+    0%, 63.33% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+      z-index: 0;
+      filter: blur(10px);
+    }
+    66.66%, 96.66% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      z-index: 10;
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-30px) scale(0.9);
+      z-index: 0;
+      filter: blur(10px);
+    }
+  }
+
+  .animate-carousel-1 {
+    animation: carousel-fade-1 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  .animate-carousel-2 {
+    animation: carousel-fade-2 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  .animate-carousel-3 {
+    animation: carousel-fade-3 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  /* Enhanced fade in animations */
+  @keyframes fade-in-up-soft {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+      filter: blur(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0px);
+    }
+  }
+
+  .animate-fade-in-up-soft {
+    animation: fade-in-up-soft 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  /* Smooth reveal animation */
+  @keyframes smooth-reveal {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+      filter: blur(8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0px);
+    }
+  }
+
+  .animate-smooth-reveal {
+    animation: smooth-reveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  /* Animation delay utilities */
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 500ms;
   }
 }
 
@@ -160,6 +483,19 @@
    ============================================================= */
 
 /* Teal theme already has secondary defined as default. */
+
+/* Sky Theme (sky-cyan-teal gradient) */
+:root.theme-sky {
+  --chart-1: oklch(45% 0.15 210);
+  --chart-2: oklch(55% 0.13 195);
+  --chart-3: oklch(65% 0.11 180);
+  --chart-4: oklch(75% 0.09 180);
+  --chart-5: oklch(85% 0.07 180);
+
+  --secondary: oklch(45% 0.15 210); /* Sky blue as secondary */
+  --secondary-foreground: oklch(98% 0.01 200);
+  --sidebar-primary: oklch(55% 0.13 195);
+}
 
 /* Pink Theme */
 :root.theme-pink {

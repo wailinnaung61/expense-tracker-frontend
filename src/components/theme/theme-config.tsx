@@ -27,9 +27,10 @@ import { useState } from "react";
 type ThemeValue = "light" | "dark";
 type LayoutValue = "vertical" | "horizontal";
 type DirectionValue = "ltr" | "rtl";
-type PrimaryColor = "teal" | "pink" | "blue" | "purple" | "red" | "orange" | "cyan" | "rose" | "indigo" | "amber";
+type PrimaryColor = "sky" | "teal" | "pink" | "blue" | "purple" | "red" | "orange" | "cyan" | "rose" | "indigo" | "amber";
 
 const COLOR_OPTIONS: { key: PrimaryColor; bg: string }[] = [
+  { key: "sky",    bg: "#0284c7" },
   { key: "teal",   bg: "#11B989" },
   { key: "pink",   bg: "#ec4899" },
   { key: "blue",   bg: "#155dfc" },

@@ -26,11 +26,12 @@ const defaultConfig = {
 
   // Color configuration
   colors: {
-    // Default primary color (#11B989 - teal/green)
-    defaultPrimaryColor: "blue",
+    // Default primary color (sky-cyan-teal gradient)
+    defaultPrimaryColor: "sky",
 
     // Available color options
     availableColors: [
+      { name: "sky", value: "#0284c7", foreground: "#ffffff" },
       { name: "slate", value: "#f8fafc", foreground: "#1e293b" },
       { name: "pink", value: "#ec4899", foreground: "#ffffff" },
       { name: "blue", value: "#155dfc", foreground: "#ffffff" },
