@@ -58,12 +58,12 @@ export function TransactionFilters({
 
   const handleStartDateSelect = (date: Date | undefined) => {
     setStartDateLocal(date);
-    onStartDateChange(date ? date.toISOString().split("T")[0] : "");
+    onStartDateChange(date ? format(date, "yyyy-MM-dd") : "");
   };
 
   const handleEndDateSelect = (date: Date | undefined) => {
     setEndDateLocal(date);
-    onEndDateChange(date ? date.toISOString().split("T")[0] : "");
+    onEndDateChange(date ? format(date, "yyyy-MM-dd") : "");
   };
 
   // Sync local state with props when they change externally

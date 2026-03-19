@@ -10,6 +10,8 @@ import spinnerGif from "@/assets/Spinner.gif";
 import { transactionService } from "@/services/tranactionService"
 import { categoryService } from "@/services/categoryService"
 import { AddTransactionDialog } from "@/components/tranactions/add-transaction-dialog"
+import { BulkAddTransactionDialog } from "@/components/tranactions/bulk-add-transaction-dialog"
+import { ImportCsvDialog } from "@/components/tranactions/import-csv-dialog"
 import { useAuth } from "@/contexts/AuthContext"
 import { format, startOfMonth, endOfMonth } from "date-fns";
 
@@ -35,10 +37,17 @@ export default function Tranactions() {
   const [startDate, setStartDate] = useState<string>(currentMonthRange.start);
   const [endDate, setEndDate] = useState<string>(currentMonthRange.end);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [currentToken, setCurrentToken] = useState<string | null>(null);
+  const [tokenHistory, setTokenHistory] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [csvImportDialogOpen, setCsvImportDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [statsRefreshKey, setStatsRefreshKey] = useState(0);
+  const [transactionsRefreshKey, setTransactionsRefreshKey] = useState(0);
 
   const pageSize = 10;
   
@@ -59,13 +68,15 @@ export default function Tranactions() {
     fetchCategories();
   }, []);
 
-  const fetchTransactions = useCallback(async () => {
+  const fetchTransactions = useCallback(async (token: string | null = null) => {
     setLoading(true);
     try {
       const params: TransactionListParams = {
         pagination: {
           pageNumber: currentPage,
           pageSize,
+          nextPageToken: token || undefined,
+          hasCursor: !!token,
         },
       };
       if (type !== "all") {
@@ -88,7 +99,9 @@ export default function Tranactions() {
       }
       const response = await transactionService.getTransactions(params);
       setTransactions(response.items);
-      setTotalPages(response.totalPages);
+      setTotalCount(response.totalCount);
+      setNextPageToken(response.nextPageToken || null);
+      setHasNextPage(response.hasNextPage);
       
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to fetch transactions";
@@ -100,53 +113,98 @@ export default function Tranactions() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, type, status, categoryId, keyword, startDate, endDate]);
+  }, [type, status, categoryId, keyword, startDate, endDate, currentPage]);
 
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    fetchTransactions(currentToken);
+  }, [fetchTransactions, transactionsRefreshKey, currentToken]);
 
   const handleTypeChange = useCallback((newType: string) => {
     setType(newType);
     setCurrentPage(1);
+    setCurrentToken(null);
+    setTokenHistory([]);
   }, []);
 
   const handleStatusChange = useCallback((newStatus: string) => {
     setStatus(newStatus);
     setCurrentPage(1);
+    setCurrentToken(null);
+    setTokenHistory([]);
   }, []);
 
   const handleCategoryChange = useCallback((newCategoryId: string) => {
     setCategoryId(newCategoryId);
     setCurrentPage(1);
+    setCurrentToken(null);
+    setTokenHistory([]);
   }, []);
 
   const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
     setCurrentPage(1);
+    setCurrentToken(null);
+    setTokenHistory([]);
   }, []);
 
   const handleStartDateChange = useCallback((newStartDate: string) => {
     setStartDate(newStartDate);
     setCurrentPage(1);
+    setCurrentToken(null);
+    setTokenHistory([]);
   }, []);
 
   const handleEndDateChange = useCallback((newEndDate: string) => {
     setEndDate(newEndDate);
     setCurrentPage(1);
+    setCurrentToken(null);
+    setTokenHistory([]);
   }, []);
 
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-  }, []);
+  const handleNextPage = useCallback(() => {
+    if (hasNextPage && nextPageToken) {
+      setTokenHistory(prev => [...prev, currentToken || '']);
+      setCurrentPage(prev => prev + 1);
+      setCurrentToken(nextPageToken);
+    }
+  }, [hasNextPage, nextPageToken, currentToken]);
+
+  const handlePreviousPage = useCallback(() => {
+    if (tokenHistory.length > 0) {
+      const newHistory = [...tokenHistory];
+      const prevToken = newHistory.pop();
+      setTokenHistory(newHistory);
+      setCurrentPage(prev => prev - 1);
+      setCurrentToken(prevToken || null);
+    }
+  }, [tokenHistory]);
 
   const handleAddClick = useCallback(() => {
     setSelectedTransaction(null);
     setDialogOpen(true);
   }, []);
+
+  const handleBulkAddClick = useCallback(() => {
+    setBulkDialogOpen(true);
+  }, []);
+
+  const handleImportCsvClick = useCallback(() => {
+    setCsvImportDialogOpen(true);
+  }, []);
   
   const handleEditClick = useCallback((transaction: Transaction) => {
     setSelectedTransaction(transaction);
+    setDialogOpen(true);
+  }, []);
+
+  const handleDuplicateClick = useCallback((transaction: Transaction) => {
+    // Create a copy without the ID to treat as a new transaction
+    const duplicatedTransaction: Transaction = {
+      ...transaction,
+      tranactionId: '', // Clear ID so it creates a new one
+      tranactionDate: new Date().toISOString(), // Set to today
+    };
+    setSelectedTransaction(duplicatedTransaction);
     setDialogOpen(true);
   }, []);
 
@@ -155,18 +213,26 @@ export default function Tranactions() {
     // Clear date filters to ensure new transaction is visible
     setStartDate("");
     setEndDate("");
-    // fetchTransactions will be called automatically by useEffect when state changes
+    // Reset pagination state
+    setCurrentToken(null);
+    setTokenHistory([]);
+    // Trigger refresh after state updates
     setStatsRefreshKey(prev => prev + 1);
+    setTransactionsRefreshKey(prev => prev + 1);
   }, []);
 
   const handleDeleteSuccess = useCallback(() => {
-    fetchTransactions();
     setStatsRefreshKey(prev => prev + 1);
-  }, [fetchTransactions]);
+    setTransactionsRefreshKey(prev => prev + 1);
+  }, []);
 
   return (
     <div className="space-y-6">
-      <ExpensesHeader onAddClick={handleAddClick} />
+      <ExpensesHeader 
+        onAddClick={handleAddClick} 
+        onBulkAddClick={handleBulkAddClick}
+        onImportCsvClick={handleImportCsvClick}
+      />
 
       <div className="grid gap-6 grid-cols-12">
         <div className="col-span-12 xl:col-span-8 space-y-6">
@@ -192,10 +258,14 @@ export default function Tranactions() {
             <TransactionsTable
               transactions={transactions}
               categories={categories}
-              totalPages={totalPages}
               currentPage={currentPage}
-              onPageChange={handlePageChange}
+              totalCount={totalCount}
+              hasNextPage={hasNextPage}
+              hasPreviousPage={tokenHistory.length > 0}
+              onNextPage={handleNextPage}
+              onPreviousPage={handlePreviousPage}
               onEdit={handleEditClick}
+              onDuplicate={handleDuplicateClick}
               onDelete={handleDeleteSuccess}
               currency={user?.currency || "USD"}
             />
@@ -211,6 +281,18 @@ export default function Tranactions() {
         onOpenChange={setDialogOpen}
         onSuccess={handleDialogSuccess}
         transaction={selectedTransaction}
+      />
+
+      <BulkAddTransactionDialog
+        open={bulkDialogOpen}
+        onOpenChange={setBulkDialogOpen}
+        onSuccess={handleDialogSuccess}
+      />
+
+      <ImportCsvDialog
+        open={csvImportDialogOpen}
+        onOpenChange={setCsvImportDialogOpen}
+        onSuccess={handleDialogSuccess}
       />
     </div>
   )

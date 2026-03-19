@@ -144,8 +144,8 @@ export function AddTransactionDialog({
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
-      if (transaction) {
-        // Edit mode
+      if (transaction && transaction.tranactionId) {
+        // Edit mode - has valid transaction ID
         reset({
           type: String(transaction.type),
           categoryId: transaction.categoryId,
@@ -157,8 +157,22 @@ export function AddTransactionDialog({
           imageUrl: transaction.imageUrl || "",
         });
         setPreviewUrl(transaction.imageUrl || null);
+      } else if (transaction && !transaction.tranactionId) {
+        // Duplicate mode - has transaction data but no ID
+        reset({
+          type: String(transaction.type),
+          categoryId: transaction.categoryId,
+          amount: String(transaction.amount),
+          tranactionDate: new Date(transaction.tranactionDate),
+          status: String(transaction.status),
+          description: transaction.description || "",
+          note: transaction.note || "",
+          imageUrl: transaction.imageUrl || "",
+        });
+        setPreviewUrl(transaction.imageUrl || null);
+        setSelectedFile(null); // Clear any file selection for duplicate
       } else {
-        // Create mode
+        // Create mode - no transaction
         reset({
           type: String(TransactionType.Expense),
           categoryId: "",
@@ -258,8 +272,8 @@ export function AddTransactionDialog({
         imageUrl: uploadedImageUrl?.trim() || "",
       };
 
-      if (transaction) {
-        // Update existing transaction
+      if (transaction && transaction.tranactionId) {
+        // Update existing transaction (only if it has a valid ID)
         await transactionService.updateTransaction(transaction.tranactionId, payload);
         Swal.fire({
           icon: "success",
@@ -269,7 +283,7 @@ export function AddTransactionDialog({
           showConfirmButton: false,
         });
       } else {
-        // Create new transaction
+        // Create new transaction (for new or duplicated transactions)
         await transactionService.createTransaction(payload);
         Swal.fire({
           icon: "success",
@@ -297,10 +311,10 @@ export function AddTransactionDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {transaction ? "Edit Transaction" : "Add New Transaction"}
+            {transaction && transaction.tranactionId ? "Edit Transaction" : "Add New Transaction"}
           </DialogTitle>
           <DialogDescription>
-            {transaction
+            {transaction && transaction.tranactionId
               ? "Update the transaction details below"
               : "Fill in the details to add a new transaction"}
           </DialogDescription>

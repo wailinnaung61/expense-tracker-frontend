@@ -67,6 +67,8 @@ export interface TransactionListParams {
     pagination?: {
         pageNumber?: number;
         pageSize?: number;
+        nextPageToken?: string;
+        hasCursor?: boolean;
     };
 }
 

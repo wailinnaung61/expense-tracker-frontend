@@ -38,6 +38,8 @@ export interface CategoryListParams {
   pagination?: {
     pageNumber?: number;
     pageSize?: number;
+    nextPageToken?: string;
+    hasCursor?: boolean;
   };
 }
 

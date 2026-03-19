@@ -21,9 +21,12 @@ import Swal from "sweetalert2";
 
 interface CategoriesTableProps {
   categories: ExpenseCategory[];
-  totalPages: number;
   currentPage: number;
-  onPageChange: (page: number) => void;
+  totalCount: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  onNextPage: () => void;
+  onPreviousPage: () => void;
   onEdit: (category: ExpenseCategory) => void;
   onDelete: () => void;
 }
@@ -50,9 +53,12 @@ const getTypeBadgeClass = (type: TransactionType): string => {
 
 export function CategoriesTable({
   categories,
-  totalPages,
   currentPage,
-  onPageChange,
+  totalCount,
+  hasNextPage,
+  hasPreviousPage,
+  onNextPage,
+  onPreviousPage,
   onEdit,
   onDelete,
 }: CategoriesTableProps) {
@@ -177,84 +183,34 @@ export function CategoriesTable({
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {(hasNextPage || hasPreviousPage) && (
         <div className="flex flex-wrap justify-between items-center">
           <span className="text-sm text-muted-foreground mb-1 md:mb-0">
-            Page {currentPage} of {totalPages}
+            Page {currentPage} · {totalCount} items
           </span>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage === 1}
-              onClick={() => onPageChange(currentPage - 1)}
-              className="px-1 py-2 rtl:rotate-180"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            
-            {/* Smart pagination logic */}
-            {(() => {
-              const pages: (number | string)[] = [];
-              const showEllipsisStart = currentPage > 3;
-              const showEllipsisEnd = currentPage < totalPages - 2;
-
-              // Always show first page
-              pages.push(1);
-
-              // Show ellipsis after first page
-              if (showEllipsisStart) {
-                pages.push('...');
-              }
-
-              // Show pages around current page
-              const start = Math.max(2, currentPage - 1);
-              const end = Math.min(totalPages - 1, currentPage + 1);
-              
-              for (let i = start; i <= end; i++) {
-                if (i !== 1 && i !== totalPages) {
-                  pages.push(i);
-                }
-              }
-
-              // Show ellipsis before last page
-              if (showEllipsisEnd) {
-                pages.push('...');
-              }
-
-              // Always show last page (if more than 1 page)
-              if (totalPages > 1) {
-                pages.push(totalPages);
-              }
-
-              return pages.map((page, idx) =>
-                typeof page === 'number' ? (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => onPageChange(page)}
-                    className="px-2 py-2 min-w-8"
-                  >
-                    {page}
-                  </Button>
-                ) : (
-                  <span key={`ellipsis-${idx}`} className="px-2 py-1 text-muted-foreground">
-                    {page}
-                  </span>
-                )
-              );
-            })()}
-
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage === totalPages}
-              onClick={() => onPageChange(currentPage + 1)}
-              className="px-1 py-2 rtl:rotate-180"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            {hasPreviousPage && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onPreviousPage}
+                className="px-3 py-2 rtl:rotate-180"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Previous
+              </Button>
+            )}
+            {hasNextPage && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onNextPage}
+                className="px-3 py-2 rtl:rotate-180"
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            )}
           </div>
         </div>
       )}

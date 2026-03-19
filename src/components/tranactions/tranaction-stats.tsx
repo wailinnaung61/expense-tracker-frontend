@@ -6,12 +6,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { aggregationService } from "@/services/aggregationService";
-import type { ExpenseBreakdown } from "@/types/aggregation";
+import { Link } from "react-router-dom";
+import type { ExpenseBreakdown, MonthlyAggregation } from "@/types/aggregation";
 import { formatCurrency } from "@/lib/utils";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, PiggyBank, TrendingUp, ArrowRight, Wallet, CreditCard, Receipt } from "lucide-react";
 import { format, addMonths, subMonths } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
 import { Loader2 } from "lucide-react";
@@ -38,9 +51,11 @@ const COLORS = [
 export default function TransactionStats({ currency = "USD", refreshKey = 0 }: TransactionStatsProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [data, setData] = useState<ExpenseBreakdown | null>(null);
+  const [monthlyData, setMonthlyData] = useState<MonthlyAggregation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false);
 
   const fetchExpenseBreakdown = useCallback(async (date: Date, isRetry = false) => {
     if (!isRetry) {
@@ -50,13 +65,18 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
     setError(null);
     try {
       const monthStr = format(date, "yyyy-MM");
-      const breakdown = await aggregationService.getExpenseBreakdown(monthStr);
+      const [breakdown, monthly] = await Promise.all([
+        aggregationService.getExpenseBreakdown(monthStr),
+        aggregationService.getMonthlyAggregation(monthStr),
+      ]);
       setData(breakdown);
+      setMonthlyData(monthly);
       setRetryCount(0);
     } catch (err: any) {
       console.error("Failed to fetch expense breakdown:", err);
       setError(err.message || "Failed to load data");
       setData(null);
+      setMonthlyData(null);
     } finally {
       if (!isRetry) {
         setLoading(false);
@@ -72,13 +92,15 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   // Smart retry for lambda eventual consistency when refreshKey changes
   // Real-world pattern: AWS Lambda aggregations are eventually consistent
   // - Try immediately (might be cached or fast execution)
-  // - Retry after 1s (lambda cold start or processing time)
-  // - Final retry after 3s total (ensure we get updated data)
+  // - Retry after 2s (DynamoDB streams + Lambda processing time)
+  // - Retry after 5s (eventual consistency window)
+  // - Final retry after 8s (ensure we get updated data)
   useEffect(() => {
     if (refreshKey === 0) return; // Skip on initial mount
 
     let timer1: number;
     let timer2: number;
+    let timer3: number;
     
     const delayedRefresh = async () => {
       // Show syncing indicator for entire retry period
@@ -87,16 +109,21 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
       // First immediate attempt
       await fetchExpenseBreakdown(currentMonth, true);
       
-      // Retry after 1 second (lambda might still be processing)
+      // Retry after 2 seconds (DynamoDB streams processing)
       timer1 = setTimeout(async () => {
         await fetchExpenseBreakdown(currentMonth, true);
         
-        // Final retry after 2 more seconds if needed
+        // Retry after 3 more seconds (eventual consistency)
         timer2 = setTimeout(async () => {
           await fetchExpenseBreakdown(currentMonth, true);
-          setRetryCount(0); // Done with all retries
-        }, 2000);
-      }, 1000);
+          
+          // Final retry after 3 more seconds
+          timer3 = setTimeout(async () => {
+            await fetchExpenseBreakdown(currentMonth, true);
+            setRetryCount(0); // Done with all retries
+          }, 3000);
+        }, 3000);
+      }, 2000);
     };
 
     delayedRefresh();
@@ -104,6 +131,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
     return () => {
       if (timer1) clearTimeout(timer1);
       if (timer2) clearTimeout(timer2);
+      if (timer3) clearTimeout(timer3);
       setRetryCount(0);
     };
   }, [refreshKey, currentMonth, fetchExpenseBreakdown]);
@@ -119,6 +147,22 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   const handleCurrentMonth = useCallback(() => {
     setCurrentMonth(new Date());
   }, []);
+
+  const handleMonthChange = useCallback((month: string) => {
+    const newDate = new Date(currentMonth);
+    newDate.setMonth(parseInt(month));
+    setCurrentMonth(newDate);
+  }, [currentMonth]);
+
+  const handleYearChange = useCallback((year: string) => {
+    const newDate = new Date(currentMonth);
+    newDate.setFullYear(parseInt(year));
+    setCurrentMonth(newDate);
+  }, [currentMonth]);
+
+  // Generate year options (current year ± 5 years)
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
   const isCurrentMonth = useMemo(() => 
     format(currentMonth, "yyyy-MM") === format(new Date(), "yyyy-MM"),
@@ -142,7 +186,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <CardTitle>Expense Breakdown</CardTitle>
+              <CardTitle>Monthly Overview</CardTitle>
               {retryCount > 0 && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Loader2 className="h-3 w-3 animate-spin" />
@@ -151,7 +195,15 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
               )}
             </div>
             <CardDescription>
-              {format(currentMonth, "MMMM yyyy")} spending by category
+              {monthlyData ? (
+                <>
+                  <span className="text-xs">
+                    {format(new Date(monthlyData.periodStart), "MMM dd")} - {format(new Date(monthlyData.periodEnd), "MMM dd, yyyy")}
+                  </span>
+                </>
+              ) : (
+                `${format(currentMonth, "MMMM yyyy")} financial summary`
+              )}
             </CardDescription>
           </div>
           <div className="flex items-center gap-1">
@@ -163,6 +215,67 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
+            <Popover open={monthPickerOpen} onOpenChange={setMonthPickerOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-3 text-xs font-medium hover:bg-accent"
+                >
+                  {format(currentMonth, "MMM yyyy")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-70 p-4" align="center" sideOffset={8}>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-muted-foreground">Month</label>
+                      <Select value={String(currentMonth.getMonth())} onValueChange={handleMonthChange}>
+                        <SelectTrigger className="h-9 bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">January</SelectItem>
+                          <SelectItem value="1">February</SelectItem>
+                          <SelectItem value="2">March</SelectItem>
+                          <SelectItem value="3">April</SelectItem>
+                          <SelectItem value="4">May</SelectItem>
+                          <SelectItem value="5">June</SelectItem>
+                          <SelectItem value="6">July</SelectItem>
+                          <SelectItem value="7">August</SelectItem>
+                          <SelectItem value="8">September</SelectItem>
+                          <SelectItem value="9">October</SelectItem>
+                          <SelectItem value="10">November</SelectItem>
+                          <SelectItem value="11">December</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-muted-foreground">Year</label>
+                      <Select value={String(currentMonth.getFullYear())} onValueChange={handleYearChange}>
+                        <SelectTrigger className="h-9 bg-background">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {yearOptions.map((year) => (
+                            <SelectItem key={year} value={String(year)}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    className="w-full h-9" 
+                    onClick={() => setMonthPickerOpen(false)}
+                  >
+                    Done
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             {!isCurrentMonth && (
               <Button
                 variant="ghost"
@@ -202,7 +315,108 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
           </div>
         ) : (
           <>
-            <div className="relative h-60 flex items-center justify-center">
+            {/* Monthly Summary */}
+            {monthlyData && (
+              <div className="space-y-4 mb-6">
+                {/* Financial Summary Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg border bg-linear-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 p-3.5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                        <Wallet className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="text-xs font-medium text-green-700 dark:text-green-300">Income</div>
+                    </div>
+                    <div className="text-lg font-bold text-green-700 dark:text-green-300">
+                      +{formatCurrency(monthlyData.income, currency)}
+                    </div>
+                  </div>
+                  <div className="rounded-lg border bg-linear-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 p-3.5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+                        <CreditCard className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="text-xs font-medium text-red-700 dark:text-red-300">Expenses</div>
+                    </div>
+                    <div className="text-lg font-bold text-red-700 dark:text-red-300">
+                      -{formatCurrency(monthlyData.expense, currency)}
+                    </div>
+                  </div>
+                  <Link to="/saving" className="block rounded-lg border bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 p-3.5 hover:scale-[1.02] transition-all cursor-pointer group">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                          <PiggyBank className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="text-xs font-medium text-blue-700 dark:text-blue-300">Saving</div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                    <div className="text-lg font-bold text-blue-700 dark:text-blue-300 mb-1">
+                      {formatCurrency(monthlyData.saving, currency)}
+                    </div>
+                    <div className="text-[10px] text-blue-600 dark:text-blue-400">Track your savings goals</div>
+                  </Link>
+                  <Link to="/investment" className="block rounded-lg border bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 p-3.5 hover:scale-[1.02] transition-all cursor-pointer group">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
+                          <TrendingUp className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="text-xs font-medium text-purple-700 dark:text-purple-300">Investment</div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                    <div className="text-lg font-bold text-purple-700 dark:text-purple-300 mb-1">
+                      {formatCurrency(monthlyData.investment, currency)}
+                    </div>
+                    <div className="text-[10px] text-purple-600 dark:text-purple-400">View your investments</div>
+                  </Link>
+                  
+                  {/* Net Savings - Highlighted */}
+                  <div className={`col-span-2 rounded-lg border-2 p-4 ${
+                    monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment >= 0
+                      ? 'bg-linear-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900 border-green-300 dark:border-green-700'
+                      : 'bg-linear-to-br from-red-50 to-rose-100 dark:from-red-950 dark:to-rose-900 border-red-300 dark:border-red-700'
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment >= 0
+                            ? 'bg-green-500'
+                            : 'bg-red-500'
+                        }`}>
+                          <Wallet className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-medium text-muted-foreground mb-1">Net Savings</div>
+                          <div className={`text-2xl font-bold ${
+                          monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment >= 0 
+                            ? 'text-green-700 dark:text-green-300' 
+                            : 'text-red-700 dark:text-red-300'
+                        }`}>
+                            {monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment >= 0 ? '+' : ''}
+                            {formatCurrency(monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment, currency)}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center justify-end gap-2 mb-1">
+                          <Receipt className="w-4 h-4 text-muted-foreground" />
+                          <div className="text-xs text-muted-foreground">Transactions</div>
+                        </div>
+                        <div className="text-xl font-bold">{monthlyData.transactionCount}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Expense Breakdown Chart */}
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-medium mb-4">Expense Breakdown</h3>
+              <div className="relative h-60 flex items-center justify-center">
               <ResponsiveContainer>
                 <PieChart>
                   <Pie
@@ -278,6 +492,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                 </div>
               </div>
             )}
+            </div>
           </>
         )}
       </CardContent>

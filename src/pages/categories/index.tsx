@@ -14,19 +14,25 @@ export default function Categories() {
   const [type, setType] = useState<string>("all");
   const [keyword, setKeyword] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [currentToken, setCurrentToken] = useState<string | null>(null);
+  const [tokenHistory, setTokenHistory] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | null>(null); 
 
   const pageSize = 10;
 
-  const fetchCategories = useCallback(async () => {
+  const fetchCategories = useCallback(async (token: string | null = null) => {
     setLoading(true);
     try {
       const params: CategoryListParams = {
         pagination: {
           pageNumber: currentPage,
           pageSize,
+          nextPageToken: token || undefined,
+          hasCursor: !!token,
         },
       };
 
@@ -40,7 +46,9 @@ export default function Categories() {
 
       const response = await categoryService.getCategories(params);
       setCategories(response.items);
-      setTotalPages(response.totalPages);
+      setTotalCount(response.totalCount);
+      setNextPageToken(response.nextPageToken || null);
+      setHasNextPage(response.hasNextPage);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to fetch categories";
       Swal.fire({
@@ -51,25 +59,43 @@ export default function Categories() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, type, keyword]);
+  }, [type, keyword, currentPage]);
 
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    fetchCategories(currentToken);
+  }, [fetchCategories, currentToken]);
 
   const handleTypeChange = useCallback((newType: string) => {
     setType(newType);
     setCurrentPage(1);
+    setCurrentToken(null);
+    setTokenHistory([]);
   }, []);
 
   const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
     setCurrentPage(1);
+    setCurrentToken(null);
+    setTokenHistory([]);
   }, []);
 
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-  }, []);
+  const handleNextPage = useCallback(() => {
+    if (hasNextPage && nextPageToken) {
+      setTokenHistory(prev => [...prev, currentToken || '']);
+      setCurrentPage(prev => prev + 1);
+      setCurrentToken(nextPageToken);
+    }
+  }, [hasNextPage, nextPageToken, currentToken]);
+
+  const handlePreviousPage = useCallback(() => {
+    if (tokenHistory.length > 0) {
+      const newHistory = [...tokenHistory];
+      const prevToken = newHistory.pop();
+      setTokenHistory(newHistory);
+      setCurrentPage(prev => prev - 1);
+      setCurrentToken(prevToken || null);
+    }
+  }, [tokenHistory]);
 
   const handleAddClick = useCallback(() => {
     setSelectedCategory(null);
@@ -82,8 +108,14 @@ export default function Categories() {
   }, []);
 
   const handleDialogSuccess = useCallback(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    setCurrentPage(1);
+    setCurrentToken(null);
+    setTokenHistory([]);
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    fetchCategories(currentToken);
+  }, [fetchCategories, currentToken]);
 
   return (
     <div className="space-y-6">
@@ -103,11 +135,14 @@ export default function Categories() {
       ) : (
         <CategoriesTable
           categories={categories}
-          totalPages={totalPages}
           currentPage={currentPage}
-          onPageChange={handlePageChange}
+          totalCount={totalCount}
+          hasNextPage={hasNextPage}
+          hasPreviousPage={tokenHistory.length > 0}
+          onNextPage={handleNextPage}
+          onPreviousPage={handlePreviousPage}
           onEdit={handleEditClick}
-          onDelete={fetchCategories}
+          onDelete={handleRefresh}
         />
       )}
 

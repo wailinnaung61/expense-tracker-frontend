@@ -1,0 +1,551 @@
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { categoryService } from "@/services/categoryService";
+import { transactionService } from "@/services/tranactionService";
+import type { ExpenseCategory } from "@/types/category";
+import { TransactionType, PaymentStatus } from "@/types/transaction";
+import { format } from "date-fns";
+import { CalendarIcon, Plus, Trash2, Copy, CopyPlus } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import Swal from "sweetalert2";
+import { z } from "zod";
+
+interface BulkAddTransactionDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+}
+
+interface TransactionRow {
+  id: string;
+  type: number;
+  categoryId: string;
+  amount: string;
+  date: Date;
+  status: number;
+  description: string;
+  note: string;
+}
+
+interface RowErrors {
+  categoryId?: string;
+  amount?: string;
+}
+
+const transactionRowSchema = z.object({
+  categoryId: z.string().min(1, "Category is required"),
+  amount: z.string()
+    .min(1, "Amount is required")
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Amount must be greater than 0",
+    }),
+});
+
+export function BulkAddTransactionDialog({
+  open,
+  onOpenChange,
+  onSuccess,
+}: BulkAddTransactionDialogProps) {
+  const [categories, setCategories] = useState<ExpenseCategory[]>([]);
+  const [rows, setRows] = useState<TransactionRow[]>([
+    {
+      id: crypto.randomUUID(),
+      type: TransactionType.Expense,
+      categoryId: "",
+      amount: "",
+      date: new Date(),
+      status: PaymentStatus.Completed,
+      description: "",
+      note: "",
+    },
+  ]);
+  const [rowErrors, setRowErrors] = useState<Record<string, RowErrors>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const amountInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await categoryService.getCategories({
+          pagination: {
+            pageNumber: 1,
+            pageSize: 999999999,
+          },
+        });
+        setCategories(response.items || []);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
+    if (open) {
+      fetchCategories();
+    }
+  }, [open]);
+
+  // Reset form when dialog opens
+  useEffect(() => {
+    if (open) {
+      setRows([
+        {
+          id: crypto.randomUUID(),
+          type: TransactionType.Expense,
+          categoryId: "",
+          amount: "",
+          date: new Date(),
+          status: PaymentStatus.Completed,
+          description: "",
+          note: "",
+        },
+      ]);
+      setRowErrors({});
+    }
+  }, [open]);
+
+  const addRow = () => {
+    setRows([
+      ...rows,
+      {
+        id: crypto.randomUUID(),
+        type: TransactionType.Expense,
+        categoryId: "",
+        amount: "",
+        date: new Date(),
+        status: PaymentStatus.Completed,
+        description: "",
+        note: "",
+      },
+    ]);
+  };
+
+  const duplicateLastRow = () => {
+    if (rows.length > 0) {
+      const lastRow = rows[rows.length - 1];
+      const newId = crypto.randomUUID();
+      setRows([
+        ...rows,
+        {
+          id: newId,
+          type: lastRow.type,
+          categoryId: lastRow.categoryId,
+          amount: "", // Empty amount for new entry
+          date: new Date(),
+          status: lastRow.status,
+          description: lastRow.description,
+          note: lastRow.note,
+        },
+      ]);
+      // Focus on amount input after row is added
+      setTimeout(() => {
+        amountInputRefs.current[newId]?.focus();
+      }, 100);
+    }
+  };
+
+  const copyFromAbove = (currentIndex: number) => {
+    if (currentIndex > 0) {
+      const previousRow = rows[currentIndex - 1];
+      const currentRowId = rows[currentIndex].id;
+      updateMultipleFields(currentRowId, {
+        type: previousRow.type,
+        categoryId: previousRow.categoryId,
+        status: previousRow.status,
+        description: previousRow.description,
+        note: previousRow.note,
+      });
+      // Focus on amount input
+      setTimeout(() => {
+        amountInputRefs.current[currentRowId]?.focus();
+      }, 100);
+    }
+  };
+
+  const removeRow = (id: string) => {
+    if (rows.length > 1) {
+      setRows(rows.filter((row) => row.id !== id));
+      setRowErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[id];
+        return newErrors;
+      });
+    }
+  };
+
+  const clearFieldErrors = (id: string, fields: (keyof RowErrors)[]) => {
+    setRowErrors((prev) => {
+      const newErrors = { ...prev };
+      if (newErrors[id]) {
+        fields.forEach((field) => delete newErrors[id][field]);
+        if (Object.keys(newErrors[id]).length === 0) {
+          delete newErrors[id];
+        }
+      }
+      return newErrors;
+    });
+  };
+
+  const updateRow = (id: string, field: keyof TransactionRow, value: any) => {
+    setRows((prevRows) =>
+      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+    );
+    if (field === "categoryId" || field === "amount") {
+      clearFieldErrors(id, [field]);
+    }
+  };
+
+  const updateMultipleFields = (id: string, updates: Partial<TransactionRow>) => {
+    setRows((prevRows) =>
+      prevRows.map((row) => (row.id === id ? { ...row, ...updates } : row))
+    );
+    const errorFields = (Object.keys(updates) as (keyof TransactionRow)[]).filter(
+      (f) => f === "categoryId" || f === "amount"
+    ) as (keyof RowErrors)[];
+    if (errorFields.length > 0) {
+      clearFieldErrors(id, errorFields);
+    }
+  };
+
+  const getFilteredCategories = (type: number) => {
+    return categories.filter((cat) => cat.type === type);
+  };
+
+  const handleSubmit = async () => {
+    // Validate all rows using Zod
+    const newErrors: Record<string, RowErrors> = {};
+    let hasErrors = false;
+
+    rows.forEach((row) => {
+      const result = transactionRowSchema.safeParse({
+        categoryId: row.categoryId,
+        amount: row.amount,
+      });
+
+      if (!result.success) {
+        const rowErrors: RowErrors = {};
+        result.error.issues.forEach((issue) => {
+          const field = issue.path[0] as keyof RowErrors;
+          rowErrors[field] = issue.message;
+        });
+        newErrors[row.id] = rowErrors;
+        hasErrors = true;
+      }
+    });
+
+    setRowErrors(newErrors);
+
+    if (hasErrors) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Create all transactions in parallel
+      await Promise.all(
+        rows.map((row) =>
+          transactionService.createTransaction({
+            type: row.type as TransactionType,
+            categoryId: row.categoryId,
+            amount: Number(row.amount),
+            tranactionDate: row.date.toISOString(),
+            status: row.status as PaymentStatus,
+            description: row.description?.trim() || "",
+            note: row.note?.trim() || "",
+            imageUrl: "",
+          })
+        )
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: `${rows.length} transaction(s) created successfully`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      onSuccess();
+      onOpenChange(false);
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Failed to create transactions",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[90vw]! w-[90vw]! max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="sticky top-0 bg-background pb-4 pt-6 px-6 z-20">
+          <DialogTitle>Bulk Add Transactions</DialogTitle>
+          <DialogDescription>
+            Add multiple transactions at once - easier than Excel! Use "Duplicate Last Row" for same category or "Copy from above" for individual rows.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex-1 overflow-auto border rounded-md mx-4">
+          <table className="w-full border-collapse">
+            <thead className="sticky top-0 bg-muted z-10">
+              <tr>
+                <th className="text-left p-2 text-sm font-semibold w-12">#</th>
+                <th className="text-left p-2 text-sm font-semibold w-28">Type</th>
+                <th className="text-left p-2 text-sm font-semibold w-48">Category *</th>
+                <th className="text-left p-2 text-sm font-semibold w-28">Amount *</th>
+                <th className="text-left p-2 text-sm font-semibold w-36">Date</th>
+                <th className="text-left p-2 text-sm font-semibold w-32">Status</th>
+                <th className="text-left p-2 text-sm font-semibold w-48">Description</th>
+                <th className="text-left p-2 text-sm font-semibold w-48">Note</th>
+                <th className="text-center p-2 text-sm font-semibold w-32">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, index) => (
+                <tr key={row.id} className="border-b hover:bg-muted/50 transition-colors">
+                  {/* Row Number */}
+                  <td className="p-2">
+                    <div className="text-sm font-medium text-muted-foreground">#{index + 1}</div>
+                  </td>
+
+                  {/* Type */}
+                  <td className="p-2">
+                    <Select
+                      value={String(row.type)}
+                      onValueChange={(value) => {
+                        updateMultipleFields(row.id, {
+                          type: Number(value),
+                          categoryId: "", // Clear category when type changes
+                        });
+                      }}
+                    >
+                      <SelectTrigger className="h-9 w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4}>
+                        <SelectItem value={String(TransactionType.Expense)}>
+                          <span className="flex items-center gap-2">
+                            <span className="text-red-600">−</span>
+                            <span>Expense</span>
+                          </span>
+                        </SelectItem>
+                        <SelectItem value={String(TransactionType.Income)}>
+                          <span className="flex items-center gap-2">
+                            <span className="text-green-600">+</span>
+                            <span>Income</span>
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+
+                  {/* Category */}
+                  <td className="p-2">
+                    <div>
+                      <Select
+                        value={row.categoryId}
+                        onValueChange={(value) => updateRow(row.id, "categoryId", value)}
+                      >
+                        <SelectTrigger className={`h-9 w-full ${rowErrors[row.id]?.categoryId ? 'border-destructive' : ''}`}>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent position="popper" className="max-h-60 w-(--radix-select-trigger-width) max-w-75" sideOffset={4}>
+                          {getFilteredCategories(row.type).length === 0 ? (
+                            <div className="p-4 text-sm text-muted-foreground">
+                              No categories available
+                            </div>
+                          ) : (
+                            getFilteredCategories(row.type).map((category) => (
+                              <SelectItem 
+                                key={category.categoryId} 
+                                value={category.categoryId}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span>{category.icon}</span>
+                                  <span>{category.displayName}</span>
+                                </span>
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                      {rowErrors[row.id]?.categoryId && (
+                        <p className="text-xs text-destructive mt-1">{rowErrors[row.id].categoryId}</p>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* Amount */}
+                  <td className="p-2">
+                    <div>
+                      <Input
+                        ref={(el) => { amountInputRefs.current[row.id] = el; }}
+                        type="number"
+                        placeholder="0.00"
+                        step="0.01"
+                        value={row.amount}
+                        onChange={(e) => updateRow(row.id, "amount", e.target.value)}
+                        className={`h-9 ${rowErrors[row.id]?.amount ? 'border-destructive' : ''}`}
+                      />
+                      {rowErrors[row.id]?.amount && (
+                        <p className="text-xs text-destructive mt-1">{rowErrors[row.id].amount}</p>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* Date */}
+                  <td className="p-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="h-9 w-full justify-start text-left font-normal"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {format(row.date, "MMM dd")}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start" sideOffset={4}>
+                        <Calendar
+                          mode="single"
+                          selected={row.date}
+                          onSelect={(date) => updateRow(row.id, "date", date || new Date())}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </td>
+
+                  {/* Status */}
+                  <td className="p-2">
+                    <Select
+                      value={String(row.status)}
+                      onValueChange={(value) => updateRow(row.id, "status", Number(value))}
+                    >
+                      <SelectTrigger className="h-9 w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4}>
+                        <SelectItem value={String(PaymentStatus.Completed)}>Completed</SelectItem>
+                        <SelectItem value={String(PaymentStatus.Pending)}>Pending</SelectItem>
+                        <SelectItem value={String(PaymentStatus.Failed)}>Failed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+
+                  {/* Description */}
+                  <td className="p-2">
+                    <Input
+                      placeholder="Description"
+                      value={row.description}
+                      onChange={(e) => updateRow(row.id, "description", e.target.value)}
+                      className="h-9"
+                    />
+                  </td>
+
+                  {/* Note */}
+                  <td className="p-2">
+                    <Input
+                      placeholder="Note"
+                      value={row.note}
+                      onChange={(e) => updateRow(row.id, "note", e.target.value)}
+                      className="h-9"
+                    />
+                  </td>
+
+                  {/* Actions */}
+                  <td className="p-2">
+                    <div className="flex items-center gap-1">
+                      {index > 0 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyFromAbove(index)}
+                          className="h-8 w-8 hover:bg-primary/10"
+                          title="Copy from above"
+                        >
+                          <Copy className="h-4 w-4 text-primary" />
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeRow(row.id)}
+                        disabled={rows.length === 1}
+                        className="h-8 w-8 hover:bg-destructive/10"
+                        title="Delete row"
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Add Row Buttons */}
+        <div className="pt-4 px-6 border-t bg-background">
+          <div className="flex gap-3 justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addRow}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Empty Row
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              onClick={duplicateLastRow}
+              disabled={rows.length === 0}
+              className="gap-2"
+            >
+              <CopyPlus className="h-4 w-4" />
+              Duplicate Last Row
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            💡 Tip: Use "Copy from above" button to quickly copy settings from previous row
+          </p>
+        </div>
+
+        <DialogFooter className="mt-4 px-6 pb-6 bg-background">
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={isSubmitting || rows.length === 0}>
+            {isSubmitting ? "Creating..." : `Create ${rows.length} Transaction(s)`}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
