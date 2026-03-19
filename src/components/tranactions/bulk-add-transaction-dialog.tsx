@@ -58,7 +58,7 @@ const transactionRowSchema = z.object({
   amount: z.string()
     .min(1, "Amount is required")
     .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Amount must be greater than 0",
+      message: "Enter amount > 0",
     }),
 });
 
@@ -96,7 +96,7 @@ export function BulkAddTransactionDialog({
         });
         setCategories(response.items || []);
       } catch (error) {
-        console.error("Failed to fetch categories:", error);
+        // Handle error (optional)
       }
     };
 
@@ -509,42 +509,48 @@ export function BulkAddTransactionDialog({
           </table>
         </div>
 
-        {/* Add Row Buttons */}
-        <div className="pt-4 px-6 border-t bg-background">
-          <div className="flex gap-3 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={addRow}
-              className="gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add Empty Row
-            </Button>
-            <Button
-              type="button"
-              variant="default"
-              onClick={duplicateLastRow}
-              disabled={rows.length === 0}
-              className="gap-2"
-            >
-              <CopyPlus className="h-4 w-4" />
-              Duplicate Last Row
-            </Button>
+        {/* Footer with Actions */}
+        <div className="border-t bg-background px-6 py-4">
+          <div className="flex items-center justify-between gap-4 mb-2">
+            {/* Left side - Row management */}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addRow}
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Row
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={duplicateLastRow}
+                disabled={rows.length === 0}
+                className="gap-2"
+              >
+                <CopyPlus className="h-4 w-4" />
+                Duplicate Last
+              </Button>
+            </div>
+
+            {/* Right side - Form actions */}
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button onClick={handleSubmit} disabled={isSubmitting || rows.length === 0}>
+                {isSubmitting ? "Creating..." : `Create ${rows.length} Transaction(s)`}
+              </Button>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground">
             💡 Tip: Use "Copy from above" button to quickly copy settings from previous row
           </p>
         </div>
-
-        <DialogFooter className="mt-4 px-6 pb-6 bg-background">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting || rows.length === 0}>
-            {isSubmitting ? "Creating..." : `Create ${rows.length} Transaction(s)`}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

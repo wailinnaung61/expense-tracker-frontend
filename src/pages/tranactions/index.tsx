@@ -57,7 +57,7 @@ export default function Tranactions() {
       try {
         const response = await categoryService.getCategories({
           pagination: {
-            pageSize: 100, // Get all categories
+            pageSize: 100,
           },
         });
         setCategories(response.items);
