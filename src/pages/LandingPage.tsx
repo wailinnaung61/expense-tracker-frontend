@@ -97,11 +97,11 @@ export default function LandingPage() {
         <div className="absolute bottom-2/5 left-3/5 w-1 h-1 bg-cyan-400/42 rounded-full animate-pulse shadow-sm shadow-cyan-200" style={{animationDelay: '1.2s'}}></div>
         <div className="absolute top-4/5 right-1/6 w-1.5 h-1.5 bg-teal-400/40 rounded-full animate-pulse shadow-md shadow-teal-200" style={{animationDelay: '0.6s'}}></div>
         
-        {/* Decorative rotating circles */}
-        <div className="absolute top-1/6 right-1/5 w-20 h-20 border border-sky-300/25 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDuration: '28s'}}></div>
-        <div className="absolute bottom-1/6 left-1/5 w-24 h-24 border-2 border-cyan-300/22 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDirection: 'reverse', animationDuration: '32s'}}></div>
-        <div className="absolute top-2/5 left-1/8 w-16 h-16 border border-teal-300/28 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDuration: '26s'}}></div>
-        <div className="absolute bottom-3/5 right-1/8 w-22 h-22 border border-sky-300/24 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDirection: 'reverse', animationDuration: '30s'}}></div>
+        {/* Decorative floating circles */}
+        <div className="absolute top-1/6 right-1/5 w-20 h-20 border border-sky-300/25 rounded-full animate-float" style={{animationDuration: '6s', animationDelay: '0.5s'}}></div>
+        <div className="absolute bottom-1/6 left-1/5 w-24 h-24 border-2 border-cyan-300/22 rounded-full animate-float" style={{animationDuration: '7s', animationDelay: '1s'}}></div>
+        <div className="absolute top-2/5 left-1/8 w-16 h-16 border border-teal-300/28 rounded-full animate-float" style={{animationDuration: '5.5s', animationDelay: '0.3s'}}></div>
+        <div className="absolute bottom-3/5 right-1/8 w-22 h-22 border border-sky-300/24 rounded-full animate-float" style={{animationDuration: '6.5s', animationDelay: '1.5s'}}></div>
       </div>
 
       {/* Navigation */}
@@ -190,18 +190,18 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(20,184,166,0.06),transparent_60%)]"></div>
         
         {/* Floating decorative circles - various sizes */}
-        <div className="absolute top-1/4 right-20 w-24 h-24 border-2 border-sky-300/35 rounded-full animate-rotate-slow animate-bounce-subtle"></div>
-        <div className="absolute bottom-1/4 left-20 w-32 h-32 border-2 border-cyan-300/31 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDirection: 'reverse', animationDuration: '25s'}}></div>
-        <div className="absolute top-1/2 right-1/3 w-20 h-20 border border-teal-300/27 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDuration: '30s'}}></div>
-        <div className="absolute bottom-1/3 left-1/2 w-28 h-28 border-2 border-sky-300/23 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDirection: 'reverse', animationDuration: '35s'}}></div>
-        <div className="absolute top-1/6 left-1/3 w-16 h-16 border border-cyan-300/31 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDuration: '28s'}}></div>
-        <div className="absolute bottom-1/6 right-1/4 w-36 h-36 border-2 border-teal-300/20 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDirection: 'reverse', animationDuration: '32s'}}></div>
-        <div className="absolute top-2/3 left-1/5 w-22 h-22 border border-sky-300/25 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDuration: '26s'}}></div>
-        <div className="absolute bottom-2/3 right-1/5 w-18 h-18 border border-cyan-300/29 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDirection: 'reverse', animationDuration: '29s'}}></div>
-        <div className="absolute top-1/3 left-2/3 w-26 h-26 border-2 border-teal-300/27 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDuration: '33s'}}></div>
-        <div className="absolute top-1/8 right-1/6 w-20 h-20 border border-sky-300/29 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDuration: '27s'}}></div>
-        <div className="absolute bottom-3/5 left-1/4 w-24 h-24 border-2 border-cyan-300/25 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDirection: 'reverse', animationDuration: '31s'}}></div>
-        <div className="absolute top-4/5 right-2/5 w-30 h-30 border-2 border-teal-300/23 rounded-full animate-rotate-slow animate-bounce-subtle" style={{animationDuration: '34s'}}></div>
+        <div className="absolute top-1/4 right-20 w-24 h-24 border-2 border-sky-300/35 rounded-full animate-float" style={{animationDuration: '6s'}}></div>
+        <div className="absolute bottom-1/4 left-20 w-32 h-32 border-2 border-cyan-300/31 rounded-full animate-float" style={{animationDuration: '7.5s', animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 right-1/3 w-20 h-20 border border-teal-300/27 rounded-full animate-float" style={{animationDuration: '5.5s', animationDelay: '0.5s'}}></div>
+        <div className="absolute bottom-1/3 left-1/2 w-28 h-28 border-2 border-sky-300/23 rounded-full animate-float" style={{animationDuration: '8s', animationDelay: '1.5s'}}></div>
+        <div className="absolute top-1/6 left-1/3 w-16 h-16 border border-cyan-300/31 rounded-full animate-float" style={{animationDuration: '6.5s', animationDelay: '0.8s'}}></div>
+        <div className="absolute bottom-1/6 right-1/4 w-36 h-36 border-2 border-teal-300/20 rounded-full animate-float" style={{animationDuration: '7s', animationDelay: '2s'}}></div>
+        <div className="absolute top-2/3 left-1/5 w-22 h-22 border border-sky-300/25 rounded-full animate-float" style={{animationDuration: '5.8s', animationDelay: '0.3s'}}></div>
+        <div className="absolute bottom-2/3 right-1/5 w-18 h-18 border border-cyan-300/29 rounded-full animate-float" style={{animationDuration: '6.2s', animationDelay: '1.2s'}}></div>
+        <div className="absolute top-1/3 left-2/3 w-26 h-26 border-2 border-teal-300/27 rounded-full animate-float" style={{animationDuration: '7.2s', animationDelay: '0.6s'}}></div>
+        <div className="absolute top-1/8 right-1/6 w-20 h-20 border border-sky-300/29 rounded-full animate-float" style={{animationDuration: '6.3s', animationDelay: '1.8s'}}></div>
+        <div className="absolute bottom-3/5 left-1/4 w-24 h-24 border-2 border-cyan-300/25 rounded-full animate-float" style={{animationDuration: '6.8s', animationDelay: '0.9s'}}></div>
+        <div className="absolute top-4/5 right-2/5 w-30 h-30 border-2 border-teal-300/23 rounded-full animate-float" style={{animationDuration: '7.8s', animationDelay: '1.3s'}}></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28 sm:pt-32 sm:pb-36">
           <div className="text-center">
@@ -298,8 +298,8 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(14,165,233,0.05),transparent_70%)]"></div>
         
         {/* Floating decorative circles */}
-        <div className="absolute top-10 right-10 w-20 h-20 border-4 border-sky-200 rounded-full animate-rotate-slow opacity-50"></div>
-        <div className="absolute bottom-20 left-10 w-32 h-32 border-4 border-cyan-200 rounded-full animate-rotate-slow opacity-30" style={{animationDirection: 'reverse'}}></div>
+        <div className="absolute top-10 right-10 w-20 h-20 border-4 border-sky-200 rounded-full animate-float opacity-50" style={{animationDuration: '6s'}}></div>
+        <div className="absolute bottom-20 left-10 w-32 h-32 border-4 border-cyan-200 rounded-full animate-float opacity-30" style={{animationDuration: '7.5s', animationDelay: '1s'}}></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
@@ -415,13 +415,44 @@ export default function LandingPage() {
 
       {/* Screenshots Section */}
       <section className="py-24 sm:py-32 bg-linear-to-b from-gray-50 to-white relative overflow-hidden">
-        {/* Decorative elements */}
+        {/* Decorative elements - Enhanced with more spots and bubbles */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-40 right-10 w-72 h-72 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-20 left-1/4 w-64 h-64 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-1/2 right-1/3 w-56 h-56 bg-sky-300 rounded-full mix-blend-multiply filter blur-3xl opacity-18 animate-float" style={{animationDelay: '1.5s'}}></div>
+        <div className="absolute bottom-1/3 right-1/5 w-60 h-60 bg-cyan-300 rounded-full mix-blend-multiply filter blur-3xl opacity-16 animate-float" style={{animationDelay: '0.8s'}}></div>
         
-        {/* Rotating rings */}
-        <div className="absolute top-1/4 left-1/4 w-16 h-16 border-2 border-sky-300 rounded-full animate-rotate-slow opacity-40"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 border-2 border-cyan-300 rounded-full animate-rotate-slow opacity-30" style={{animationDirection: 'reverse', animationDuration: '30s'}}></div>
+        {/* Sparkle spots scattered throughout */}
+        <div className="absolute top-1/5 left-1/6 w-1.5 h-1.5 bg-sky-400/45 rounded-full animate-pulse shadow-lg shadow-sky-300"></div>
+        <div className="absolute top-1/4 right-1/5 w-2 h-2 bg-cyan-400/40 rounded-full animate-pulse shadow-lg shadow-cyan-300" style={{animationDelay: '0.5s'}}></div>
+        <div className="absolute top-1/3 left-1/3 w-1 h-1 bg-teal-400/50 rounded-full animate-pulse shadow-md shadow-teal-300" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-2/5 right-2/5 w-1.5 h-1.5 bg-sky-400/42 rounded-full animate-pulse shadow-lg shadow-sky-300" style={{animationDelay: '1.5s'}}></div>
+        <div className="absolute bottom-1/5 left-1/4 w-1 h-1 bg-cyan-400/48 rounded-full animate-pulse shadow-md shadow-cyan-300" style={{animationDelay: '0.3s'}}></div>
+        <div className="absolute bottom-1/4 right-1/6 w-1.5 h-1.5 bg-teal-400/45 rounded-full animate-pulse shadow-lg shadow-teal-300" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-3/5 left-2/5 w-2 h-2 bg-sky-300/40 rounded-full animate-pulse shadow-lg shadow-sky-200" style={{animationDelay: '0.8s'}}></div>
+        <div className="absolute bottom-2/5 right-1/3 w-1 h-1 bg-cyan-300/50 rounded-full animate-pulse shadow-sm shadow-cyan-200" style={{animationDelay: '1.2s'}}></div>
+        <div className="absolute top-1/6 right-1/4 w-1.5 h-1.5 bg-teal-300/45 rounded-full animate-pulse shadow-lg shadow-teal-200" style={{animationDelay: '1.8s'}}></div>
+        <div className="absolute bottom-1/6 left-1/5 w-1 h-1 bg-sky-300/50 rounded-full animate-pulse shadow-sm shadow-sky-200" style={{animationDelay: '0.6s'}}></div>
+        <div className="absolute top-4/5 left-1/2 w-1.5 h-1.5 bg-cyan-300/47 rounded-full animate-pulse shadow-lg shadow-cyan-200" style={{animationDelay: '1.4s'}}></div>
+        <div className="absolute bottom-1/3 left-2/3 w-1 h-1 bg-teal-300/50 rounded-full animate-pulse shadow-sm shadow-teal-200" style={{animationDelay: '0.9s'}}></div>
+        <div className="absolute top-2/3 right-2/5 w-2 h-2 bg-sky-300/42 rounded-full animate-pulse shadow-lg shadow-sky-200" style={{animationDelay: '1.7s'}}></div>
+        <div className="absolute bottom-2/3 left-3/5 w-1.5 h-1.5 bg-cyan-300/45 rounded-full animate-pulse shadow-lg shadow-cyan-200" style={{animationDelay: '0.4s'}}></div>
+        <div className="absolute top-1/7 left-1/8 w-1 h-1 bg-teal-400/47 rounded-full animate-pulse shadow-sm shadow-teal-300" style={{animationDelay: '2.2s'}}></div>
+        <div className="absolute bottom-3/4 right-1/8 w-1.5 h-1.5 bg-sky-400/47 rounded-full animate-pulse shadow-lg shadow-sky-300" style={{animationDelay: '1.1s'}}></div>
+        <div className="absolute top-3/4 left-3/4 w-2 h-2 bg-cyan-400/43 rounded-full animate-pulse shadow-lg shadow-cyan-300" style={{animationDelay: '0.7s'}}></div>
+        <div className="absolute bottom-3/5 right-3/5 w-1 h-1 bg-teal-400/45 rounded-full animate-pulse shadow-sm shadow-teal-300" style={{animationDelay: '1.9s'}}></div>
+        
+        {/* Floating decorative circles */}
+        <div className="absolute top-1/4 left-1/4 w-16 h-16 border-2 border-sky-300/40 rounded-full animate-float" style={{animationDuration: '6s'}}></div>
+        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 border-2 border-cyan-300/35 rounded-full animate-float" style={{animationDelay: '1s', animationDuration: '7s'}}></div>
+        <div className="absolute top-1/3 right-1/5 w-20 h-20 border border-teal-300/32 rounded-full animate-float" style={{animationDelay: '0.5s', animationDuration: '5.5s'}}></div>
+        <div className="absolute bottom-1/3 left-1/5 w-18 h-18 border border-sky-300/38 rounded-full animate-float" style={{animationDelay: '1.5s', animationDuration: '6.5s'}}></div>
+        <div className="absolute top-1/2 left-1/6 w-22 h-22 border-2 border-cyan-300/30 rounded-full animate-float" style={{animationDelay: '0.8s', animationDuration: '5s'}}></div>
+        <div className="absolute bottom-1/2 right-1/6 w-26 h-26 border-2 border-teal-300/28 rounded-full animate-float" style={{animationDelay: '2s', animationDuration: '7.5s'}}></div>
+        <div className="absolute top-2/5 right-3/5 w-16 h-16 border border-sky-300/35 rounded-full animate-float" style={{animationDelay: '0.3s', animationDuration: '6s'}}></div>
+        <div className="absolute bottom-2/5 left-3/5 w-20 h-20 border border-cyan-300/33 rounded-full animate-float" style={{animationDelay: '1.2s', animationDuration: '6.8s'}}></div>
+        <div className="absolute top-3/5 left-1/7 w-24 h-24 border-2 border-teal-300/30 rounded-full animate-float" style={{animationDelay: '0.6s', animationDuration: '5.3s'}}></div>
+        <div className="absolute bottom-3/5 right-1/7 w-18 h-18 border border-sky-300/36 rounded-full animate-float" style={{animationDelay: '1.8s', animationDuration: '6.2s'}}></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20 animate-smooth-reveal">
@@ -652,7 +683,7 @@ export default function LandingPage() {
                 className="flex items-center gap-2 px-4 py-2 h-auto rounded-full bg-cyan-100 border border-cyan-200 hover:bg-cyan-200 hover:scale-110 transition-all duration-300 text-cyan-700 hover:text-cyan-800"
               >
                 <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" style={{animationDelay: '0.3s'}}></div>
-                <span className="text-sm font-semibold">Table</span>
+                <span className="text-sm font-semibold">Tablet</span>
               </Button>
               <Button
                 variant="outline"
