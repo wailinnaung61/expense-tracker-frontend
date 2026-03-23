@@ -416,6 +416,9 @@
 
   /* Base color variables in HSL */
 
+  --sky: oklch(55.91% 0.14186 232.768);
+  --sky-foreground: oklch(100% 0.00011 271.152);
+
   --pink: oklch(65.59% 0.21181 354.287);
   --pink-foreground: #ffffff;
 
@@ -618,6 +621,9 @@
   --foreground: oklch(94.9119% 0 0);
 
   /* Dark mode color adjustments */
+  --sky: oklch(55.91% 0.14186 232.768);
+  --sky-foreground: oklch(100% 0.00011 271.152);
+
   --slate: oklch(27.5325% 0.03636 259.7);
   --slate-foreground: oklch(98.3834% 0.00348 247.86);
 
@@ -664,6 +670,19 @@
   --secondary: oklch(68.2093% 0.21527 12.34);
   --secondary-foreground: oklch(98% 0.01 210);
   --sidebar-primary: oklch(65.59% 0.24181 354.287);
+}
+
+/* Dark Mode: Sky Theme */
+:root.dark.theme-sky {
+  --chart-1: oklch(45% 0.15 210);
+  --chart-2: oklch(55% 0.13 195);
+  --chart-3: oklch(65% 0.11 180);
+  --chart-4: oklch(75% 0.09 180);
+  --chart-5: oklch(85% 0.07 180);
+
+  --secondary: oklch(45% 0.15 210);
+  --secondary-foreground: oklch(98% 0.01 200);
+  --sidebar-primary: oklch(55% 0.13 195);
 }
 
 /* Dark Mode: Blue Theme */

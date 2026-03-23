@@ -1,4 +1,4 @@
-import ClientTransactionStats from "@/components/tranactions/client-transaction-stats"
+import {UpcomingPayments} from "@/components/tranactions/upcoming-payments"
 import { ExpensesHeader } from "@/components/tranactions/tranactions-header"
 import { TransactionFilters } from "@/components/tranactions/tranaction-filters"
 import TransactionsTable from "@/components/tranactions/tranactions"
@@ -46,7 +46,6 @@ export default function Tranactions() {
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
   const [csvImportDialogOpen, setCsvImportDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [statsRefreshKey, setStatsRefreshKey] = useState(0);
   const [transactionsRefreshKey, setTransactionsRefreshKey] = useState(0);
 
   const pageSize = 10;
@@ -60,7 +59,16 @@ export default function Tranactions() {
             pageSize: 100,
           },
         });
-        setCategories(response.items);
+        
+        // Remove duplicates by categoryId - O(n) using Map
+        const seen = new Map<string, ExpenseCategory>();
+        (response.items || []).forEach(cat => {
+          if (!seen.has(cat.categoryId)) {
+            seen.set(cat.categoryId, cat);
+          }
+        });
+        
+        setCategories(Array.from(seen.values()));
       } catch (error) {
         // Silent fail - categories will be empty array
       }
@@ -98,7 +106,16 @@ export default function Tranactions() {
         params.endDate = endDate;
       }
       const response = await transactionService.getTransactions(params);
-      setTransactions(response.items);
+      
+      // Remove duplicates by tranactionId - O(n) using Map
+      const seen = new Map<string, Transaction>();
+      (response.items || []).forEach(trans => {
+        if (!seen.has(trans.tranactionId)) {
+          seen.set(trans.tranactionId, trans);
+        }
+      });
+      
+      setTransactions(Array.from(seen.values()));
       setTotalCount(response.totalCount);
       setNextPageToken(response.nextPageToken || null);
       setHasNextPage(response.hasNextPage);
@@ -210,19 +227,22 @@ export default function Tranactions() {
 
   const handleDialogSuccess = useCallback(() => {
     setCurrentPage(1); // Reset to first page
-    // Clear date filters to ensure new transaction is visible
-    setStartDate("");
-    setEndDate("");
+    // Only reset dates if they are at default (current month)
+    // If user has chosen custom dates, preserve them
+    if (startDate === currentMonthRange.start && endDate === currentMonthRange.end) {
+      // Dates are at default, reset to current month
+      setStartDate(currentMonthRange.start);
+      setEndDate(currentMonthRange.end);
+    }
+    // If dates are custom, don't reset - just refresh with current dates
     // Reset pagination state
     setCurrentToken(null);
     setTokenHistory([]);
     // Trigger refresh after state updates
-    setStatsRefreshKey(prev => prev + 1);
-    setTransactionsRefreshKey(prev => prev + 1);
-  }, []);
+    setTransactionsRefreshKey(prev => prev + 1);  
+  }, [currentMonthRange, startDate, endDate]);
 
   const handleDeleteSuccess = useCallback(() => {
-    setStatsRefreshKey(prev => prev + 1);
     setTransactionsRefreshKey(prev => prev + 1);
   }, []);
 
@@ -234,46 +254,41 @@ export default function Tranactions() {
         onImportCsvClick={handleImportCsvClick}
       />
 
-      <div className="grid gap-6 grid-cols-12">
-        <div className="col-span-12 xl:col-span-8 space-y-6">
-          <TransactionFilters  
-            type={type}
-            status={status}
-            categoryId={categoryId}
-            keyword={keyword}
-            startDate={startDate}
-            endDate={endDate}
-            onTypeChange={handleTypeChange}
-            onStatusChange={handleStatusChange}
-            onCategoryChange={handleCategoryChange}
-            onKeywordChange={handleKeywordChange}
-            onStartDateChange={handleStartDateChange}
-            onEndDateChange={handleEndDateChange}
+      <div className="space-y-6">
+        <TransactionFilters  
+          type={type}
+          status={status}
+          categoryId={categoryId}
+          keyword={keyword}
+          startDate={startDate}
+          endDate={endDate}
+          onTypeChange={handleTypeChange}
+          onStatusChange={handleStatusChange}
+          onCategoryChange={handleCategoryChange}
+          onKeywordChange={handleKeywordChange}
+          onStartDateChange={handleStartDateChange}
+          onEndDateChange={handleEndDateChange}
+        />
+        {loading ? (
+          <div className="flex items-center justify-center p-12">
+            <img src={spinnerGif} alt="Loading" className="w-12 h-12" />
+          </div>
+        ) : (
+          <TransactionsTable
+            transactions={transactions}
+            categories={categories}
+            currentPage={currentPage}
+            totalCount={totalCount}
+            hasNextPage={hasNextPage}
+            hasPreviousPage={tokenHistory.length > 0}
+            onNextPage={handleNextPage}
+            onPreviousPage={handlePreviousPage}
+            onEdit={handleEditClick}
+            onDuplicate={handleDuplicateClick}
+            onDelete={handleDeleteSuccess}
+            currency={user?.currency || "USD"}
           />
-          {loading ? (
-            <div className="flex items-center justify-center p-12">
-              <img src={spinnerGif} alt="Loading" className="w-12 h-12" />
-            </div>
-          ) : (
-            <TransactionsTable
-              transactions={transactions}
-              categories={categories}
-              currentPage={currentPage}
-              totalCount={totalCount}
-              hasNextPage={hasNextPage}
-              hasPreviousPage={tokenHistory.length > 0}
-              onNextPage={handleNextPage}
-              onPreviousPage={handlePreviousPage}
-              onEdit={handleEditClick}
-              onDuplicate={handleDuplicateClick}
-              onDelete={handleDeleteSuccess}
-              currency={user?.currency || "USD"}
-            />
-          )}
-        </div>
-        <div className="col-span-12 xl:col-span-4 xl:order-1 sticky top-12">
-          <ClientTransactionStats refreshKey={statsRefreshKey} />
-        </div>
+        )}
       </div>
 
       <AddTransactionDialog
@@ -293,6 +308,12 @@ export default function Tranactions() {
         open={csvImportDialogOpen}
         onOpenChange={setCsvImportDialogOpen}
         onSuccess={handleDialogSuccess}
+      />
+
+      <UpcomingPayments 
+        startDate={startDate} 
+        endDate={endDate} 
+        onTransactionCreated={handleDialogSuccess}
       />
     </div>
   )

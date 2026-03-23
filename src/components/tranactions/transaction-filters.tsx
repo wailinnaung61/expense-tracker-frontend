@@ -91,11 +91,21 @@ export function TransactionFilters({
         }
         
         const response = await categoryService.getCategories(params);
-        setCategories(response.items || []);
+        
+        // Remove duplicates by categoryId - O(n) using Map
+        const seen = new Map<string, ExpenseCategory>();
+        (response.items || []).forEach(cat => {
+          if (!seen.has(cat.categoryId)) {
+            seen.set(cat.categoryId, cat);
+          }
+        });
+        
+        const uniqueCategories = Array.from(seen.values());
+        setCategories(uniqueCategories);
         
         // Clear selected category if it's not in the new filtered list
-        if (categoryId && response.items) {
-          const categoryExists = response.items.some((cat: ExpenseCategory) => cat.categoryId === categoryId);
+        if (categoryId && uniqueCategories.length > 0) {
+          const categoryExists = uniqueCategories.some((cat: ExpenseCategory) => cat.categoryId === categoryId);
           if (!categoryExists) {
             onCategoryChange("all");
           }

@@ -91,11 +91,21 @@ export function TransactionFilters({
         }
         
         const response = await categoryService.getCategories(params);
-        setCategories(response.items || []);
+        
+        // Remove duplicates by categoryId - O(n) using Map
+        const seen = new Map<string, ExpenseCategory>();
+        (response.items || []).forEach(cat => {
+          if (!seen.has(cat.categoryId)) {
+            seen.set(cat.categoryId, cat);
+          }
+        });
+        
+        const uniqueCategories = Array.from(seen.values());
+        setCategories(uniqueCategories);
         
         // Clear selected category if it's not in the new filtered list
-        if (categoryId && response.items) {
-          const categoryExists = response.items.some((cat: ExpenseCategory) => cat.categoryId === categoryId);
+        if (categoryId && uniqueCategories.length > 0) {
+          const categoryExists = uniqueCategories.some((cat: ExpenseCategory) => cat.categoryId === categoryId);
           if (!categoryExists) {
             onCategoryChange("all");
           }
@@ -109,21 +119,23 @@ export function TransactionFilters({
   }, [type]);
 
   return (
-    <div className="p-4 border rounded-lg shadow-sm">
-      <div className="space-y-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute inset-s-2.5 top-2.5 h-4 w-4 border-muted text-muted-foreground" />
+    <div className="rounded-xl border bg-card/50 backdrop-blur-sm shadow-md">
+      <div className="p-6 space-y-5">
+        {/* Search and Filters Row */}
+        <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute inset-s-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
               placeholder="Search transactions..."
-              className="ps-8 bg-transparent"
+              className="ps-10 h-11 border-muted-foreground/20 focus-visible:ring-2"
               value={keyword}
               onChange={(e) => onKeywordChange(e.target.value)}
             />
           </div>
-          <div className="flex flex-col sm:flex-row gap-2">
+          
+          <div className="flex flex-wrap sm:flex-nowrap gap-2.5">
             <Select value={type} onValueChange={onTypeChange}>
-              <SelectTrigger className="w-35 bg-transparent">
+              <SelectTrigger className="w-full sm:w-36 h-11 border-muted-foreground/20">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
@@ -132,8 +144,9 @@ export function TransactionFilters({
                 <SelectItem value="0">Income</SelectItem>
               </SelectContent>
             </Select>
+            
             <Select value={status} onValueChange={onStatusChange}>
-              <SelectTrigger className="w-35 bg-transparent">
+              <SelectTrigger className="w-full sm:w-36 h-11 border-muted-foreground/20">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -143,11 +156,12 @@ export function TransactionFilters({
                 <SelectItem value="2">Failed</SelectItem>
               </SelectContent>
             </Select>
+            
             <Select value={categoryId} onValueChange={onCategoryChange}>
-              <SelectTrigger className="w-35 bg-transparent">
+              <SelectTrigger className="w-full sm:w-40 h-11 border-muted-foreground/20">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-100">
                 <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((cat) => (
                   <SelectItem key={cat.categoryId} value={cat.categoryId}>
@@ -158,49 +172,56 @@ export function TransactionFilters({
             </Select>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal bg-transparent"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDateLocal ? format(startDateLocal, "PPP") : <span>Start Date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarUI
-                  mode="single"
-                  selected={startDateLocal}
-                  onSelect={handleStartDateSelect}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="flex-1">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal bg-transparent"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDateLocal ? format(endDateLocal, "PPP") : <span>End Date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarUI
-                  mode="single"
-                  selected={endDateLocal}
-                  onSelect={handleEndDateSelect}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+
+        {/* Date Range Row */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full sm:w-64 h-11 justify-start text-left font-normal border-muted-foreground/20 hover:bg-accent/50"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {startDateLocal ? (
+                  <span className="font-medium">{format(startDateLocal, "PPP")}</span>
+                ) : (
+                  <span className="text-muted-foreground">Start Date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <CalendarUI
+                mode="single"
+                selected={startDateLocal}
+                onSelect={handleStartDateSelect}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full sm:w-64 h-11 justify-start text-left font-normal border-muted-foreground/20 hover:bg-accent/50"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {endDateLocal ? (
+                  <span className="font-medium">{format(endDateLocal, "PPP")}</span>
+                ) : (
+                  <span className="text-muted-foreground">End Date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <CalendarUI
+                mode="single"
+                selected={endDateLocal}
+                onSelect={handleEndDateSelect}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </div>

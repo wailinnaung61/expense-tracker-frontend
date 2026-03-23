@@ -52,7 +52,9 @@ export const signInSchema = z.object({
 })
 
 export const signUpSchema = z.object({
-  userName: z.string().min(2, 'User Name is required'),
+  userName: z.string()
+    .min(2, 'User Name is required')
+    .regex(/^\S*$/, 'Username must not contain spaces'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, "Password must be at least 8 characters")
   .regex(/[0-9]/, "Use a number")

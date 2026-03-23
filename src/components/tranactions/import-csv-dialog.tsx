@@ -58,7 +58,16 @@ export function ImportCsvDialog({
             pageSize: 999999999,
           },
         });
-        setCategories(response.items || []);
+        
+        // Remove duplicates by categoryId - O(n) using Map
+        const seen = new Map<string, ExpenseCategory>();
+        (response.items || []).forEach(cat => {
+          if (!seen.has(cat.categoryId)) {
+            seen.set(cat.categoryId, cat);
+          }
+        });
+        
+        setCategories(Array.from(seen.values()));
       } catch (error) {
         // Silent fail
       }

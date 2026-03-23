@@ -45,7 +45,16 @@ export default function Categories() {
       }
 
       const response = await categoryService.getCategories(params);
-      setCategories(response.items);
+      
+      // Remove duplicates by categoryId - O(n) using Map
+      const seen = new Map<string, ExpenseCategory>();
+      (response.items || []).forEach(cat => {
+        if (!seen.has(cat.categoryId)) {
+          seen.set(cat.categoryId, cat);
+        }
+      });
+      
+      setCategories(Array.from(seen.values()));
       setTotalCount(response.totalCount);
       setNextPageToken(response.nextPageToken || null);
       setHasNextPage(response.hasNextPage);
