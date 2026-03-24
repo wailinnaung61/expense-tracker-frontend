@@ -1,8 +1,11 @@
-export default function Settings() {
+import { SettingsHeader } from "@/components/settings/settings-header";
+import { SettingsTabs } from "@/components/settings/settings-tabs";
+
+export default function SettingsPage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">Settings</h1>
-      <p className="text-muted-foreground">Manage your settings here.</p>
-    </div>
-  )
+      <div className="space-y-6">
+        <SettingsHeader />
+        <SettingsTabs />
+      </div>
+  );
 }

@@ -35,6 +35,15 @@ export interface User {
   menus: UserMenu[]
 }
 
+export interface UpdateAuthProfileRequest {
+  userName: string
+  email: string
+}
+
+export interface ConfirmEmailChangeRequest {
+  confirmationCode: string
+}
+
 export interface VerifyTotpResponse {
   tokens: {
     accessToken: string

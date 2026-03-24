@@ -111,10 +111,11 @@ export function AddTransactionDialog({
           },
         });
         
-        // Remove duplicates by categoryId - O(n) using Map
+        // Remove duplicates by categoryId - keep the latest version (ISO strings are sortable)
         const seen = new Map<string, ExpenseCategory>();
         (response.items || []).forEach(cat => {
-          if (!seen.has(cat.categoryId)) {
+          const existing = seen.get(cat.categoryId);
+          if (!existing || cat.updatedAt > existing.updatedAt) {
             seen.set(cat.categoryId, cat);
           }
         });

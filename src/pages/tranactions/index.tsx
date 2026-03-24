@@ -60,10 +60,11 @@ export default function Tranactions() {
           },
         });
         
-        // Remove duplicates by categoryId - O(n) using Map
+        // Remove duplicates by categoryId - keep the latest version (ISO strings are sortable)
         const seen = new Map<string, ExpenseCategory>();
         (response.items || []).forEach(cat => {
-          if (!seen.has(cat.categoryId)) {
+          const existing = seen.get(cat.categoryId);
+          if (!existing || cat.updatedAt > existing.updatedAt) {
             seen.set(cat.categoryId, cat);
           }
         });
@@ -107,10 +108,11 @@ export default function Tranactions() {
       }
       const response = await transactionService.getTransactions(params);
       
-      // Remove duplicates by tranactionId - O(n) using Map
+      // Remove duplicates by tranactionId - keep the latest version (ISO strings are sortable)
       const seen = new Map<string, Transaction>();
       (response.items || []).forEach(trans => {
-        if (!seen.has(trans.tranactionId)) {
+        const existing = seen.get(trans.tranactionId);
+        if (!existing || trans.updatedAt > existing.updatedAt) {
           seen.set(trans.tranactionId, trans);
         }
       });

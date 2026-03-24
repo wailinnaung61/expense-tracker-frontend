@@ -77,6 +77,21 @@ export const authService = {
     return apiClient.post('/api/Auth/change-password', data)
   },
 
+  // Update auth profile (userName, email)
+  async updateAuthProfile(data: { userName: string; email: string }): Promise<User> {
+    return apiClient.put<User>('/api/Auth/profile', data)
+  },
+
+  // Resend email verification
+  async resendEmailVerification(): Promise<{ message: string }> {
+    return apiClient.post('/api/Auth/resend-email-verification')
+  },
+
+  // Confirm email change
+  async confirmEmailChange(confirmationCode: string): Promise<{ message: string }> {
+    return apiClient.post('/api/Auth/confirm-email-change', { confirmationCode })
+  },
+
   // Disable MFA with backup code
   async disableMfaWithBackup(data: { username: string; backupCode: string }): Promise<{ message: string }> {
     return apiClient.post('/api/Auth/mfa/disable-with-backup', data)
