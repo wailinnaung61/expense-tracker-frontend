@@ -1,25 +1,92 @@
 import { z } from 'zod'
 
-// API Response Types
-export interface LoginResponse {
-  requiresMfa: boolean
-  tokens: {
-    accessToken: string
-    idToken: string
-    refreshToken: string
-    expiresIn: number
-    tokenType: string
-  }
-  mfaChallenge: string | null
+// ============================================================================
+// Backend-Aligned API Types
+// ============================================================================
+
+// Token Types
+export interface TokenResponse {
+  accessToken: string
+  idToken: string
+  refreshToken: string
+  expiresIn: number
+  tokenType: string
 }
 
+// Sign Up
+export interface UserSignUpRequest {
+  username: string
+  email: string
+  password: string
+}
+
+export interface UserSignUpResponse {
+  message: string
+  userSub?: string
+}
+
+// Resend Confirmation
+export interface ResendConfirmationRequest {
+  username: string
+}
+
+// Confirm Sign Up
+export interface UserConfirmSignUpRequest {
+  username: string
+  confirmationCode: string
+}
+
+// Sign In
+export interface UserSignInRequest {
+  usernameOrEmail: string
+  password: string
+}
+
+export interface AuthSignInResult {
+  requiresMfa: boolean
+  tokens?: TokenResponse
+  mfaChallenge?: string
+  session?: string
+  userName?: string
+}
+
+export interface UserSignInResponse {
+  tokens: TokenResponse
+}
+
+// Refresh Token
+export interface UserRefreshTokenWithUsernameRequest {
+  refreshToken: string
+  username: string
+}
+
+// Forgot Password
+export interface UserForgotPasswordRequest {
+  usernameOrEmail: string
+}
+
+// Reset Password
+export interface UserResetPasswordRequest {
+  usernameOrEmail: string
+  confirmationCode: string
+  newPassword: string
+}
+
+// Change Password
+export interface UserChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
+// User Profile
 export interface UserMenu {
   key: string
   label: string
   path: string
 }
 
-export interface User {
+export interface CognitoUser {
   userId: string
   userName: string
   email: string
@@ -35,24 +102,63 @@ export interface User {
   menus: UserMenu[]
 }
 
-export interface UpdateAuthProfileRequest {
+export interface UpdateProfileRequest {
   userName: string
   email: string
 }
 
+// Email Verification
 export interface ConfirmEmailChangeRequest {
   confirmationCode: string
 }
 
-export interface VerifyTotpResponse {
-  tokens: {
-    accessToken: string
-    idToken: string
-    refreshToken: string
-    expiresIn: number
-    tokenType: string
-  }
+// MFA Types
+export interface MfaVerifyRequest {
+  session: string
+  username: string
+  totpCode: string
 }
+
+export interface MfaSetupResponse {
+  secretCode: string
+  qrCodeUri: string
+}
+
+export interface MfaVerifySetupRequest {
+  totpCode: string
+}
+
+export interface MfaVerifySetupResponse {
+  status: string
+  message: string
+  backupCodes: string[]
+}
+
+export interface DisableMfaWithBackupCodeRequest {
+  username: string
+  backupCode: string
+}
+
+export interface MfaStatusResponse {
+  mfaEnabled: boolean
+  preferredMfa?: string
+}
+
+// Google OAuth
+export interface OAuthUrlResponse {
+  authorizationUrl: string
+}
+
+export interface GoogleSignInRequest {
+  authorizationCode: string
+  redirectUri: string
+}
+
+// Legacy Aliases (for backward compatibility)
+export type LoginResponse = AuthSignInResult
+export type User = CognitoUser
+export type UpdateAuthProfileRequest = UpdateProfileRequest
+export type VerifyTotpResponse = UserSignInResponse
 
 // Form Validation Schemas
 export const signInSchema = z.object({

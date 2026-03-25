@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export class ApiError extends Error {
   status: number;
@@ -37,10 +37,13 @@ export const apiClient = {
 
     console.log('🔄 Attempting to refresh access token for user:', username);
 
+    const language = localStorage.getItem("i18nextLng") || "en";
+
     const response = await fetch(`${API_BASE_URL}/api/Auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept-Language': language,
       },
       body: JSON.stringify({ refreshToken, username }),
     });
@@ -105,9 +108,11 @@ export const apiClient = {
 
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = localStorage.getItem("accessToken");
+    const language = localStorage.getItem("i18nextLng") || "en";
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
+      "Accept-Language": language,
       ...(options.headers as Record<string, string>),
     };
 

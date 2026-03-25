@@ -64,5 +64,9 @@ export interface ExpenseBreakdownComparison {
 export interface ExpenseBreakdown {
   totalExpenses: number;
   categories: ExpenseBreakdownCategory[];
-  comparison: ExpenseBreakdownComparison;
+  comparison: ExpenseBreakdownComparison | null; // Backend: MonthlyComparison? (nullable)
 }
+
+// Type aliases for backend naming compatibility
+export type CategoryBreakdownItem = ExpenseBreakdownCategory;
+export type MonthlyComparison = ExpenseBreakdownComparison;

@@ -14,7 +14,8 @@ import { TransactionType, PaymentStatus } from "@/types/transaction";
 import { Upload, FileText, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
-import { parse } from "date-fns";
+import { toast } from "react-toastify";
+import { parse, format } from "date-fns";
 
 interface ImportCsvDialogProps {
   open: boolean;
@@ -53,17 +54,14 @@ export function ImportCsvDialog({
     const fetchCategories = async () => {
       try {
         const response = await categoryService.getCategories({
-          pagination: {
-            pageNumber: 1,
-            pageSize: 999999999,
-          },
+          pageSize: 999999999,
         });
         
         // Remove duplicates by categoryId - keep the latest version (ISO strings are sortable)
         const seen = new Map<string, ExpenseCategory>();
         (response.items || []).forEach(cat => {
           const existing = seen.get(cat.categoryId);
-          if (!existing || cat.updatedAt > existing.updatedAt) {
+          if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
             seen.set(cat.categoryId, cat);
           }
         });
@@ -246,11 +244,7 @@ export function ImportCsvDialog({
     if (!file) return;
 
     if (!file.name.endsWith(".csv")) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid File",
-        text: "Please select a CSV file",
-      });
+      console.error('Invalid file type - not a CSV');
       return;
     }
 
@@ -261,11 +255,7 @@ export function ImportCsvDialog({
       const rows = parseCSV(text);
 
       if (rows.length === 0) {
-        Swal.fire({
-          icon: "error",
-          title: "Empty File",
-          text: "The CSV file is empty",
-        });
+        console.error('CSV file is empty');
         return;
       }
 
@@ -284,11 +274,7 @@ export function ImportCsvDialog({
       setValidCount(parsed.filter((r) => r.valid).length);
       setInvalidCount(parsed.filter((r) => !r.valid).length);
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Parse Error",
-        text: "Failed to parse CSV file",
-      });
+      console.error('Failed to parse CSV file:', error);
     }
   };
 
@@ -296,11 +282,7 @@ export function ImportCsvDialog({
     const validRows = parsedData.filter((r) => r.valid);
 
     if (validRows.length === 0) {
-      Swal.fire({
-        icon: "error",
-        title: "No Valid Rows",
-        text: "There are no valid rows to import",
-      });
+      console.error('No valid rows to import');
       return;
     }
 
@@ -318,7 +300,7 @@ export function ImportCsvDialog({
             type: type as TransactionType,
             categoryId: category.categoryId,
             amount: parseFloat(row.amount),
-            tranactionDate: date.toISOString(),
+            tranactionDate: format(date, "yyyy-MM-dd"),
             status: status as PaymentStatus,
             description: row.description.trim(),
             note: row.note.trim(),
@@ -337,11 +319,8 @@ export function ImportCsvDialog({
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Import Failed",
-        text: error.message || "Failed to import transactions",
-      });
+      console.error('Failed to import transactions:', error);
+      toast.error(error.message || 'Failed to import transactions. Please try again.');
     } finally {
       setIsImporting(false);
     }

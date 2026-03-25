@@ -2,10 +2,10 @@ import {UpcomingPayments} from "@/components/tranactions/upcoming-payments"
 import { ExpensesHeader } from "@/components/tranactions/tranactions-header"
 import { TransactionFilters } from "@/components/tranactions/tranaction-filters"
 import TransactionsTable from "@/components/tranactions/tranactions"
+import ClientTransactionStats from "@/components/tranactions/client-transaction-stats"
 import type { Transaction, TransactionListParams } from "@/types/transaction"
 import type { ExpenseCategory } from "@/types/category"
 import { useEffect, useState, useCallback, useMemo } from "react";
-import Swal from "sweetalert2";
 import spinnerGif from "@/assets/Spinner.gif";
 import { transactionService } from "@/services/tranactionService"
 import { categoryService } from "@/services/categoryService"
@@ -38,10 +38,12 @@ export default function Tranactions() {
   const [endDate, setEndDate] = useState<string>(currentMonthRange.end);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [nextCursorId, setNextCursorId] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [currentToken, setCurrentToken] = useState<string | null>(null);
-  const [tokenHistory, setTokenHistory] = useState<string[]>([]);
+  const [currentCursor, setCurrentCursor] = useState<string | null>(null);
+  const [currentCursorId, setCurrentCursorId] = useState<string | null>(null);
+  const [cursorHistory, setCursorHistory] = useState<Array<{ cursor: string | null; cursorId: string | null }>>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
   const [csvImportDialogOpen, setCsvImportDialogOpen] = useState(false);
@@ -55,16 +57,13 @@ export default function Tranactions() {
     const fetchCategories = async () => {
       try {
         const response = await categoryService.getCategories({
-          pagination: {
-            pageSize: 100,
-          },
+          pageSize: 100,
         });
         
-        // Remove duplicates by categoryId - keep the latest version (ISO strings are sortable)
         const seen = new Map<string, ExpenseCategory>();
         (response.items || []).forEach(cat => {
           const existing = seen.get(cat.categoryId);
-          if (!existing || cat.updatedAt > existing.updatedAt) {
+          if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
             seen.set(cat.categoryId, cat);
           }
         });
@@ -77,17 +76,19 @@ export default function Tranactions() {
     fetchCategories();
   }, []);
 
-  const fetchTransactions = useCallback(async (token: string | null = null) => {
+  const fetchTransactions = useCallback(async (cursor: string | null = null, cursorId: string | null = null) => {
     setLoading(true);
     try {
       const params: TransactionListParams = {
-        pagination: {
-          pageNumber: currentPage,
-          pageSize,
-          nextPageToken: token || undefined,
-          hasCursor: !!token,
-        },
+        pageSize,
       };
+      
+      // Add cursor-based pagination if we have cursor values
+      if (cursor && cursorId) {
+        params.cursor = cursor;
+        params.cursorId = cursorId;
+      }
+      
       if (type !== "all") {
         params.type = type;
       }
@@ -112,91 +113,95 @@ export default function Tranactions() {
       const seen = new Map<string, Transaction>();
       (response.items || []).forEach(trans => {
         const existing = seen.get(trans.tranactionId);
-        if (!existing || trans.updatedAt > existing.updatedAt) {
+        if (!existing || (trans.updatedAt && existing.updatedAt && trans.updatedAt > existing.updatedAt) || (trans.updatedAt && !existing.updatedAt)) {
           seen.set(trans.tranactionId, trans);
         }
       });
       
       setTransactions(Array.from(seen.values()));
       setTotalCount(response.totalCount);
-      setNextPageToken(response.nextPageToken || null);
+      setNextCursor(response.nextCursor || null);
+      setNextCursorId(response.nextCursorId || null);
       setHasNextPage(response.hasNextPage);
       
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to fetch transactions";
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: message,
-      });
+      console.error("Failed to fetch transactions:", error);
     } finally {
       setLoading(false);
     }
-  }, [type, status, categoryId, keyword, startDate, endDate, currentPage]);
+  }, [type, status, categoryId, keyword, startDate, endDate, pageSize]);
 
   useEffect(() => {
-    fetchTransactions(currentToken);
-  }, [fetchTransactions, transactionsRefreshKey, currentToken]);
+    fetchTransactions(currentCursor, currentCursorId);
+  }, [fetchTransactions, transactionsRefreshKey, currentCursor, currentCursorId]);
 
   const handleTypeChange = useCallback((newType: string) => {
     setType(newType);
     setCurrentPage(1);
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
   }, []);
 
   const handleStatusChange = useCallback((newStatus: string) => {
     setStatus(newStatus);
     setCurrentPage(1);
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
   }, []);
 
   const handleCategoryChange = useCallback((newCategoryId: string) => {
     setCategoryId(newCategoryId);
     setCurrentPage(1);
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
   }, []);
 
   const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
     setCurrentPage(1);
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
   }, []);
 
   const handleStartDateChange = useCallback((newStartDate: string) => {
     setStartDate(newStartDate);
     setCurrentPage(1);
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
   }, []);
 
   const handleEndDateChange = useCallback((newEndDate: string) => {
     setEndDate(newEndDate);
     setCurrentPage(1);
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
   }, []);
 
   const handleNextPage = useCallback(() => {
-    if (hasNextPage && nextPageToken) {
-      setTokenHistory(prev => [...prev, currentToken || '']);
+    if (hasNextPage && nextCursor && nextCursorId) {
+      setCursorHistory(prev => [...prev, {cursor: currentCursor, cursorId: currentCursorId}]);
       setCurrentPage(prev => prev + 1);
-      setCurrentToken(nextPageToken);
+      setCurrentCursor(nextCursor);
+      setCurrentCursorId(nextCursorId);
     }
-  }, [hasNextPage, nextPageToken, currentToken]);
+  }, [hasNextPage, nextCursor, nextCursorId, currentCursor, currentCursorId]);
 
   const handlePreviousPage = useCallback(() => {
-    if (tokenHistory.length > 0) {
-      const newHistory = [...tokenHistory];
-      const prevToken = newHistory.pop();
-      setTokenHistory(newHistory);
+    if (cursorHistory.length > 0) {
+      const newHistory = [...cursorHistory];
+      const prevCursors = newHistory.pop();
+      setCursorHistory(newHistory);
       setCurrentPage(prev => prev - 1);
-      setCurrentToken(prevToken || null);
+      setCurrentCursor(prevCursors?.cursor || null);
+      setCurrentCursorId(prevCursors?.cursorId || null);
     }
-  }, [tokenHistory]);
+  }, [cursorHistory]);
 
   const handleAddClick = useCallback(() => {
     setSelectedTransaction(null);
@@ -221,7 +226,7 @@ export default function Tranactions() {
     const duplicatedTransaction: Transaction = {
       ...transaction,
       tranactionId: '', // Clear ID so it creates a new one
-      tranactionDate: new Date().toISOString(), // Set to today
+      tranactionDate: format(new Date(), "yyyy-MM-dd"), // Set to today
     };
     setSelectedTransaction(duplicatedTransaction);
     setDialogOpen(true);
@@ -238,8 +243,9 @@ export default function Tranactions() {
     }
     // If dates are custom, don't reset - just refresh with current dates
     // Reset pagination state
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
     // Trigger refresh after state updates
     setTransactionsRefreshKey(prev => prev + 1);  
   }, [currentMonthRange, startDate, endDate]);
@@ -256,41 +262,55 @@ export default function Tranactions() {
         onImportCsvClick={handleImportCsvClick}
       />
 
-      <div className="space-y-6">
-        <TransactionFilters  
-          type={type}
-          status={status}
-          categoryId={categoryId}
-          keyword={keyword}
-          startDate={startDate}
-          endDate={endDate}
-          onTypeChange={handleTypeChange}
-          onStatusChange={handleStatusChange}
-          onCategoryChange={handleCategoryChange}
-          onKeywordChange={handleKeywordChange}
-          onStartDateChange={handleStartDateChange}
-          onEndDateChange={handleEndDateChange}
-        />
-        {loading ? (
-          <div className="flex items-center justify-center p-12">
-            <img src={spinnerGif} alt="Loading" className="w-12 h-12" />
-          </div>
-        ) : (
-          <TransactionsTable
-            transactions={transactions}
-            categories={categories}
-            currentPage={currentPage}
-            totalCount={totalCount}
-            hasNextPage={hasNextPage}
-            hasPreviousPage={tokenHistory.length > 0}
-            onNextPage={handleNextPage}
-            onPreviousPage={handlePreviousPage}
-            onEdit={handleEditClick}
-            onDuplicate={handleDuplicateClick}
-            onDelete={handleDeleteSuccess}
-            currency={user?.currency || "USD"}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content - Left */}
+        <div className="lg:col-span-2 space-y-6">
+          <TransactionFilters  
+            type={type}
+            status={status}
+            categoryId={categoryId}
+            keyword={keyword}
+            startDate={startDate}
+            endDate={endDate}
+            onTypeChange={handleTypeChange}
+            onStatusChange={handleStatusChange}
+            onCategoryChange={handleCategoryChange}
+            onKeywordChange={handleKeywordChange}
+            onStartDateChange={handleStartDateChange}
+            onEndDateChange={handleEndDateChange}
           />
-        )}
+          {loading ? (
+            <div className="flex items-center justify-center p-12">
+              <img src={spinnerGif} alt="Loading" className="w-12 h-12" />
+            </div>
+          ) : (
+            <TransactionsTable
+              transactions={transactions}
+              categories={categories}
+              currentPage={currentPage}
+              totalCount={totalCount}
+              hasNextPage={hasNextPage}
+              hasPreviousPage={cursorHistory.length > 0}
+              onNextPage={handleNextPage}
+              onPreviousPage={handlePreviousPage}
+              onEdit={handleEditClick}
+              onDuplicate={handleDuplicateClick}
+              onDelete={handleDeleteSuccess}
+              currency={user?.currency || "USD"}
+            />
+          )}
+
+          <UpcomingPayments 
+            startDate={startDate} 
+            endDate={endDate} 
+            onTransactionCreated={handleDialogSuccess}
+          />
+        </div>
+
+        {/* Stats Sidebar - Right */}
+        <div className="lg:col-span-1">
+          <ClientTransactionStats refreshKey={transactionsRefreshKey} />
+        </div>
       </div>
 
       <AddTransactionDialog
@@ -310,12 +330,6 @@ export default function Tranactions() {
         open={csvImportDialogOpen}
         onOpenChange={setCsvImportDialogOpen}
         onSuccess={handleDialogSuccess}
-      />
-
-      <UpcomingPayments 
-        startDate={startDate} 
-        endDate={endDate} 
-        onTransactionCreated={handleDialogSuccess}
       />
     </div>
   )

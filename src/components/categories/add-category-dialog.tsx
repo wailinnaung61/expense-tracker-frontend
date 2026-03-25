@@ -136,11 +136,7 @@ export function AddCategoryDialog({
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Failed to save category",
-      });
+      console.error("Failed to save category:", error);
     }
   };
 

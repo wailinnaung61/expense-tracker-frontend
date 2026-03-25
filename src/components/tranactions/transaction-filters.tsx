@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { categoryService } from "@/services/categoryService";
-import type { ExpenseCategory } from "@/types/category";
+import type { CategoryListParams, ExpenseCategory } from "@/types/category";
 import { format } from "date-fns";
 import { CalendarIcon, Search } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -78,16 +78,13 @@ export function TransactionFilters({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const params: any = {
-          pagination: {
-            pageNumber: 1,
-            pageSize: 999999999, // Fetch all categories for the dropdown
-          },
+        const params: CategoryListParams = {
+          pageSize: 999999999, // Fetch all categories for the dropdown
         };
         
         // Add type filter if not "all"
         if (type !== "all") {
-          params.type = parseInt(type);
+          params.type = type;
         }
         
         const response = await categoryService.getCategories(params);

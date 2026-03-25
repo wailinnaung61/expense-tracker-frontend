@@ -86,11 +86,7 @@ export function CategoriesTable({
         });
         onDelete();
       } catch (error: any) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: error.message || "Failed to delete category",
-        });
+        console.error("Failed to delete category:", error);
       }
     }
   };

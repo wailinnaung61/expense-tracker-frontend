@@ -27,7 +27,6 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { ChevronLeft, ChevronRight, PiggyBank, TrendingUp, ArrowRight, Wallet, CreditCard, Receipt } from "lucide-react";
 import { format, addMonths, subMonths } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
-import { Loader2 } from "lucide-react";
 
 interface TransactionStatsProps {
   currency?: string;
@@ -54,14 +53,10 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   const [monthlyData, setMonthlyData] = useState<MonthlyAggregation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
 
-  const fetchExpenseBreakdown = useCallback(async (date: Date, isRetry = false) => {
-    if (!isRetry) {
-      setLoading(true);
-      setRetryCount(0);
-    }
+  const fetchExpenseBreakdown = useCallback(async (date: Date) => {
+    setLoading(true);
     setError(null);
     try {
       const monthStr = format(date, "yyyy-MM");
@@ -71,16 +66,13 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
       ]);
       setData(breakdown);
       setMonthlyData(monthly);
-      setRetryCount(0);
     } catch (err: any) {
       console.error("Failed to fetch expense breakdown:", err);
       setError(err.message || "Failed to load data");
       setData(null);
       setMonthlyData(null);
     } finally {
-      if (!isRetry) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   }, []);
 
@@ -89,51 +81,10 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
     fetchExpenseBreakdown(currentMonth);
   }, [currentMonth, fetchExpenseBreakdown]);
 
-  // Smart retry for lambda eventual consistency when refreshKey changes
-  // Real-world pattern: AWS Lambda aggregations are eventually consistent
-  // - Try immediately (might be cached or fast execution)
-  // - Retry after 2s (DynamoDB streams + Lambda processing time)
-  // - Retry after 5s (eventual consistency window)
-  // - Final retry after 8s (ensure we get updated data)
+  // Immediate refresh when transaction changes (materialized view is ready immediately)
   useEffect(() => {
     if (refreshKey === 0) return; // Skip on initial mount
-
-    let timer1: number;
-    let timer2: number;
-    let timer3: number;
-    
-    const delayedRefresh = async () => {
-      // Show syncing indicator for entire retry period
-      setRetryCount(1);
-      
-      // First immediate attempt
-      await fetchExpenseBreakdown(currentMonth, true);
-      
-      // Retry after 2 seconds (DynamoDB streams processing)
-      timer1 = setTimeout(async () => {
-        await fetchExpenseBreakdown(currentMonth, true);
-        
-        // Retry after 3 more seconds (eventual consistency)
-        timer2 = setTimeout(async () => {
-          await fetchExpenseBreakdown(currentMonth, true);
-          
-          // Final retry after 3 more seconds
-          timer3 = setTimeout(async () => {
-            await fetchExpenseBreakdown(currentMonth, true);
-            setRetryCount(0); // Done with all retries
-          }, 3000);
-        }, 3000);
-      }, 2000);
-    };
-
-    delayedRefresh();
-
-    return () => {
-      if (timer1) clearTimeout(timer1);
-      if (timer2) clearTimeout(timer2);
-      if (timer3) clearTimeout(timer3);
-      setRetryCount(0);
-    };
+    fetchExpenseBreakdown(currentMonth);
   }, [refreshKey, currentMonth, fetchExpenseBreakdown]);
 
   const handlePreviousMonth = useCallback(() => {
@@ -185,15 +136,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <CardTitle>Monthly Overview</CardTitle>
-              {retryCount > 0 && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  <span>Syncing...</span>
-                </div>
-              )}
-            </div>
+            <CardTitle>Monthly Overview</CardTitle>
             <CardDescription>
               {monthlyData ? (
                 <>
@@ -435,8 +378,16 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="text-2xl font-bold">
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+                <div className={`font-bold ${
+                  formatCurrency(data.totalExpenses, currency).length > 15 
+                    ? 'text-sm' 
+                    : formatCurrency(data.totalExpenses, currency).length > 12 
+                    ? 'text-base' 
+                    : formatCurrency(data.totalExpenses, currency).length > 10
+                    ? 'text-lg'
+                    : 'text-2xl'
+                } wrap-break-word text-center max-w-full`}>
                   {formatCurrency(data.totalExpenses, currency)}
                 </div>
                 <div className="text-xs text-muted-foreground">Total Expenses</div>

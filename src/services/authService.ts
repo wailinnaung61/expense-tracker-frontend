@@ -1,5 +1,22 @@
 import { apiClient } from '@/lib/api'
-import type { LoginResponse, User, VerifyTotpResponse } from '@/types/auth'
+import type { 
+  AuthSignInResult,
+  CognitoUser, 
+  UserSignInRequest,
+  UserSignUpRequest,
+  UserSignUpResponse,
+  UserConfirmSignUpRequest,
+  UserForgotPasswordRequest,
+  UserResetPasswordRequest,
+  UserChangePasswordRequest,
+  UpdateProfileRequest,
+  MfaVerifyRequest,
+  UserSignInResponse,
+  OAuthUrlResponse,
+  GoogleSignInRequest,
+  DisableMfaWithBackupCodeRequest,
+  TokenResponse
+} from '@/types/auth'
 
 export interface SignUpData {
   userName: string
@@ -16,13 +33,16 @@ export interface VerifyTotpData {
   session: string
   username: string
   totpCode: string
-
 }
 
 export const authService = {
   // Sign in - returns MFA status or tokens
-  async signIn(data: SignInData): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>('/api/Auth/signin', data)
+  async signIn(data: SignInData): Promise<AuthSignInResult> {
+    const signInRequest: UserSignInRequest = {
+      usernameOrEmail: data.usernameOrEmail,
+      password: data.password
+    }
+    const response = await apiClient.post<AuthSignInResult>('/api/Auth/signin', signInRequest)
     
     // If no MFA required, store tokens immediately
     if (!response.requiresMfa && response.tokens) {
@@ -34,8 +54,13 @@ export const authService = {
   },
 
   // Verify TOTP code for MFA
-  async verifyTotp(data: VerifyTotpData): Promise<VerifyTotpResponse> {
-    const response = await apiClient.post<VerifyTotpResponse>('/api/Auth/mfa/verify', data)
+  async verifyTotp(data: VerifyTotpData): Promise<UserSignInResponse> {
+    const mfaRequest: MfaVerifyRequest = {
+      session: data.session,
+      username: data.username,
+      totpCode: data.totpCode
+    }
+    const response = await apiClient.post<UserSignInResponse>('/api/Auth/mfa/verify', mfaRequest)
     this.storeTokens(response.tokens)
     // Store username for refresh token requests
     localStorage.setItem('username', data.username)
@@ -43,13 +68,18 @@ export const authService = {
   },
 
   // Get current user info
-  async getMe(): Promise<User> {
-    return apiClient.get<User>('/api/Auth/me')
+  async getMe(): Promise<CognitoUser> {
+    return apiClient.get<CognitoUser>('/api/Auth/me')
   },
 
   // Sign up
-  async signUp(data: SignUpData): Promise<{ message: string }> {
-    return apiClient.post('/api/Auth/signup', data)
+  async signUp(data: SignUpData): Promise<UserSignUpResponse> {
+    const signUpRequest: UserSignUpRequest = {
+      username: data.userName,
+      email: data.email,
+      password: data.password
+    }
+    return apiClient.post<UserSignUpResponse>('/api/Auth/signup', signUpRequest)
   },
 
   // Resend confirmation email
@@ -59,27 +89,48 @@ export const authService = {
 
   // Confirm email
   async confirm(username: string, confirmationCode: string): Promise<{ message: string }> {
-    return apiClient.post('/api/Auth/confirm', { username, confirmationCode })
+    const confirmRequest: UserConfirmSignUpRequest = {
+      username,
+      confirmationCode
+    }
+    return apiClient.post('/api/Auth/confirm', confirmRequest)
   },
 
   // Forgot password
   async forgotPassword(usernameOrEmail: string): Promise<{ message: string }> {
-    return apiClient.post('/api/Auth/forgot-password', { usernameOrEmail })
+    const forgotRequest: UserForgotPasswordRequest = {
+      usernameOrEmail
+    }
+    return apiClient.post('/api/Auth/forgot-password', forgotRequest)
   },
 
   // Reset password
   async resetPassword(data: { usernameOrEmail: string; confirmationCode: string; newPassword: string; }): Promise<{ message: string }> {
-    return apiClient.post('/api/Auth/reset-password', data)
+    const resetRequest: UserResetPasswordRequest = {
+      usernameOrEmail: data.usernameOrEmail,
+      confirmationCode: data.confirmationCode,
+      newPassword: data.newPassword
+    }
+    return apiClient.post('/api/Auth/reset-password', resetRequest)
   },
 
   // Change password
   async changePassword(data: { currentPassword: string; newPassword: string; confirmPassword: string }): Promise<{ message: string }> {
-    return apiClient.post('/api/Auth/change-password', data)
+    const changeRequest: UserChangePasswordRequest = {
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+      confirmPassword: data.confirmPassword
+    }
+    return apiClient.post('/api/Auth/change-password', changeRequest)
   },
 
   // Update auth profile (userName, email)
-  async updateAuthProfile(data: { userName: string; email: string }): Promise<User> {
-    return apiClient.put<User>('/api/Auth/profile', data)
+  async updateAuthProfile(data: { userName: string; email: string }): Promise<CognitoUser> {
+    const updateRequest: UpdateProfileRequest = {
+      userName: data.userName,
+      email: data.email
+    }
+    return apiClient.put<CognitoUser>('/api/Auth/profile', updateRequest)
   },
 
   // Resend email verification
@@ -94,7 +145,11 @@ export const authService = {
 
   // Disable MFA with backup code
   async disableMfaWithBackup(data: { username: string; backupCode: string }): Promise<{ message: string }> {
-    return apiClient.post('/api/Auth/mfa/disable-with-backup', data)
+    const disableRequest: DisableMfaWithBackupCodeRequest = {
+      username: data.username,
+      backupCode: data.backupCode
+    }
+    return apiClient.post('/api/Auth/mfa/disable-with-backup', disableRequest)
   },
 
   // Sign out
@@ -116,17 +171,18 @@ export const authService = {
   },
 
   // Google OAuth
-  async getGoogleAuthUrl(): Promise<{ authorizationUrl: string }> {
+  async getGoogleAuthUrl(): Promise<OAuthUrlResponse> {
     const redirectUri = import.meta.env.VITE_REDIRECT_URI
-    return apiClient.get<{ authorizationUrl: string }>('/api/Auth/google/url', { redirectUri })
+    return apiClient.get<OAuthUrlResponse>('/api/Auth/google/url', { redirectUri })
   },
 
-  async handleGoogleCallback(authorizationCode: string): Promise<LoginResponse> {
+  async handleGoogleCallback(authorizationCode: string): Promise<AuthSignInResult> {
     const redirectUri = import.meta.env.VITE_REDIRECT_URI
-    const response = await apiClient.post<LoginResponse>('/api/Auth/google/callback', {
+    const googleRequest: GoogleSignInRequest = {
       authorizationCode,
       redirectUri,
-    })
+    }
+    const response = await apiClient.post<AuthSignInResult>('/api/Auth/google/callback', googleRequest)
     
     // Store tokens if no MFA required
     if (!response.requiresMfa && response.tokens) {
@@ -136,7 +192,7 @@ export const authService = {
   },
 
   // Token management
-  storeTokens(tokens: LoginResponse['tokens']): void {
+  storeTokens(tokens: TokenResponse): void {
     localStorage.setItem('accessToken', tokens.accessToken)
     localStorage.setItem('idToken', tokens.idToken)
     localStorage.setItem('refreshToken', tokens.refreshToken)

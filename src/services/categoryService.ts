@@ -39,7 +39,7 @@ export const categoryService = {
   //Get categories by type (for dropdowns, etc.)
   getCategoriesByType(params?: CategoryListParams) {
     return apiClient.get<ExpenseCategory>(
-      "/api/ExpenseCategory/list",
+      "/api/ExpenseCategory",
       params as Record<string, string | number | boolean | undefined>
     );
   },

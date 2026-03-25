@@ -36,6 +36,7 @@ import { CalendarIcon, Upload, X, FileIcon, Loader2 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { z } from "zod";
 
 interface AddTransactionDialogProps {
@@ -105,17 +106,14 @@ export function AddTransactionDialog({
     const fetchCategories = async () => {
       try {
         const response = await categoryService.getCategories({
-          pagination: {
-            pageNumber: 1,
-            pageSize: 999999999, // Fetch all categories for the dropdown
-          },
+          pageSize: 999999999, // Fetch all categories for the dropdown
         });
         
         // Remove duplicates by categoryId - keep the latest version (ISO strings are sortable)
         const seen = new Map<string, ExpenseCategory>();
         (response.items || []).forEach(cat => {
           const existing = seen.get(cat.categoryId);
-          if (!existing || cat.updatedAt > existing.updatedAt) {
+          if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
             seen.set(cat.categoryId, cat);
           }
         });
@@ -206,22 +204,14 @@ export function AddTransactionDialog({
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Invalid File Type',
-        text: 'Please select an image (JPEG, PNG, GIF, WebP) or PDF file',
-      });
+      console.error('Invalid file type:', file.type);
       return;
     }
 
     // Validate file size (5MB)
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      Swal.fire({
-        icon: 'error',
-        title: 'File Too Large',
-        text: 'File size must be less than 5MB',
-      });
+      console.error('File too large:', file.size);
       return;
     }
 
@@ -262,11 +252,8 @@ export function AddTransactionDialog({
           uploadedImageUrl = uploadResult.url;
         } catch (uploadError: any) {
           setUploading(false);
-          Swal.fire({
-            icon: 'error',
-            title: 'Upload Failed',
-            text: uploadError.message || 'Failed to upload receipt image',
-          });
+          console.error('Failed to upload receipt:', uploadError);
+          toast.error(uploadError.message || 'Failed to upload receipt');
           return;
         }
       }
@@ -275,12 +262,14 @@ export function AddTransactionDialog({
         type: Number(data.type) as TransactionType,
         categoryId: data.categoryId,
         amount: Number(data.amount),
-        tranactionDate: data.tranactionDate.toISOString(),
+        tranactionDate: format(data.tranactionDate, "yyyy-MM-dd"),
         status: Number(data.status) as PaymentStatus,
         description: data.description?.trim() || "",
         note: data.note?.trim() || "",
         imageUrl: uploadedImageUrl?.trim() || "",
       };
+
+      console.log('Sending transaction payload:', payload);
 
       if (transaction && transaction.tranactionId) {
         // Update existing transaction (only if it has a valid ID)
@@ -306,11 +295,9 @@ export function AddTransactionDialog({
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Failed to save transaction",
-      });
+      console.error('Failed to save transaction:', error);
+      console.error('Error response:', error.message);
+      toast.error(error.message || 'Failed to save transaction. Please try again.');
     } finally {
       setUploading(false);
     }

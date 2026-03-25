@@ -116,7 +116,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: U
           type: TransactionType.Expense,
           categoryId: payment.categoryId,
           amount: payment.amount,
-          tranactionDate: new Date().toISOString().split('T')[0],
+          tranactionDate: format(new Date(), "yyyy-MM-dd"),
           status: PaymentStatus.Completed,
           description: `${payment.name} - ${payment.frequency} payment`,
           note: `Auto-created from recurring payment: ${payment.name}`,
@@ -133,11 +133,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: U
         setRefreshKey((prev) => prev + 1);
         onTransactionCreated?.();
       } catch (error: any) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: error.message || "Failed to process payment",
-        });
+        console.error("Failed to process payment:", error);
       }
     }
   };
@@ -171,11 +167,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: U
         });
         setRefreshKey((prev) => prev + 1);
       } catch (error: any) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: error.message || "Failed to delete recurring payment",
-        });
+        console.error("Failed to delete recurring payment:", error);
       }
     }
   };
@@ -190,9 +182,21 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: U
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    const currency = user?.currency || "USD";
+    const localeMap: Record<string, string> = {
+      'USD': 'en-US',
+      'EUR': 'de-DE',
+      'GBP': 'en-GB',
+      'JPY': 'ja-JP',
+      'SGD': 'en-SG',
+      'THB': 'th-TH',
+      'MMK': 'my-MM',
+    };
+    const locale = localeMap[currency] || 'en-US';
+    return new Intl.NumberFormat(locale, {
       style: "currency",
-      currency: user?.currency || "USD",
+      currency: currency,
+      currencyDisplay: 'symbol', // Force symbol display
     }).format(amount);
   };
 
@@ -268,7 +272,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: U
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {payment.categoryName} &bull; Due{" "}
+                          {payment.categoryName || 'Unknown Category'} &bull; Due{" "}
                           {format(new Date(payment.nextDueDate), "MMM dd")}
                           {payment.lastPaidDate && (
                             <> &bull; Last paid {format(new Date(payment.lastPaidDate), "MMM dd")}</>

@@ -10,13 +10,13 @@ export type TransactionType = (typeof TransactionType)[keyof typeof TransactionT
 export interface ExpenseCategory {
   categoryId: string;
   displayName: string;
-  displayNameLower: string;
+  displayNameLower?: string;
   type: TransactionType;
   icon: string;
   color: string;
   isActive: boolean;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string; // Nullable in backend
 }
 
 export interface CreateCategoryRequest {
@@ -33,24 +33,22 @@ export interface UpdateCategoryRequest {
 }
 
 export interface CategoryListParams {
+  startDate?: string;
+  endDate?: string;
   type?: TransactionType | string;
+  categoryId?: string;
   keyword?: string;
-  pagination?: {
-    pageNumber?: number;
-    pageSize?: number;
-    nextPageToken?: string;
-    hasCursor?: boolean;
-  };
+  isActive?: boolean;
+  pageSize?: number;
+  cursor?: string;
+  cursorId?: string;
 }
 
 export interface PaginatedResponse<T> {
   items: T[];
-  pageNumber: number;
-  pageSize: number;
   totalCount: number;
-  totalPages: number;
-  hasPreviousPage: boolean;
+  pageSize: number;
   hasNextPage: boolean;
-  nextPageToken?: string;
-  previousPageToken?: string;
+  nextCursor?: string;
+  nextCursorId?: string;
 }

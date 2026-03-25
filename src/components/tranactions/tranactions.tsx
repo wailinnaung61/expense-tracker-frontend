@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronLeft, ChevronRight, MoreHorizontal, Copy } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import type { Transaction } from "@/types/transaction";
 import type { ExpenseCategory } from "@/types/category";
 import { TransactionType, PaymentStatus } from "@/types/transaction";
@@ -114,11 +114,7 @@ export default function TransactionsTable({
         });
         onDelete();
       } catch (error: any) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: error.message || "Failed to delete transaction",
-        });
+        console.error("Failed to delete transaction:", error);
       }
     }
   };
@@ -144,11 +140,7 @@ export default function TransactionsTable({
       });
       onDelete(); // Refresh the list
     } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Failed to update status",
-      });
+      console.error("Failed to update status:", error);
     }
   };
 

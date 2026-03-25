@@ -28,6 +28,7 @@ import { format } from "date-fns";
 import { CalendarIcon, Plus, Trash2, Copy, CopyPlus } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { z } from "zod";
 
 interface BulkAddTransactionDialogProps {
@@ -88,17 +89,14 @@ export function BulkAddTransactionDialog({
     const fetchCategories = async () => {
       try {
         const response = await categoryService.getCategories({
-          pagination: {
-            pageNumber: 1,
-            pageSize: 999999999,
-          },
+          pageSize: 999999999,
         });
         
         // Remove duplicates by categoryId - keep the latest version (ISO strings are sortable)
         const seen = new Map<string, ExpenseCategory>();
         (response.items || []).forEach(cat => {
           const existing = seen.get(cat.categoryId);
-          if (!existing || cat.updatedAt > existing.updatedAt) {
+          if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
             seen.set(cat.categoryId, cat);
           }
         });
@@ -277,7 +275,7 @@ export function BulkAddTransactionDialog({
             type: row.type as TransactionType,
             categoryId: row.categoryId,
             amount: Number(row.amount),
-            tranactionDate: row.date.toISOString(),
+            tranactionDate: format(row.date, "yyyy-MM-dd"),
             status: row.status as PaymentStatus,
             description: row.description?.trim() || "",
             note: row.note?.trim() || "",
@@ -296,11 +294,8 @@ export function BulkAddTransactionDialog({
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Failed to create transactions",
-      });
+      console.error('Failed to create transactions:', error);
+      toast.error(error.message || 'Failed to create transactions. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -535,7 +530,7 @@ export function BulkAddTransactionDialog({
               </Button>
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={duplicateLastRow}
                 disabled={rows.length === 0}

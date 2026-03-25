@@ -6,20 +6,38 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Format currency amount based on user's currency setting
+ * Get locale for currency formatting - ensures proper symbols (¥, $, €, etc.)
+ */
+function getCurrencyLocale(currency: string): string {
+  const currencyLocaleMap: Record<string, string> = {
+    'USD': 'en-US',
+    'EUR': 'de-DE',
+    'GBP': 'en-GB',
+    'JPY': 'ja-JP', 
+    'SGD': 'en-SG',
+    'THB': 'th-TH',
+    'MMK': 'my-MM',
+  };
+  return currencyLocaleMap[currency] || 'en-US';
+}
+
+/**
+ * Format currency amount with proper symbols (¥, $, €, etc.)
  * @param amount - The amount to format
  * @param currency - Currency code (e.g., 'USD', 'JPY', 'EUR')
- * @param locale - Locale for formatting (default: 'en-US')
- * @returns Formatted currency string
+ * @param locale - Locale for formatting (optional, auto-detected)
+ * @returns Formatted currency string with symbol
  */
 export function formatCurrency(
   amount: number,
   currency: string = "USD",
-  locale: string = "en-US"
+  locale?: string
 ): string {
-  return new Intl.NumberFormat(locale, {
+  const finalLocale = locale || getCurrencyLocale(currency);
+  return new Intl.NumberFormat(finalLocale, {
     style: "currency",
     currency: currency,
+    currencyDisplay: 'symbol', // Display currency symbols (¥, $, €, etc.)
   }).format(amount);
 }
 
@@ -29,7 +47,8 @@ export function formatCurrency(
  * @returns Currency symbol (e.g., '$', '¥', '€')
  */
 export function getCurrencySymbol(currency: string = "USD"): string {
-  const formatter = new Intl.NumberFormat("en-US", {
+  const locale = getCurrencyLocale(currency);
+  const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency,
     minimumFractionDigits: 0,

@@ -5,7 +5,6 @@ import { CategoryFilters } from "@/components/categories/category-filters";
 import { categoryService } from "@/services/categoryService";
 import type { ExpenseCategory, CategoryListParams } from "@/types/category";
 import { useEffect, useState, useCallback } from "react";
-import Swal from "sweetalert2";
 import spinnerGif from "@/assets/Spinner.gif";
 
 export default function Categories() {
@@ -15,25 +14,23 @@ export default function Categories() {
   const [keyword, setKeyword] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [nextCursorId, setNextCursorId] = useState<string | null>(null);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [currentToken, setCurrentToken] = useState<string | null>(null);
-  const [tokenHistory, setTokenHistory] = useState<string[]>([]);
+  const [currentCursor, setCurrentCursor] = useState<string | null>(null);
+  const [currentCursorId, setCurrentCursorId] = useState<string | null>(null);
+  const [cursorHistory, setCursorHistory] = useState<Array<{cursor: string | null, cursorId: string | null}>>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | null>(null); 
+  const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const pageSize = 10;
 
-  const fetchCategories = useCallback(async (token: string | null = null) => {
+  const fetchCategories = useCallback(async (cursor: string | null = null, cursorId: string | null = null) => {
     setLoading(true);
     try {
       const params: CategoryListParams = {
-        pagination: {
-          pageNumber: currentPage,
-          pageSize,
-          nextPageToken: token || undefined,
-          hasCursor: !!token,
-        },
+        pageSize,
       };
 
       if (type !== "all") {
@@ -44,68 +41,76 @@ export default function Categories() {
         params.keyword = keyword.trim();
       }
 
+      if (cursor) {
+        params.cursor = cursor;
+      }
+
+      if (cursorId) {
+        params.cursorId = cursorId;
+      }
+
       const response = await categoryService.getCategories(params);
       
       // Remove duplicates by categoryId - keep the latest version (ISO strings are sortable)
       const seen = new Map<string, ExpenseCategory>();
       (response.items || []).forEach(cat => {
         const existing = seen.get(cat.categoryId);
-        if (!existing || cat.updatedAt > existing.updatedAt) {
+          if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
           seen.set(cat.categoryId, cat);
         }
       });
       
       setCategories(Array.from(seen.values()));
       setTotalCount(response.totalCount);
-      setNextPageToken(response.nextPageToken || null);
+      setNextCursor(response.nextCursor || null);
+      setNextCursorId(response.nextCursorId || null);
       setHasNextPage(response.hasNextPage);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to fetch categories";
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: message,
-      });
+      console.error("Failed to fetch categories:", error);
     } finally {
       setLoading(false);
     }
-  }, [type, keyword, currentPage]);
+  }, [type, keyword]);
 
   useEffect(() => {
-    fetchCategories(currentToken);
-  }, [fetchCategories, currentToken]);
+    fetchCategories(currentCursor, currentCursorId);
+  }, [fetchCategories, currentCursor, currentCursorId, refreshKey]);
 
   const handleTypeChange = useCallback((newType: string) => {
     setType(newType);
     setCurrentPage(1);
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
   }, []);
 
   const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
     setCurrentPage(1);
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
   }, []);
 
   const handleNextPage = useCallback(() => {
-    if (hasNextPage && nextPageToken) {
-      setTokenHistory(prev => [...prev, currentToken || '']);
+    if (hasNextPage && nextCursor && nextCursorId) {
+      setCursorHistory(prev => [...prev, {cursor: currentCursor, cursorId: currentCursorId}]);
       setCurrentPage(prev => prev + 1);
-      setCurrentToken(nextPageToken);
+      setCurrentCursor(nextCursor);
+      setCurrentCursorId(nextCursorId);
     }
-  }, [hasNextPage, nextPageToken, currentToken]);
+  }, [hasNextPage, nextCursor, nextCursorId, currentCursor, currentCursorId]);
 
   const handlePreviousPage = useCallback(() => {
-    if (tokenHistory.length > 0) {
-      const newHistory = [...tokenHistory];
-      const prevToken = newHistory.pop();
-      setTokenHistory(newHistory);
+    if (cursorHistory.length > 0) {
+      const newHistory = [...cursorHistory];
+      const prevCursors = newHistory.pop();
+      setCursorHistory(newHistory);
       setCurrentPage(prev => prev - 1);
-      setCurrentToken(prevToken || null);
+      setCurrentCursor(prevCursors?.cursor || null);
+      setCurrentCursorId(prevCursors?.cursorId || null);
     }
-  }, [tokenHistory]);
+  }, [cursorHistory]);
 
   const handleAddClick = useCallback(() => {
     setSelectedCategory(null);
@@ -119,13 +124,15 @@ export default function Categories() {
 
   const handleDialogSuccess = useCallback(() => {
     setCurrentPage(1);
-    setCurrentToken(null);
-    setTokenHistory([]);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
+    setRefreshKey(prev => prev + 1);
   }, []);
 
-  const handleRefresh = useCallback(() => {
-    fetchCategories(currentToken);
-  }, [fetchCategories, currentToken]);
+  const handleDeleteSuccess = useCallback(() => {
+    setRefreshKey(prev => prev + 1);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -148,11 +155,11 @@ export default function Categories() {
           currentPage={currentPage}
           totalCount={totalCount}
           hasNextPage={hasNextPage}
-          hasPreviousPage={tokenHistory.length > 0}
+          hasPreviousPage={cursorHistory.length > 0}
           onNextPage={handleNextPage}
           onPreviousPage={handlePreviousPage}
           onEdit={handleEditClick}
-          onDelete={handleRefresh}
+          onDelete={handleDeleteSuccess}
         />
       )}
 

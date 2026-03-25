@@ -79,10 +79,7 @@ export function TransactionFilters({
     const fetchCategories = async () => {
       try {
         const params: CategoryListParams = {
-          pagination: {
-            pageNumber: 1,
-            pageSize: 100,
-          },
+          pageSize: 100,
         };
         
         // Add type filter if not "all"

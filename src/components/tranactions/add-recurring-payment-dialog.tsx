@@ -26,13 +26,14 @@ import { categoryService } from "@/services/categoryService";
 import { recurringPaymentService } from "@/services/recurringPaymentService";
 import type { ExpenseCategory } from "@/types/category";
 import type { RecurringPayment } from "@/types/recurringPayment";
-import { RecurringFrequency } from "@/types/recurringPayment";
+import { RecurringFrequency, getRecurringStatusValue } from "@/types/recurringPayment";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { z } from "zod";
 
 interface AddRecurringPaymentDialogProps {
@@ -88,17 +89,14 @@ export function AddRecurringPaymentDialog({
     const fetchCategories = async () => {
       try {
         const response = await categoryService.getCategories({
-          pagination: {
-            pageNumber: 1,
-            pageSize: 999999999,
-          },
+          pageSize: 999999999,
         });
 
         // Remove duplicates by categoryId - keep the latest version (ISO strings are sortable)
         const seen = new Map<string, ExpenseCategory>();
         (response.items || []).forEach((cat) => {
           const existing = seen.get(cat.categoryId);
-          if (!existing || cat.updatedAt > existing.updatedAt) {
+          if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
             seen.set(cat.categoryId, cat);
           }
         });
@@ -157,18 +155,20 @@ export function AddRecurringPaymentDialog({
   const onSubmit = async (data: RecurringPaymentFormData) => {
     setIsSubmitting(true);
     try {
-      const payload = {
-        name: data.name,
-        amount: Number(data.amount),
-        categoryId: data.categoryId,
-        frequency: Number(data.frequency),
-        nextDueDate: format(data.nextDueDate, "yyyy-MM-dd"),
-      };
-
       if (recurringPayment) {
+        // Update requires status field
+        const updatePayload = {
+          name: data.name,
+          amount: Number(data.amount),
+          categoryId: data.categoryId,
+          frequency: Number(data.frequency),
+          nextDueDate: format(data.nextDueDate, "yyyy-MM-dd"),
+          status: getRecurringStatusValue(recurringPayment.status), // Convert status string to enum number
+        };
+        
         await recurringPaymentService.updateRecurringPayment(
           recurringPayment.recurringId,
-          payload
+          updatePayload
         );
         Swal.fire({
           icon: "success",
@@ -178,7 +178,16 @@ export function AddRecurringPaymentDialog({
           showConfirmButton: false,
         });
       } else {
-        await recurringPaymentService.createRecurringPayment(payload);
+        // Create doesn't require status field
+        const createPayload = {
+          name: data.name,
+          amount: Number(data.amount),
+          categoryId: data.categoryId,
+          frequency: Number(data.frequency),
+          nextDueDate: format(data.nextDueDate, "yyyy-MM-dd"),
+        };
+        
+        await recurringPaymentService.createRecurringPayment(createPayload);
         Swal.fire({
           icon: "success",
           title: "Success",
@@ -192,11 +201,8 @@ export function AddRecurringPaymentDialog({
       onOpenChange(false);
       reset();
     } catch (error: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Failed to save recurring payment",
-      });
+      console.error('Failed to save recurring payment:', error);
+      toast.error(error.message || 'Failed to save recurring payment. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
