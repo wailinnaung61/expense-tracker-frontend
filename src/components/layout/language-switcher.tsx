@@ -40,7 +40,7 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2 bg-muted/50 hover:bg-muted">
+        <Button variant="ghost" size="sm" className="gap-2 bg-muted/30 hover:bg-muted">
           <CurrentFlag className="h-4 w-5 rounded-sm border border-border/50" />
           <span className="hidden sm:inline">{currentLanguage.name}</span>
         </Button>

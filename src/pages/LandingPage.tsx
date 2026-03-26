@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "@/hooks/useTranslation";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import {
   ArrowRight,
   BarChart3,
@@ -20,59 +22,61 @@ import {
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const isMyanmar = i18n.language === 'my';
 
   const features = [
     {
       icon: <Wallet className="h-8 w-8" />,
-      title: "Smart Expense Tracking",
-      description: "Track every penny with our intuitive interface. Categorize, tag, and organize your expenses effortlessly.",
+      title: t('landing.features.smartTracking.title'),
+      description: t('landing.features.smartTracking.description'),
       gradient: "from-sky-500 to-cyan-500",
     },
     {
       icon: <BarChart3 className="h-8 w-8" />,
-      title: "Powerful Analytics",
-      description: "Beautiful charts and insights help you understand your spending patterns and make better financial decisions.",
+      title: t('landing.features.budgetPlanning.title'),
+      description: t('landing.features.budgetPlanning.description'),
       gradient: "from-cyan-500 to-teal-500",
     },
     {
       icon: <PiggyBank className="h-8 w-8" />,
-      title: "Budget Planning",
-      description: "Set budgets, track savings goals, and get alerts when you're close to your limits.",
+      title: t('landing.features.insights.title'),
+      description: t('landing.features.insights.description'),
       gradient: "from-teal-500 to-emerald-500",
     },
     {
       icon: <TrendingUp className="h-8 w-8" />,
-      title: "Investment Tracking",
-      description: "Monitor your investments and see your net worth grow in real-time.",
+      title: t('landing.features.multiCurrency.title'),
+      description: t('landing.features.multiCurrency.description'),
       gradient: "from-blue-500 to-sky-500",
     },
     {
       icon: <Bell className="h-8 w-8" />,
-      title: "Smart Notifications",
-      description: "Get timely reminders for bills, budget alerts, and financial milestones.",
+      title: t('landing.features.cloudSync.title'),
+      description: t('landing.features.cloudSync.description'),
       gradient: "from-sky-400 to-cyan-400",
     },
     {
       icon: <Lock className="h-8 w-8" />,
-      title: "Bank-Level Security",
-      description: "Your data is encrypted and secured with industry-leading security protocols.",
+      title: t('landing.features.secure.title'),
+      description: t('landing.features.secure.description'),
       gradient: "from-indigo-500 to-blue-500",
     },
   ];
 
   const stats = [
-    { value: "10K+", label: "Active Users" },
-    { value: "$50M+", label: "Tracked" },
-    { value: "99.9%", label: "Uptime" },
-    { value: "4.9★", label: "Rating" },
+    { value: "10K+", label: t('landing.stats.users') },
+    { value: "$50M+", label: t('landing.stats.tracked') },
+    { value: "99.9%", label: t('landing.stats.saved') },
+    { value: "4.9★", label: t('landing.stats.rating') },
   ];
 
   const benefits = [
-    { icon: <Zap className="h-5 w-5" />, text: "Lightning Fast Performance" },
-    { icon: <Smartphone className="h-5 w-5" />, text: "Mobile Responsive" },
-    { icon: <Globe className="h-5 w-5" />, text: "Multi-Currency Support" },
-    { icon: <Target className="h-5 w-5" />, text: "Goal-Based Saving" },
-    { icon: <Shield className="h-5 w-5" />, text: "Privacy First" },
+    { icon: <Zap className="h-5 w-5" />, text: t('landing.benefits.easy.title') },
+    { icon: <Smartphone className="h-5 w-5" />, text: t('landing.benefits.powerful.title') },
+    { icon: <Globe className="h-5 w-5" />, text: t('landing.benefits.secure.title') },
+    { icon: <Target className="h-5 w-5" />, text: t('landing.benefits.support.title') },
+    { icon: <Shield className="h-5 w-5" />, text: t('landing.benefits.updates.title') },
   ];
 
   return (
@@ -120,6 +124,7 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="flex gap-3 animate-in fade-in slide-in-from-right duration-700">
+              <LanguageSwitcher />
               <Button 
                 variant="ghost" 
                 onClick={() => navigate("/login")} 
@@ -214,20 +219,20 @@ export default function LandingPage() {
                 </div>
               </div>
               <span className="text-sm font-semibold bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent">
-                The Future of Personal Finance
+                {t('landing.badge')}
               </span>
             </div>
             
             {/* Main Heading */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight mb-6 leading-tight">
+            <h1 className={`text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight mb-6 ${isMyanmar ? 'leading-relaxed' : 'leading-tight'}`}>
               <span className="block text-gray-900 animate-in fade-in slide-in-from-bottom duration-700 delay-200">
-                Take Control of Your
+                {t('landing.hero.title1')}
               </span>
-              <span className="block relative animate-in fade-in slide-in-from-bottom duration-700 delay-300">
+              <span className={`block relative animate-in fade-in slide-in-from-bottom duration-700 delay-300 ${isMyanmar ? 'mt-4' : ''}`}>
                 <span className="relative inline-block group cursor-default">
                   <span className="absolute inset-0 bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 blur-2xl opacity-30 group-hover:opacity-50 transition-opacity animate-pulse"></span>
-                  <span className="relative bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent animate-gradient bg-size-[200%_200%]" style={{backgroundSize: '200% 200%'}}>
-                    Financial Future
+                  <span className={`relative bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent animate-gradient bg-size-[200%_200%] ${isMyanmar ? 'inline-block py-1' : ''}`} style={{backgroundSize: '200% 200%'}}>
+                    {t('landing.hero.title2')}
                   </span>
                 </span>
               </span>
@@ -235,9 +240,9 @@ export default function LandingPage() {
             
             {/* Subtitle */}
             <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom duration-700 delay-400">
-              Track expenses, manage budgets, and achieve your financial goals with the most 
-              <span className="font-semibold text-sky-600"> intuitive expense tracking app</span>. 
-              Join thousands who are already in control of their money.
+              {t('landing.hero.subtitle')} 
+              <span className="font-semibold text-sky-600">{t('landing.hero.subtitleBold')}</span>. {' '}
+              {t('landing.hero.subtitleEnd')}
             </p>
             
             {/* CTA Buttons */}
@@ -248,7 +253,7 @@ export default function LandingPage() {
                 className="relative overflow-hidden bg-linear-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-lg px-10 h-14 shadow-2xl shadow-sky-500/40 hover:shadow-sky-500/60 hover:scale-110 transition-all text-white font-semibold group animate-pulse-glow"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Start Free Today
+                  {t('landing.hero.ctaStart')}
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform animate-bounce-subtle" />
                 </span>
                 <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/25 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -263,7 +268,7 @@ export default function LandingPage() {
                 className="text-lg px-10 h-14 border-2 border-sky-200 hover:border-sky-400 hover:bg-linear-to-r hover:from-sky-50 hover:to-cyan-50 hover:scale-110 transition-all font-semibold group shadow-lg hover:shadow-xl relative overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Watch Demo
+                  {t('landing.hero.ctaDemo')}
                   <div className="w-2 h-2 rounded-full bg-sky-500 animate-pulse group-hover:scale-150 transition-transform"></div>
                 </span>
                 <div className="absolute inset-0 bg-linear-to-r from-sky-100/0 via-sky-100/50 to-sky-100/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -305,20 +310,20 @@ export default function LandingPage() {
           <div className="text-center mb-20">
             <div className="inline-block mb-4 animate-fade-in-up-soft">
               <span className="text-sm font-bold uppercase tracking-wider text-sky-600 bg-sky-100 px-4 py-2 rounded-full">
-                Powerful Features
+                {t('landing.features.title')}
               </span>
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 animate-smooth-reveal animation-delay-100">
-              <span className="block text-gray-900">Everything You Need to</span>
-              <span className="relative inline-block mt-2">
+            <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-6 animate-smooth-reveal animation-delay-100 ${isMyanmar ? 'leading-relaxed' : ''}`}>
+              <span className="block text-gray-900">{t('landing.features.subtitle1')}</span>
+              <span className={`relative inline-block ${isMyanmar ? 'mt-4' : 'mt-2'}`}>
                 <span className="absolute inset-0 bg-linear-to-r from-sky-600 to-cyan-600 blur-2xl opacity-20"></span>
-                <span className="relative bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent">
-                  Master Your Finances
+                <span className={`relative bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent ${isMyanmar ? 'inline-block py-1' : ''}`}>
+                  {t('landing.features.subtitle2')}
                 </span>
               </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in-up-soft animation-delay-200">
-              Powerful features designed to make managing money simple, intuitive, and actually enjoyable.
+              {t('landing.features.description')}
             </p>
           </div>
 
@@ -378,10 +383,10 @@ export default function LandingPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom duration-700">
             <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">
-              Why Choose ExpenseTracker?
+              {t('landing.benefits.title')}
             </h2>
             <p className="text-xl text-sky-100 max-w-2xl mx-auto">
-              Join thousands of satisfied users who trust us with their financial future
+              {t('landing.benefits.subtitle')}
             </p>
           </div>
           
@@ -458,20 +463,20 @@ export default function LandingPage() {
           <div className="text-center mb-20 animate-smooth-reveal">
             <div className="inline-block mb-4 animate-fade-in-up-soft">
               <span className="text-sm font-bold uppercase tracking-wider text-sky-600 bg-sky-100 px-4 py-2 rounded-full">
-                Cross-Platform
+                {t('landing.screenshots.badge')}
               </span>
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 animate-smooth-reveal animation-delay-100">
-              <span className="block text-gray-900">Beautiful on</span>
-              <span className="relative inline-block mt-2">
+            <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-6 animate-smooth-reveal animation-delay-100 ${isMyanmar ? 'leading-relaxed' : ''}`}>
+              <span className="block text-gray-900">{t('landing.screenshots.title1')}</span>
+              <span className={`relative inline-block ${isMyanmar ? 'mt-4' : 'mt-2'}`}>
                 <span className="absolute inset-0 bg-linear-to-r from-sky-600 to-cyan-600 blur-2xl opacity-20"></span>
-                <span className="relative bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent">
-                  Every Device
+                <span className={`relative bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent ${isMyanmar ? 'inline-block py-1' : ''}`}>
+                  {t('landing.screenshots.title2')}
                 </span>
               </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Seamlessly designed for desktop, tablet, and mobile. Your finances, perfectly presented anywhere.
+              {t('landing.screenshots.description')}
             </p>
           </div>
 
@@ -676,21 +681,21 @@ export default function LandingPage() {
                 className="flex items-center gap-2 px-4 py-2 h-auto rounded-full bg-sky-100 border border-sky-200 hover:bg-sky-200 hover:scale-110 transition-all duration-300 text-sky-700 hover:text-sky-800"
               >
                 <div className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></div>
-                <span className="text-sm font-semibold">Dashboard</span>
+                <span className="text-sm font-semibold">{t('landing.screenshots.dashboard')}</span>
               </Button>
               <Button
                 variant="outline"
                 className="flex items-center gap-2 px-4 py-2 h-auto rounded-full bg-cyan-100 border border-cyan-200 hover:bg-cyan-200 hover:scale-110 transition-all duration-300 text-cyan-700 hover:text-cyan-800"
               >
                 <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" style={{animationDelay: '0.3s'}}></div>
-                <span className="text-sm font-semibold">Tablet</span>
+                <span className="text-sm font-semibold">{t('landing.screenshots.tablet')}</span>
               </Button>
               <Button
                 variant="outline"
                 className="flex items-center gap-2 px-4 py-2 h-auto rounded-full bg-teal-100 border border-teal-200 hover:bg-teal-200 hover:scale-110 transition-all duration-300 text-teal-700 hover:text-teal-800"
               >
                 <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" style={{animationDelay: '0.6s'}}></div>
-                <span className="text-sm font-semibold">Mobile</span>
+                <span className="text-sm font-semibold">{t('landing.screenshots.mobile')}</span>
               </Button>
             </div>
           </div>
@@ -713,22 +718,22 @@ export default function LandingPage() {
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-block mb-6 animate-fade-in-up-soft">
             <span className="text-sm font-bold uppercase tracking-wider text-sky-600 bg-sky-100 px-4 py-2 rounded-full">
-              Get Started Today
+              {t('landing.cta.badge')}
             </span>
           </div>
           
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-8 animate-smooth-reveal animation-delay-100">
-            <span className="block text-gray-900 mb-2">Ready to Transform Your</span>
+          <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-8 animate-smooth-reveal animation-delay-100 ${isMyanmar ? 'leading-relaxed' : ''}`}>
+            <span className={`block text-gray-900 ${isMyanmar ? 'mb-4' : 'mb-2'}`}>{t('landing.cta.title1')}</span>
             <span className="relative inline-block">
               <span className="absolute inset-0 bg-linear-to-r from-sky-600 to-cyan-600 blur-3xl opacity-30"></span>
-              <span className="relative bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
-                Financial Life?
+              <span className={`relative bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent ${isMyanmar ? 'inline-block py-1' : ''}`}>
+                {t('landing.cta.title2')}
               </span>
             </span>
           </h2>
           
           <p className="text-xl sm:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-up-soft animation-delay-200">
-            Join thousands of smart savers. Start tracking your expenses today - it's completely free!
+            {t('landing.cta.description')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-smooth-reveal animation-delay-300">
@@ -738,7 +743,7 @@ export default function LandingPage() {
               className="relative overflow-hidden bg-linear-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-xl px-12 h-16 shadow-2xl shadow-sky-500/40 hover:shadow-sky-500/60 hover:scale-110 transition-all text-white font-bold group"
             >
               <span className="relative z-10 flex items-center gap-3">
-                Create Free Account
+                {t('landing.cta.button')}
                 <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
               </span>
               <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -746,7 +751,7 @@ export default function LandingPage() {
           </div>
           
           <p className="mt-8 text-sm text-gray-500 animate-fade-in-up-soft animation-delay-500">
-            No credit card required • Free forever • Cancel anytime
+            {t('landing.cta.terms')}
           </p>
         </div>
       </section>
@@ -766,7 +771,7 @@ export default function LandingPage() {
                 <span className="text-xl font-bold bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">ExpenseTracker</span>
               </div>
               <p className="text-gray-600 leading-relaxed mb-6">
-                Your trusted companion for smarter money management and financial freedom.
+                {t('landing.footer.tagline')}
               </p>
               <div className="flex gap-3">
                 <div className="w-10 h-10 rounded-full bg-sky-100 hover:bg-sky-200 flex items-center justify-center cursor-pointer transition-all hover:scale-110">
@@ -776,32 +781,32 @@ export default function LandingPage() {
             </div>
             
             <div className="animate-in fade-in slide-in-from-bottom duration-500 delay-100">
-              <h3 className="font-bold text-gray-900 mb-4 text-lg">Product</h3>
+              <h3 className="font-bold text-gray-900 mb-4 text-lg">{t('landing.footer.product')}</h3>
               <ul className="space-y-3">
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Features</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Pricing</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Security</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Updates</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.features')}</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.pricing')}</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.security')}</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.updates')}</li>
               </ul>
             </div>
             
             <div className="animate-in fade-in slide-in-from-bottom duration-500 delay-200">
-              <h3 className="font-bold text-gray-900 mb-4 text-lg">Company</h3>
+              <h3 className="font-bold text-gray-900 mb-4 text-lg">{t('landing.footer.company')}</h3>
               <ul className="space-y-3">
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">About</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Blog</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Careers</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Contact</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.about')}</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.blog')}</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.careers')}</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.contact')}</li>
               </ul>
             </div>
             
             <div className="animate-in fade-in slide-in-from-bottom duration-500 delay-300">
-              <h3 className="font-bold text-gray-900 mb-4 text-lg">Legal</h3>
+              <h3 className="font-bold text-gray-900 mb-4 text-lg">{t('landing.footer.legal')}</h3>
               <ul className="space-y-3">
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Privacy</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Terms</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Cookie Policy</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">Licenses</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.privacy')}</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.terms')}</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.cookiePolicy')}</li>
+                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.licenses')}</li>
               </ul>
             </div>
           </div>
@@ -809,10 +814,10 @@ export default function LandingPage() {
           <div className="border-t border-gray-200 pt-8 animate-in fade-in duration-700 delay-400">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-gray-600 text-sm">
-                © 2026 ExpenseTracker. All rights reserved.
+                {t('landing.footer.copyright')}
               </p>
-              <p className="text-gray-600 text-sm flex items-center gap-2">
-                Built with <span className="text-red-500 animate-pulse">❤️</span> for better financial futures
+              <p className="text-gray-600 text-sm">
+                {t('landing.footer.madeWith')}
               </p>
             </div>
           </div>

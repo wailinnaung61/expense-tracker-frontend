@@ -91,5 +91,122 @@
     "fetchFailed": "Failed to fetch data",
     "networkError": "Network error. Please check your connection.",
     "unknownError": "An unknown error occurred"
+  },
+  "landing": {
+    "badge": "The Future of Personal Finance",
+    "hero": {
+      "title1": "Take Control of Your",
+      "title2": "Financial Future",
+      "subtitle": "Track expenses, manage budgets, and achieve your financial goals with the most",
+      "subtitleBold": "intuitive expense tracking app",
+      "subtitleEnd": "Join thousands who are already in control of their money.",
+      "ctaStart": "Start Free Today",
+      "ctaDemo": "Watch Demo"
+    },
+    "stats": {
+      "users": "Active Users",
+      "tracked": "Tracked",
+      "saved": "Saved",
+      "rating": "Rating"
+    },
+    "features": {
+      "title": "Powerful Features",
+      "subtitle1": "Everything You Need to",
+      "subtitle2": "Master Your Finances",
+      "description": "Powerful features designed to make managing money simple, intuitive, and actually enjoyable.",
+      "smartTracking": {
+        "title": "Smart Expense Tracking",
+        "description": "Automatically categorize and track your expenses with AI-powered insights"
+      },
+      "budgetPlanning": {
+        "title": "Budget Planning",
+        "description": "Set realistic budgets and get alerts when you're approaching limits"
+      },
+      "insights": {
+        "title": "Financial Insights",
+        "description": "Understand your spending patterns with beautiful charts and analytics"
+      },
+      "multiCurrency": {
+        "title": "Multi-Currency Support",
+        "description": "Track expenses in multiple currencies with real-time conversion"
+      },
+      "cloudSync": {
+        "title": "Cloud Sync",
+        "description": "Access your data anywhere, anytime on any device"
+      },
+      "secure": {
+        "title": "Bank-Level Security",
+        "description": "Your financial data is encrypted and protected with top-tier security"
+      }
+    },
+    "benefits": {
+      "title": "Why Choose ExpenseTracker?",
+      "subtitle": "Join thousands of satisfied users who trust us with their financial future",
+      "easy": {
+        "title": "Easy to Use",
+        "description": "Intuitive interface that anyone can master in minutes"
+      },
+      "powerful": {
+        "title": "Powerful Analytics",
+        "description": "Deep insights into your spending habits"
+      },
+      "secure": {
+        "title": "100% Secure",
+        "description": "Bank-level encryption for your peace of mind"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Always here to help you succeed"
+      },
+      "updates": {
+        "title": "Regular Updates",
+        "description": "Constantly improving with new features"
+      },
+      "free": {
+        "title": "Free Forever",
+        "description": "Core features always free, no surprises"
+      }
+    },
+    "testimonials": {
+      "title": "Loved by Thousands",
+      "subtitle": "See what our users are saying about ExpenseTracker"
+    },
+    "screenshots": {
+      "badge": "Cross-Platform",
+      "title1": "Beautiful on",
+      "title2": "Every Device",
+      "description": "Seamlessly designed for desktop, tablet, and mobile. Your finances, perfectly presented anywhere.",
+      "dashboard": "Dashboard",
+      "tablet": "Tablet",
+      "mobile": "Mobile"
+    },
+    "cta": {
+      "badge": "Get Started Today",
+      "title1": "Ready to Transform Your",
+      "title2": "Financial Life?",
+      "description": "Join thousands of smart savers. Start tracking your expenses today - it's completely free!",
+      "button": "Create Free Account",
+      "terms": "No credit card required • Free forever • Cancel anytime"
+    },
+    "footer": {
+      "tagline": "Your trusted companion for smarter money management and financial freedom.",
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "security": "Security",
+      "updates": "Updates",
+      "company": "Company",
+      "about": "About",
+      "blog": "Blog",
+      "careers": "Careers",
+      "contact": "Contact",
+      "legal": "Legal",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookiePolicy": "Cookie Policy",
+      "licenses": "Licenses",
+      "copyright": "© 2026 ExpenseTracker. All rights reserved.",
+      "madeWith": "Built with ❤️ for better financial futures"
+    }
   }
 }
