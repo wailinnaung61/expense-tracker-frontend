@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 // Import translation files
 import en from './locales/en/translation.json';
 import my from './locales/my/translation.json';
-import jp from './locales/jp/translation.json';
+import ja from './locales/ja/translation.json';
 // Add more languages here:
 // import es from './locales/es/translation.json';
 
@@ -16,8 +16,8 @@ const resources = {
   my: {
     translation: my,
   },
-  jp: {
-    translation: jp,
+  ja: {
+    translation: ja,
   },
   // Add more languages here:
   // es: { translation: es },
@@ -32,7 +32,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'en', // Fallback language
-    supportedLngs: ['en', 'my', 'jp'], // Supported languages
+    supportedLngs: ['en', 'my', 'ja'], // Supported languages
     debug: false, // Set to true for debugging
     
     interpolation: {

@@ -24,6 +24,7 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { z } from "zod";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface AddCategoryDialogProps {
   open: boolean;
@@ -62,6 +63,8 @@ export function AddCategoryDialog({
   onSuccess,
   category,
 }: AddCategoryDialogProps) {
+  const { t } = useTranslation();
+  
   const {
     register,
     handleSubmit,
@@ -127,8 +130,8 @@ export function AddCategoryDialog({
         });
         Swal.fire({
           icon: "success",
-          title: "Success!",
-          text: "Category created successfully",
+          title: t('categories.createSuccess'),
+          text: t('categories.createSuccessMessage'),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -145,7 +148,7 @@ export function AddCategoryDialog({
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {category ? "Edit Category" : "Add Category"}
+            {category ? t('categories.editCategory') : t('categories.addCategory')}
           </DialogTitle>
           <DialogDescription>
             {category ? "Update the category details below." : "Create a new category by filling in the details below."}
@@ -155,7 +158,7 @@ export function AddCategoryDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
           {/* Category Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Category Name *</Label>
+            <Label htmlFor="name">{t('categories.categoryName')} *</Label>
             <Input
               id="name"
               placeholder="e.g., Groceries, Rent, Salary"
@@ -169,7 +172,7 @@ export function AddCategoryDialog({
           {/* Transaction Type - only show for new categories */}
           {!category && (
             <div className="space-y-2">
-              <Label htmlFor="type">Type *</Label>
+              <Label htmlFor="type">{t('categories.categoryType')} *</Label>
               <Controller
                 name="type"
                 control={control}
@@ -180,16 +183,16 @@ export function AddCategoryDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={String(TransactionTypeEnum.Income)}>
-                        Income
+                        {t('categories.income')}
                       </SelectItem>
                       <SelectItem value={String(TransactionTypeEnum.Expense)}>
-                        Expense
+                        {t('categories.expense')}
                       </SelectItem>
                       <SelectItem value={String(TransactionTypeEnum.Investment)}>
-                        Investment
+                        {t('categories.investment')}
                       </SelectItem>
                       <SelectItem value={String(TransactionTypeEnum.Savings)}>
-                        Savings
+                        {t('categories.savings')}
                       </SelectItem>
                     </SelectContent>
                   </Select>

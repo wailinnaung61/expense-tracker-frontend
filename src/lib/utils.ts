@@ -13,7 +13,7 @@ function getCurrencyLocale(currency: string): string {
     'USD': 'en-US',
     'EUR': 'de-DE',
     'GBP': 'en-GB',
-    'JPY': 'ja-JP', 
+    'JPY': 'ja-JP',
     'SGD': 'en-SG',
     'THB': 'th-TH',
     'MMK': 'my-MM',
@@ -37,7 +37,7 @@ export function formatCurrency(
   return new Intl.NumberFormat(finalLocale, {
     style: "currency",
     currency: currency,
-    currencyDisplay: 'symbol', // Display currency symbols (¥, $, €, etc.)
+    currencyDisplay: 'narrowSymbol', // Display currency codes (JPY, USD, EUR, etc.)
   }).format(amount);
 }
 

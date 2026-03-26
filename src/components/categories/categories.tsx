@@ -18,6 +18,7 @@ import type { ExpenseCategory, TransactionType } from "@/types/category";
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight, Edit, MoreVertical, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface CategoriesTableProps {
   categories: ExpenseCategory[];
@@ -31,14 +32,19 @@ interface CategoriesTableProps {
   onDelete: () => void;
 }
 
-const getTypeLabel = (type: TransactionType): string => {
-  const labels: Record<number, string> = {
-    0: "Income",
-    1: "Expense",
-    2: "Investment",
-    3: "Savings",
+// Helper hook to get type labels with i18n
+const useTypeLabel = () => {
+  const { t } = useTranslation();
+  
+  return (type: TransactionType): string => {
+    const labels: Record<number, string> = {
+      0: t('categories.income'),
+      1: t('categories.expense'),
+      2: t('categories.investment'),
+      3: t('categories.savings'),
+    };
+    return labels[type] || "Unknown";
   };
-  return labels[type] || "Unknown";
 };
 
 const getTypeBadgeClass = (type: TransactionType): string => {
@@ -62,16 +68,19 @@ export function CategoriesTable({
   onEdit,
   onDelete,
 }: CategoriesTableProps) {
+  const { t } = useTranslation();
+  const getTypeLabel = useTypeLabel();
+  
   const handleDelete = async (category: ExpenseCategory) => {
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: `Do you want to delete "${category.displayName}"? This action cannot be undone.`,
+      title: t('categories.deleteConfirmTitle'),
+      text: t('categories.deleteConfirmMessage', { name: category.displayName }),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#ef4444",
       cancelButtonColor: "#6b7280",
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
+      confirmButtonText: t('common.yes'),
+      cancelButtonText: t('common.cancel'),
     });
 
     if (result.isConfirmed) {
@@ -79,8 +88,8 @@ export function CategoriesTable({
         await categoryService.deleteCategory(category.categoryId);
         Swal.fire({
           icon: "success",
-          title: "Deleted!",
-          text: "Category has been deleted.",
+          title: t('categories.deleteSuccess'),
+          text: t('categories.deleteSuccessMessage'),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -94,7 +103,7 @@ export function CategoriesTable({
   if (categories.length === 0) {
     return (
       <div className="border rounded-lg p-8 text-center">
-        <p className="text-muted-foreground">No categories found.</p>
+        <p className="text-muted-foreground">{t('categories.noCategories')}</p>
       </div>
     );
   }

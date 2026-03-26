@@ -5,6 +5,7 @@ import { Menu } from "lucide-react";
 import { NavigationLinks } from "./navigation-links";
 import { ProfileMenu } from "./profile-menu";
 import { ThemeToggle } from "./theme-toggle";
+import { LanguageSwitcher } from "../language-switcher";
 
 // Only need mobile menu for horizontal header
 interface HorizontalHeaderProps {
@@ -23,6 +24,7 @@ export function HorizontalHeader({ setMobileOpen }: HorizontalHeaderProps) {
         </div>
 
         <div className="flex items-center gap-3">
+          <LanguageSwitcher />
           <ThemeToggle />
           <ThemeConfig />
 

@@ -16,7 +16,7 @@ export interface ExpenseCategory {
   color: string;
   isActive: boolean;
   createdAt: string;
-  updatedAt?: string; // Nullable in backend
+  updatedAt?: string;
 }
 
 export interface CreateCategoryRequest {

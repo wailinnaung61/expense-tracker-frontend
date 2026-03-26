@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, PanelLeft } from "lucide-react";
 import { ProfileMenu } from "./profile-menu";
 import { ThemeToggle } from "./theme-toggle";
+import { LanguageSwitcher } from "../language-switcher";
 
 interface VerticalHeaderProps {
   toggleSidebar: () => void;
@@ -43,6 +44,7 @@ export function VerticalHeader({
         </div>
 
         <div className="flex items-center gap-3">
+          <LanguageSwitcher />
           <ThemeToggle />
           <ThemeConfig />
 
