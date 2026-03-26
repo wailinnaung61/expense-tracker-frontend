@@ -381,12 +381,12 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
               <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
                 <div className={`font-bold ${
                   formatCurrency(data.totalExpenses, currency).length > 15 
-                    ? 'text-sm' 
+                    ? 'text-xs' 
                     : formatCurrency(data.totalExpenses, currency).length > 12 
-                    ? 'text-base' 
+                    ? 'text-sm' 
                     : formatCurrency(data.totalExpenses, currency).length > 10
-                    ? 'text-lg'
-                    : 'text-2xl'
+                    ? 'text-base'
+                    : 'text-lg'
                 } wrap-break-word text-center max-w-full`}>
                   {formatCurrency(data.totalExpenses, currency)}
                 </div>

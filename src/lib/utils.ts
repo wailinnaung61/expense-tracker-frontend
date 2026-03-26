@@ -34,11 +34,18 @@ export function formatCurrency(
   locale?: string
 ): string {
   const finalLocale = locale || getCurrencyLocale(currency);
-  return new Intl.NumberFormat(finalLocale, {
+  const formatted = new Intl.NumberFormat(finalLocale, {
     style: "currency",
     currency: currency,
     currencyDisplay: 'narrowSymbol', // Display currency codes (JPY, USD, EUR, etc.)
   }).format(amount);
+  
+  // Replace full-width currency symbols with half-width
+  return formatted
+    .replace(/￥/g, '¥')   // JPY: full-width yen → half-width yen
+    .replace(/＄/g, '$')   // USD/SGD: full-width dollar → half-width dollar
+    .replace(/￡/g, '£')   // GBP: full-width pound → half-width pound
+    .replace(/€/g, '€');  // EUR: ensure proper euro symbol
 }
 
 /**

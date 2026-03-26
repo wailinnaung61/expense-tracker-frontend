@@ -34,6 +34,8 @@
     "login": "Login",
     "logout": "Logout",
     "signup": "Sign Up",
+    "signIn": "Sign In",
+    "getStarted": "Get Started",
     "forgotPassword": "Forgot Password",
     "resetPassword": "Reset Password",
     "email": "Email",

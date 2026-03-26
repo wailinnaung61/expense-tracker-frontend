@@ -50,23 +50,13 @@ export default function Categories() {
       }
 
       const response = await categoryService.getCategories(params);
-      
-      // Remove duplicates by categoryId - keep the latest version (ISO strings are sortable)
-      const seen = new Map<string, ExpenseCategory>();
-      (response.items || []).forEach(cat => {
-        const existing = seen.get(cat.categoryId);
-          if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
-          seen.set(cat.categoryId, cat);
-        }
-      });
-      
-      setCategories(Array.from(seen.values()));
+      setCategories(response.items);
       setTotalCount(response.totalCount);
       setNextCursor(response.nextCursor || null);
       setNextCursorId(response.nextCursorId || null);
       setHasNextPage(response.hasNextPage);
     } catch (error) {
-      console.error("Failed to fetch categories:", error);
+      console.error("Failedto  fetch categories:", error);
     } finally {
       setLoading(false);
     }
