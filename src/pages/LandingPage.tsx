@@ -24,6 +24,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isMyanmar = i18n.language === 'my';
+  const isJapanese = i18n.language === 'ja';
 
   const features = [
     {
@@ -80,7 +81,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-white">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute top-0 -left-40 w-80 h-80 bg-sky-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
@@ -109,7 +110,7 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="border-b border-sky-100/50 bg-white/70 backdrop-blur-xl sticky top-0 z-50 transition-all duration-300">
+      <nav className="border-b border-sky-100/50 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3 group animate-in fade-in slide-in-from-left duration-700">
@@ -130,13 +131,13 @@ export default function LandingPage() {
                 onClick={() => navigate("/login")} 
                 className="hover:text-sky-600 hover:bg-sky-50 transition-all"
               >
-                Sign In
+                {t('auth.signIn')}
               </Button>
               <Button 
                 onClick={() => navigate("/signup")} 
                 className="relative overflow-hidden bg-linear-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg shadow-sky-500/30 hover:shadow-xl hover:shadow-sky-500/40 transition-all hover:scale-110 group animate-pulse-glow"
               >
-                <span className="relative z-10 font-semibold">Get Started</span>
+                <span className="relative z-10 font-semibold">{t('auth.getStarted')}</span>
                 <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute top-0 left-0 w-full h-full bg-white/10 animate-shimmer"></div>
@@ -224,14 +225,14 @@ export default function LandingPage() {
             </div>
             
             {/* Main Heading */}
-            <h1 className={`text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight mb-6 ${isMyanmar ? 'leading-relaxed' : 'leading-tight'}`}>
+            <h1 className={`text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight mb-6 ${(isMyanmar || isJapanese) ? 'leading-relaxed' : 'leading-tight'}`}>
               <span className="block text-gray-900 animate-in fade-in slide-in-from-bottom duration-700 delay-200">
                 {t('landing.hero.title1')}
               </span>
-              <span className={`block relative animate-in fade-in slide-in-from-bottom duration-700 delay-300 ${isMyanmar ? 'mt-4' : ''}`}>
+              <span className={`block relative animate-in fade-in slide-in-from-bottom duration-700 delay-300 ${(isMyanmar || isJapanese) ? 'mt-4' : ''}`}>
                 <span className="relative inline-block group cursor-default">
                   <span className="absolute inset-0 bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 blur-2xl opacity-30 group-hover:opacity-50 transition-opacity animate-pulse"></span>
-                  <span className={`relative bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent animate-gradient bg-size-[200%_200%] ${isMyanmar ? 'inline-block py-1' : ''}`} style={{backgroundSize: '200% 200%'}}>
+                  <span className={`relative bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent animate-gradient bg-size-[200%_200%] ${(isMyanmar || isJapanese) ? 'inline-block py-1' : ''}`} style={{backgroundSize: '200% 200%'}}>
                     {t('landing.hero.title2')}
                   </span>
                 </span>
@@ -313,11 +314,11 @@ export default function LandingPage() {
                 {t('landing.features.title')}
               </span>
             </div>
-            <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-6 animate-smooth-reveal animation-delay-100 ${isMyanmar ? 'leading-relaxed' : ''}`}>
+            <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-6 animate-smooth-reveal animation-delay-100 ${(isMyanmar || isJapanese) ? 'leading-relaxed' : ''}`}>
               <span className="block text-gray-900">{t('landing.features.subtitle1')}</span>
-              <span className={`relative inline-block ${isMyanmar ? 'mt-4' : 'mt-2'}`}>
+              <span className={`relative inline-block ${(isMyanmar || isJapanese) ? 'mt-4' : 'mt-2'}`}>
                 <span className="absolute inset-0 bg-linear-to-r from-sky-600 to-cyan-600 blur-2xl opacity-20"></span>
-                <span className={`relative bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent ${isMyanmar ? 'inline-block py-1' : ''}`}>
+                <span className={`relative bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent ${(isMyanmar || isJapanese) ? 'inline-block py-1' : ''}`}>
                   {t('landing.features.subtitle2')}
                 </span>
               </span>
@@ -466,11 +467,11 @@ export default function LandingPage() {
                 {t('landing.screenshots.badge')}
               </span>
             </div>
-            <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-6 animate-smooth-reveal animation-delay-100 ${isMyanmar ? 'leading-relaxed' : ''}`}>
+            <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-6 animate-smooth-reveal animation-delay-100 ${(isMyanmar || isJapanese) ? 'leading-relaxed' : ''}`}>
               <span className="block text-gray-900">{t('landing.screenshots.title1')}</span>
-              <span className={`relative inline-block ${isMyanmar ? 'mt-4' : 'mt-2'}`}>
+              <span className={`relative inline-block ${(isMyanmar || isJapanese) ? 'mt-4' : 'mt-2'}`}>
                 <span className="absolute inset-0 bg-linear-to-r from-sky-600 to-cyan-600 blur-2xl opacity-20"></span>
-                <span className={`relative bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent ${isMyanmar ? 'inline-block py-1' : ''}`}>
+                <span className={`relative bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent ${(isMyanmar || isJapanese) ? 'inline-block py-1' : ''}`}>
                   {t('landing.screenshots.title2')}
                 </span>
               </span>
@@ -722,11 +723,11 @@ export default function LandingPage() {
             </span>
           </div>
           
-          <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-8 animate-smooth-reveal animation-delay-100 ${isMyanmar ? 'leading-relaxed' : ''}`}>
-            <span className={`block text-gray-900 ${isMyanmar ? 'mb-4' : 'mb-2'}`}>{t('landing.cta.title1')}</span>
+          <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-8 animate-smooth-reveal animation-delay-100 ${(isMyanmar || isJapanese) ? 'leading-relaxed' : ''}`}>
+            <span className={`block text-gray-900 ${(isMyanmar || isJapanese) ? 'mb-4' : 'mb-2'}`}>{t('landing.cta.title1')}</span>
             <span className="relative inline-block">
               <span className="absolute inset-0 bg-linear-to-r from-sky-600 to-cyan-600 blur-3xl opacity-30"></span>
-              <span className={`relative bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent ${isMyanmar ? 'inline-block py-1' : ''}`}>
+              <span className={`relative bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent ${(isMyanmar || isJapanese) ? 'inline-block py-1' : ''}`}>
                 {t('landing.cta.title2')}
               </span>
             </span>
