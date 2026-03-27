@@ -9,13 +9,16 @@ import {
   isChatRefreshTarget,
   resolveRefreshTargetFromFunctions,
 } from "@/lib/chatbot-refresh";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function ChatBot() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
-      text: "Hi! I'm your AI financial assistant. How can I help you today?",
+      text: "",
+      translationKey: "chatbot.welcomeMessage",
       isUser: false,
       timestamp: new Date(),
     },
@@ -80,7 +83,7 @@ export function ChatBot() {
       
       const errorMessage: ChatMessage = {
         id: Date.now().toString() + "-error",
-        text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+        text: t("chatbot.errorMessage"),
         isUser: false,
         timestamp: new Date(),
       };
@@ -121,10 +124,10 @@ export function ChatBot() {
               </div>
               <div>
                 <h3 className="flex items-center gap-1.5 text-sm font-semibold text-white sm:text-base">
-                  AI Assistant
+                  {t("chatbot.title")}
                   <Sparkles className="h-4 w-4" />
                 </h3>
-                <p className="text-xs text-white/85">Online now • Ask anything about your finances</p>
+                <p className="text-xs text-white/85">{t("chatbot.subtitle")}</p>
               </div>
             </div>
             <Button
@@ -139,7 +142,7 @@ export function ChatBot() {
         </div>
 
         {/* Messages */}
-        <div className="max-h-[55vh] min-h-[20rem] space-y-4 overflow-y-auto bg-linear-to-b from-sky-50/60 to-white px-4 py-4 sm:max-h-[60vh]">
+        <div className="max-h-[55vh] min-h-80 space-y-4 overflow-y-auto bg-linear-to-b from-sky-50/60 to-white px-4 py-4 sm:max-h-[60vh]">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -176,7 +179,7 @@ export function ChatBot() {
                   }`}
                 >
                   <p className="whitespace-pre-wrap wrap-break-word">
-                    {message.text}
+                    {message.translationKey ? t(message.translationKey as any) : message.text}
                   </p>
                 </div>
                 <p
@@ -226,7 +229,7 @@ export function ChatBot() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Type your message..."
+              placeholder={t("chatbot.placeholder")}
               disabled={isLoading}
               className="h-10 flex-1 rounded-full border-sky-200 px-4 focus:border-sky-400 focus:ring-sky-400"
             />
@@ -244,7 +247,7 @@ export function ChatBot() {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        aria-label={isOpen ? "Close chat" : "Open chat"}
+        aria-label={isOpen ? t("chatbot.closeChat") : t("chatbot.openChat")}
         className={`group fixed bottom-36 right-4 z-50 overflow-hidden rounded-full bg-linear-to-br from-sky-500 via-cyan-500 to-teal-500 transition-all duration-300 hover:scale-105 active:scale-95 md:bottom-24 sm:right-6 ${
           isOpen
             ? "h-9 w-9 shadow-md opacity-70 hover:opacity-100"

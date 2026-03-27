@@ -6,13 +6,14 @@ export const RecurringStatus = {
 } as const;
 
 export type RecurringStatusType = typeof RecurringStatus[keyof typeof RecurringStatus];
+export type RecurringStatusLabel = "ACTIVE" | "PAUSED" | "COMPLETED";
 
 // Helper to map status string to enum value
-export const getRecurringStatusValue = (status: string): number => {
-  const statusMap: Record<string, number> = {
-    'ACTIVE': RecurringStatus.Active,
-    'PAUSED': RecurringStatus.Paused,
-    'COMPLETED': RecurringStatus.Completed,
+export const getRecurringStatusValue = (status: string): RecurringStatusType => {
+  const statusMap: Record<string, RecurringStatusType> = {
+    ACTIVE: RecurringStatus.Active,
+    PAUSED: RecurringStatus.Paused,
+    COMPLETED: RecurringStatus.Completed,
   };
   return statusMap[status.toUpperCase()] ?? RecurringStatus.Active;
 };
@@ -26,6 +27,20 @@ export const RecurringFrequency = {
 } as const;
 
 export type RecurringFrequencyType = typeof RecurringFrequency[keyof typeof RecurringFrequency];
+export type RecurringFrequencyLabel = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+
+export const getRecurringFrequencyValue = (
+  frequency: string
+): RecurringFrequencyType => {
+  const frequencyMap: Record<string, RecurringFrequencyType> = {
+    DAILY: RecurringFrequency.Daily,
+    WEEKLY: RecurringFrequency.Weekly,
+    MONTHLY: RecurringFrequency.Monthly,
+    YEARLY: RecurringFrequency.Yearly,
+  };
+
+  return frequencyMap[frequency.toUpperCase()] ?? RecurringFrequency.Monthly;
+};
 
 // Backend: RecurringPaymentDto
 export interface RecurringPayment {
@@ -34,14 +49,14 @@ export interface RecurringPayment {
   name: string;
   amount: number;
   categoryId: string;
-  categoryName?: string; // Nullable in backend
-  frequency: string; // Backend returns uppercase string (e.g., "MONTHLY")
-  nextDueDate: string; // Backend: yyyy-MM-dd format
-  lastPaidDate?: string; // Nullable in backend: string?
+  categoryName: string | null;
+  frequency: RecurringFrequencyLabel;
+  nextDueDate: string;
+  lastPaidDate: string | null;
   missedCount: number;
-  status: string; // Backend returns uppercase string (e.g., "ACTIVE")
-  createdAt: string; // Backend: DateTime serialized to string
-  updatedAt: string; // Backend: DateTime serialized to string
+  status: RecurringStatusLabel;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Backend: CreateRecurringPaymentRequest
@@ -49,8 +64,9 @@ export interface CreateRecurringPaymentRequest {
   name: string;
   amount: number;
   categoryId: string; // Backend: Guid
-  frequency: number; // Backend: AppConstants.RecurringFrequency enum
+  frequency: RecurringFrequencyType; // Backend: AppConstants.RecurringFrequency enum
   nextDueDate: string; // Backend expects yyyy-MM-dd format
+  autoPay?: boolean; // Optional: default false on backend
 }
 
 // Backend: UpdateRecurringPaymentRequest
@@ -58,12 +74,12 @@ export interface UpdateRecurringPaymentRequest {
   name: string;
   amount: number;
   categoryId: string; // Backend: Guid
-  frequency: number; // Backend: AppConstants.RecurringFrequency enum
+  frequency: RecurringFrequencyType; // Backend: AppConstants.RecurringFrequency enum
   nextDueDate: string; // Backend expects yyyy-MM-dd format
-  status: number; // Backend: AppConstants.RecurringStatus enum
+  status: RecurringStatusType; // Backend: AppConstants.RecurringStatus enum
 }
 
 export interface RecurringPaymentListParams {
-  startDate?: string;
-  endDate?: string;
+  startDate: string;
+  endDate: string;
 }

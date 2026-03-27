@@ -208,7 +208,16 @@
       "cookiePolicy": "Cookie Policy",
       "licenses": "Licenses",
       "copyright": "© 2026 ExpenseTracker. All rights reserved.",
-      "madeWith": "Built with ❤️ for better financial futures"
+      "madeWith": "Built with ❤�E�Efor better financial futures"
     }
+  },
+  "chatbot": {
+    "title": "AI Assistant",
+    "subtitle": "Online now • Ask anything about your finances",
+    "placeholder": "Type your message...",
+    "welcomeMessage": "Hi! I'm your AI financial assistant. How can I help you today?",
+    "errorMessage": "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+    "openChat": "Open chat",
+    "closeChat": "Close chat"
   }
 }

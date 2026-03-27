@@ -210,5 +210,14 @@
       "copyright": "© 2026 ExpenseTracker. All rights reserved.",
       "madeWith": "あなたの豊かな未来のために ❤️ を込めて"
     }
+  },
+  "chatbot": {
+    "title": "AIアシスタント",
+    "subtitle": "オンライン中 • 家計について何でも聞いてください",
+    "placeholder": "メッセージを入力...",
+    "welcomeMessage": "こんにちは！私はあなたのAIファイナンシャルアシスタントです。今日はどのようにお手伝いできますか？",
+    "errorMessage": "申し訳ありませんが、現在接続に問題があります。しばらくしてからもう一度お試しください。",
+    "openChat": "チャットを開く",
+    "closeChat": "チャットを閉じる"
   }
 }

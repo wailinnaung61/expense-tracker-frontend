@@ -14,6 +14,10 @@ export const recurringPaymentService = {
 
   // Get upcoming recurring payments
   async getUpcomingPayments(params: RecurringPaymentListParams): Promise<RecurringPayment[]> {
+    if (!params.startDate || !params.endDate) {
+      return [];
+    }
+
     return apiClient.get<RecurringPayment[]>('/api/RecurringPayment/upcoming', {
       startDate: params.startDate,
       endDate: params.endDate,
@@ -29,7 +33,13 @@ export const recurringPaymentService = {
   async createRecurringPayment(
     data: CreateRecurringPaymentRequest
   ): Promise<RecurringPayment> {
-    return apiClient.post<RecurringPayment>('/api/RecurringPayment', data);
+    return apiClient.post<RecurringPayment>('/api/RecurringPayment', {
+      name: data.name,
+      amount: data.amount,
+      categoryId: data.categoryId,
+      frequency: data.frequency,
+      nextDueDate: data.nextDueDate,
+    });
   },
 
   // Update a recurring payment
@@ -37,7 +47,14 @@ export const recurringPaymentService = {
     recurringId: string,
     data: UpdateRecurringPaymentRequest
   ): Promise<RecurringPayment> {
-    return apiClient.put<RecurringPayment>(`/api/RecurringPayment/${recurringId}`, data);
+    return apiClient.put<RecurringPayment>(`/api/RecurringPayment/${recurringId}`, {
+      name: data.name,
+      amount: data.amount,
+      categoryId: data.categoryId,
+      frequency: data.frequency,
+      nextDueDate: data.nextDueDate,
+      status: data.status,
+    });
   },
 
   // Delete a recurring payment

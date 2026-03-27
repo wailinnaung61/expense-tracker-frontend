@@ -42,13 +42,17 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
   const [showAll, setShowAll] = useState(false);
 
   const fetchPayments = useCallback(async () => {
+    if (!startDate || !endDate) {
+      setPayments([]);
+      return;
+    }
+
     setLoading(true);
     try {
-      const params: any = {};
-      if (startDate) params.startDate = startDate;
-      if (endDate) params.endDate = endDate;
-
-      const data = await recurringPaymentService.getUpcomingPayments(params);
+      const data = await recurringPaymentService.getUpcomingPayments({
+        startDate,
+        endDate,
+      });
       setPayments(data);
       setShowAll(false); // Reset to show only 5 when data refreshes
     } catch (error) {

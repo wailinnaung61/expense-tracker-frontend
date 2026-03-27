@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -25,8 +26,16 @@ import {
 import { categoryService } from "@/services/categoryService";
 import { recurringPaymentService } from "@/services/recurringPaymentService";
 import type { ExpenseCategory } from "@/types/category";
-import type { RecurringPayment } from "@/types/recurringPayment";
-import { RecurringFrequency, getRecurringStatusValue } from "@/types/recurringPayment";
+import type {
+  CreateRecurringPaymentRequest,
+  RecurringPayment,
+  UpdateRecurringPaymentRequest,
+} from "@/types/recurringPayment";
+import {
+  getRecurringFrequencyValue,
+  RecurringFrequency,
+  getRecurringStatusValue,
+} from "@/types/recurringPayment";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
@@ -54,6 +63,7 @@ const recurringPaymentSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   frequency: z.string().min(1, "Frequency is required"),
   nextDueDate: z.date(),
+  autoPay: z.boolean(),
 });
 
 type RecurringPaymentFormData = z.infer<typeof recurringPaymentSchema>;
@@ -81,6 +91,7 @@ export function AddRecurringPaymentDialog({
       categoryId: "",
       frequency: RecurringFrequency.Monthly.toString(),
       nextDueDate: new Date(),
+      autoPay: false,
     },
   });
 
@@ -125,6 +136,7 @@ export function AddRecurringPaymentDialog({
         categoryId: recurringPayment.categoryId,
         frequency: getFrequencyValue(recurringPayment.frequency),
         nextDueDate: new Date(recurringPayment.nextDueDate),
+        autoPay: false,
       });
     } else if (open) {
       reset({
@@ -133,37 +145,25 @@ export function AddRecurringPaymentDialog({
         categoryId: "",
         frequency: "",
         nextDueDate: new Date(),
+        autoPay: false,
       });
     }
   }, [recurringPayment, open, reset]);
 
-  const getFrequencyValue = (frequencyString: string): string => {
-    switch (frequencyString.toLowerCase()) {
-      case "daily":
-        return RecurringFrequency.Daily.toString();
-      case "weekly":
-        return RecurringFrequency.Weekly.toString();
-      case "monthly":
-        return RecurringFrequency.Monthly.toString();
-      case "yearly":
-        return RecurringFrequency.Yearly.toString();
-      default:
-        return "";
-    }
-  };
+  const getFrequencyValue = (frequencyString: string): string =>
+    getRecurringFrequencyValue(frequencyString).toString();
 
   const onSubmit = async (data: RecurringPaymentFormData) => {
     setIsSubmitting(true);
     try {
       if (recurringPayment) {
-        // Update requires status field
-        const updatePayload = {
+        const updatePayload: UpdateRecurringPaymentRequest = {
           name: data.name,
           amount: Number(data.amount),
           categoryId: data.categoryId,
-          frequency: Number(data.frequency),
+          frequency: Number(data.frequency) as UpdateRecurringPaymentRequest["frequency"],
           nextDueDate: format(data.nextDueDate, "yyyy-MM-dd"),
-          status: getRecurringStatusValue(recurringPayment.status), // Convert status string to enum number
+          status: getRecurringStatusValue(recurringPayment.status),
         };
         
         await recurringPaymentService.updateRecurringPayment(
@@ -178,13 +178,13 @@ export function AddRecurringPaymentDialog({
           showConfirmButton: false,
         });
       } else {
-        // Create doesn't require status field
-        const createPayload = {
+        const createPayload: CreateRecurringPaymentRequest = {
           name: data.name,
           amount: Number(data.amount),
           categoryId: data.categoryId,
-          frequency: Number(data.frequency),
+          frequency: Number(data.frequency) as CreateRecurringPaymentRequest["frequency"],
           nextDueDate: format(data.nextDueDate, "yyyy-MM-dd"),
+          autoPay: data.autoPay || false,
         };
         
         await recurringPaymentService.createRecurringPayment(createPayload);
@@ -349,6 +349,24 @@ export function AddRecurringPaymentDialog({
             {errors.nextDueDate && (
               <p className="text-sm text-red-500">{errors.nextDueDate.message}</p>
             )}
+          </div>
+
+          {/* Auto Pay */}
+          <div className="flex items-center space-x-2 py-2">
+            <Controller
+              name="autoPay"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  id="autoPay"
+                />
+              )}
+            />
+            <Label htmlFor="autoPay" className="font-normal cursor-pointer">
+              Enable Auto Pay (automatically process this payment)
+            </Label>
           </div>
 
           <DialogFooter>
