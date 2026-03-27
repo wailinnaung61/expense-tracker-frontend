@@ -6,6 +6,7 @@ import { categoryService } from "@/services/categoryService";
 import type { ExpenseCategory, CategoryListParams } from "@/types/category";
 import { useEffect, useState, useCallback } from "react";
 import spinnerGif from "@/assets/Spinner.gif";
+import { CHATBOT_REFRESH_EVENT, type ChatbotRefreshEventDetail } from "@/lib/chatbot-refresh";
 
 export default function Categories() {
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
@@ -65,6 +66,24 @@ export default function Categories() {
   useEffect(() => {
     fetchCategories(currentCursor, currentCursorId);
   }, [fetchCategories, currentCursor, currentCursorId, refreshKey]);
+
+  useEffect(() => {
+    const onChatbotRefresh = (event: Event) => {
+      const customEvent = event as CustomEvent<ChatbotRefreshEventDetail>;
+      if (customEvent.detail?.target === "categories") {
+        setCurrentPage(1);
+        setCurrentCursor(null);
+        setCurrentCursorId(null);
+        setCursorHistory([]);
+        setRefreshKey((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    return () => {
+      window.removeEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    };
+  }, []);
 
   const handleTypeChange = useCallback((newType: string) => {
     setType(newType);

@@ -93,7 +93,11 @@ export function TransactionFilters({
         const seen = new Map<string, ExpenseCategory>();
         (response.items || []).forEach(cat => {
           const existing = seen.get(cat.categoryId);
-          if (!existing || cat.updatedAt > existing.updatedAt) {
+          if (
+            !existing ||
+            (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) ||
+            (cat.updatedAt && !existing.updatedAt)
+          ) {
             seen.set(cat.categoryId, cat);
           }
         });

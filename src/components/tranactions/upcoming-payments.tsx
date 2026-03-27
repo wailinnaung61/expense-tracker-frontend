@@ -29,15 +29,16 @@ interface UpcomingPaymentsProps {
   startDate?: string;
   endDate?: string;
   onTransactionCreated?: () => void;
+  refreshKey?: number;
 }
 
-export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: UpcomingPaymentsProps) {
+export function UpcomingPayments({ startDate, endDate, onTransactionCreated, refreshKey: externalRefreshKey = 0 }: UpcomingPaymentsProps) {
   const { user } = useAuth();
   const [payments, setPayments] = useState<RecurringPayment[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<RecurringPayment | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [localRefreshKey, setLocalRefreshKey] = useState(0);
   const [showAll, setShowAll] = useState(false);
 
   const fetchPayments = useCallback(async () => {
@@ -59,7 +60,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: U
 
   useEffect(() => {
     fetchPayments();
-  }, [fetchPayments, refreshKey]);
+  }, [fetchPayments, localRefreshKey, externalRefreshKey]);
 
   const getDaysLeft = (nextDueDate: string): number => {
     return differenceInDays(new Date(nextDueDate), new Date());
@@ -130,7 +131,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: U
           timer: 2000,
           showConfirmButton: false,
         });
-        setRefreshKey((prev) => prev + 1);
+        setLocalRefreshKey((prev) => prev + 1);
         onTransactionCreated?.();
       } catch (error: any) {
         console.error("Failed to process payment:", error);
@@ -165,7 +166,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: U
           timer: 2000,
           showConfirmButton: false,
         });
-        setRefreshKey((prev) => prev + 1);
+        setLocalRefreshKey((prev) => prev + 1);
       } catch (error: any) {
         console.error("Failed to delete recurring payment:", error);
       }
@@ -178,7 +179,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated }: U
   };
 
   const handleDialogSuccess = () => {
-    setRefreshKey((prev) => prev + 1);
+    setLocalRefreshKey((prev) => prev + 1);
   };
 
   const formatCurrency = (amount: number) => {

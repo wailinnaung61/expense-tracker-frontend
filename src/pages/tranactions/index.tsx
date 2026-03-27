@@ -14,6 +14,7 @@ import { BulkAddTransactionDialog } from "@/components/tranactions/bulk-add-tran
 import { ImportCsvDialog } from "@/components/tranactions/import-csv-dialog"
 import { useAuth } from "@/contexts/AuthContext"
 import { format, startOfMonth, endOfMonth } from "date-fns";
+import { CHATBOT_REFRESH_EVENT, type ChatbotRefreshEventDetail } from "@/lib/chatbot-refresh";
 
 export default function Tranactions() {
   const { user } = useAuth();
@@ -49,32 +50,35 @@ export default function Tranactions() {
   const [csvImportDialogOpen, setCsvImportDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [transactionsRefreshKey, setTransactionsRefreshKey] = useState(0);
+  const [summaryRefreshKey, setSummaryRefreshKey] = useState(0);
+  const [categoriesRefreshKey, setCategoriesRefreshKey] = useState(0);
+  const [recurringPaymentsRefreshKey, setRecurringPaymentsRefreshKey] = useState(0);
 
   const pageSize = 10;
   
-  // Fetch categories on mount
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await categoryService.getCategories({
-          pageSize: 100,
-        });
-        
-        const seen = new Map<string, ExpenseCategory>();
-        (response.items || []).forEach(cat => {
-          const existing = seen.get(cat.categoryId);
-          if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
-            seen.set(cat.categoryId, cat);
-          }
-        });
-        
-        setCategories(Array.from(seen.values()));
-      } catch (error) {
-        // Silent fail - categories will be empty array
-      }
-    };
-    fetchCategories();
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await categoryService.getCategories({
+        pageSize: 100,
+      });
+
+      const seen = new Map<string, ExpenseCategory>();
+      (response.items || []).forEach(cat => {
+        const existing = seen.get(cat.categoryId);
+        if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
+          seen.set(cat.categoryId, cat);
+        }
+      });
+
+      setCategories(Array.from(seen.values()));
+    } catch (error) {
+      // Silent fail - categories will be empty array
+    }
   }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories, categoriesRefreshKey]);
 
   const fetchTransactions = useCallback(async (cursor: string | null = null, cursorId: string | null = null) => {
     setLoading(true);
@@ -134,6 +138,35 @@ export default function Tranactions() {
   useEffect(() => {
     fetchTransactions(currentCursor, currentCursorId);
   }, [fetchTransactions, transactionsRefreshKey, currentCursor, currentCursorId]);
+
+  useEffect(() => {
+    const onChatbotRefresh = (event: Event) => {
+      const customEvent = event as CustomEvent<ChatbotRefreshEventDetail>;
+      const target = customEvent.detail?.target;
+
+      if (target === "transactions") {
+        setTransactionsRefreshKey((prev) => prev + 1);
+        setSummaryRefreshKey((prev) => prev + 1);
+      }
+
+      if (target === "summary") {
+        setSummaryRefreshKey((prev) => prev + 1);
+      }
+
+      if (target === "categories") {
+        setCategoriesRefreshKey((prev) => prev + 1);
+      }
+
+      if (target === "recurring_payments") {
+        setRecurringPaymentsRefreshKey((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    return () => {
+      window.removeEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    };
+  }, []);
 
   const handleTypeChange = useCallback((newType: string) => {
     setType(newType);
@@ -247,11 +280,13 @@ export default function Tranactions() {
     setCurrentCursorId(null);
     setCursorHistory([]);
     // Trigger refresh after state updates
-    setTransactionsRefreshKey(prev => prev + 1);  
+    setTransactionsRefreshKey(prev => prev + 1);
+    setSummaryRefreshKey(prev => prev + 1);
   }, [currentMonthRange, startDate, endDate]);
 
   const handleDeleteSuccess = useCallback(() => {
     setTransactionsRefreshKey(prev => prev + 1);
+    setSummaryRefreshKey(prev => prev + 1);
   }, []);
 
   return (
@@ -304,12 +339,13 @@ export default function Tranactions() {
             startDate={startDate} 
             endDate={endDate} 
             onTransactionCreated={handleDialogSuccess}
+            refreshKey={recurringPaymentsRefreshKey}
           />
         </div>
 
         {/* Stats Sidebar - Right */}
         <div className="lg:col-span-1">
-          <ClientTransactionStats refreshKey={transactionsRefreshKey} />
+          <ClientTransactionStats refreshKey={summaryRefreshKey} />
         </div>
       </div>
 

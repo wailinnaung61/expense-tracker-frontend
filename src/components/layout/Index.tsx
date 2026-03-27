@@ -6,6 +6,7 @@ import { Footer } from "./footer";
 import { HorizontalHeader } from "./header/horizontal-header";
 import { VerticalHeader } from "./header/vertical-header";
 import { Sidebar } from "./sidebar";
+import { ChatBot } from "@/components/chatbot/ChatBot";
 
 export function Layout() {
   const { layout, direction } = useThemeContext();
@@ -54,6 +55,9 @@ export function Layout() {
         <main className="flex-1 p-4 px-12 sm:px-6 lg:px-8"><Outlet /></main>
         <Footer />
       </div>
+      
+      {/* AI Chat Bot */}
+      <ChatBot />
     </div>
   );
 }
