@@ -159,32 +159,32 @@ export function BudgetHeader({
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-2">
                         <label className="text-xs font-semibold text-muted-foreground">
-                          Month
+                          {t("budget.header.month")}
                         </label>
                         <Select value={String(selectedDate.getMonth())} onValueChange={handleMonthChange}>
                           <SelectTrigger className="h-9 bg-background">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="0">January</SelectItem>
-                            <SelectItem value="1">February</SelectItem>
-                            <SelectItem value="2">March</SelectItem>
-                            <SelectItem value="3">April</SelectItem>
-                            <SelectItem value="4">May</SelectItem>
-                            <SelectItem value="5">June</SelectItem>
-                            <SelectItem value="6">July</SelectItem>
-                            <SelectItem value="7">August</SelectItem>
-                            <SelectItem value="8">September</SelectItem>
-                            <SelectItem value="9">October</SelectItem>
-                            <SelectItem value="10">November</SelectItem>
-                            <SelectItem value="11">December</SelectItem>
+                            <SelectItem value="0">{t("common.january")}</SelectItem>
+                            <SelectItem value="1">{t("common.february")}</SelectItem>
+                            <SelectItem value="2">{t("common.march")}</SelectItem>
+                            <SelectItem value="3">{t("common.april")}</SelectItem>
+                            <SelectItem value="4">{t("common.may")}</SelectItem>
+                            <SelectItem value="5">{t("common.june")}</SelectItem>
+                            <SelectItem value="6">{t("common.july")}</SelectItem>
+                            <SelectItem value="7">{t("common.august")}</SelectItem>
+                            <SelectItem value="8">{t("common.september")}</SelectItem>
+                            <SelectItem value="9">{t("common.october")}</SelectItem>
+                            <SelectItem value="10">{t("common.november")}</SelectItem>
+                            <SelectItem value="11">{t("common.december")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-2">
                         <label className="text-xs font-semibold text-muted-foreground">
-                          Year
+                          {t("budget.header.year")}
                         </label>
                         <Select value={String(selectedDate.getFullYear())} onValueChange={handleYearChange}>
                           <SelectTrigger className="h-9 bg-background">

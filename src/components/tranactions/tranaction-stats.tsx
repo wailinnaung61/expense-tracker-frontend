@@ -138,7 +138,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <CardTitle className="dark:text-white">{t("transactions.stats.title")}</CardTitle>
+            <CardTitle className="dark:text-slate-50">{t("transactions.stats.title")}</CardTitle>
             <CardDescription className="dark:text-slate-400">
               {monthlyData ? (
                 <>
@@ -180,18 +180,18 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="0">January</SelectItem>
-                          <SelectItem value="1">February</SelectItem>
-                          <SelectItem value="2">March</SelectItem>
-                          <SelectItem value="3">April</SelectItem>
-                          <SelectItem value="4">May</SelectItem>
-                          <SelectItem value="5">June</SelectItem>
-                          <SelectItem value="6">July</SelectItem>
-                          <SelectItem value="7">August</SelectItem>
-                          <SelectItem value="8">September</SelectItem>
-                          <SelectItem value="9">October</SelectItem>
-                          <SelectItem value="10">November</SelectItem>
-                          <SelectItem value="11">December</SelectItem>
+                          <SelectItem value="0">{t("common.january")}</SelectItem>
+                          <SelectItem value="1">{t("common.february")}</SelectItem>
+                          <SelectItem value="2">{t("common.march")}</SelectItem>
+                          <SelectItem value="3">{t("common.april")}</SelectItem>
+                          <SelectItem value="4">{t("common.may")}</SelectItem>
+                          <SelectItem value="5">{t("common.june")}</SelectItem>
+                          <SelectItem value="6">{t("common.july")}</SelectItem>
+                          <SelectItem value="7">{t("common.august")}</SelectItem>
+                          <SelectItem value="8">{t("common.september")}</SelectItem>
+                          <SelectItem value="9">{t("common.october")}</SelectItem>
+                          <SelectItem value="10">{t("common.november")}</SelectItem>
+                          <SelectItem value="11">{t("common.december")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -366,7 +366,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                           <Receipt className="w-4 h-4 text-muted-foreground dark:text-slate-400" />
                           <div className="text-xs text-muted-foreground dark:text-slate-400">{t("transactions.stats.transactionCount")}</div>
                         </div>
-                        <div className="text-2xl font-bold dark:text-white">{monthlyData.transactionCount}</div>
+                        <div className="text-2xl font-bold dark:text-slate-50">{monthlyData.transactionCount}</div>
                       </div>
                     </div>
                   </div>
@@ -376,7 +376,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
 
             {/* Expense Breakdown Chart */}
             <div className="border-t pt-4">
-              <h3 className="text-sm font-medium mb-4 dark:text-white">{t("transactions.stats.expenseBreakdown")}</h3>
+              <h3 className="text-sm font-medium mb-4 dark:text-slate-50">{t("transactions.stats.expenseBreakdown")}</h3>
               <div className="relative h-60 flex items-center justify-center">
               <ResponsiveContainer>
                 <PieChart>
@@ -397,7 +397,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-                <div className={`font-bold dark:text-white ${
+                <div className={`font-bold dark:text-slate-50 ${
                   formatCurrency(data.totalExpenses, currency).length > 15 
                     ? 'text-xs' 
                     : formatCurrency(data.totalExpenses, currency).length > 12 
@@ -420,9 +420,9 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                       className="h-3 w-3 rounded-full shrink-0"
                       style={{ backgroundColor: entry.color }}
                     />
-                    <span className="text-sm truncate dark:text-slate-200">{entry.name}</span>
+                    <span className="text-sm truncate dark:text-slate-50">{entry.name}</span>
                   </div>
-                  <div className="text-sm font-medium whitespace-nowrap ml-2 dark:text-slate-100">
+                  <div className="text-sm font-medium whitespace-nowrap ml-2 dark:text-slate-50">
                     {formatCurrency(entry.value, currency)} ({Math.round(entry.percentage)}%)
                   </div>
                 </div>
@@ -431,21 +431,21 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
 
             {data.comparison && (
               <div className="mt-6 space-y-3">
-                <div className="text-sm font-medium dark:text-white">{t("transactions.stats.monthlyComparison")}</div>
+                <div className="text-sm font-medium dark:text-slate-50">{t("transactions.stats.monthlyComparison")}</div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="dark:text-slate-300">{t("transactions.stats.lastMonth")}</span>
-                  <span className="font-medium dark:text-slate-100">
+                  <span className="dark:text-slate-100">{t("transactions.stats.lastMonth")}</span>
+                  <span className="font-medium dark:text-slate-50">
                     {formatCurrency(data.comparison.lastMonth, currency)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="dark:text-slate-300">{t("transactions.stats.thisMonth")}</span>
-                  <span className="font-medium dark:text-slate-100">
+                  <span className="dark:text-slate-100">{t("transactions.stats.thisMonth")}</span>
+                  <span className="font-medium dark:text-slate-50">
                     {formatCurrency(data.comparison.thisMonth, currency)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="dark:text-slate-300">{t("transactions.stats.difference")}</span>
+                  <span className="dark:text-slate-100">{t("transactions.stats.difference")}</span>
                   <span
                     className={`font-medium ${
                       data.comparison.difference >= 0

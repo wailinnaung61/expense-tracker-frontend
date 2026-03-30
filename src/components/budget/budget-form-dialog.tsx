@@ -21,6 +21,24 @@ import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/utils";
 import { budgetService } from "@/services/budgetService";
 import { useEffect, useMemo, useState } from "react";
+import type { DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, Maximize2, Minimize2 } from "lucide-react";
 
 type CategoryDraft = {
   allocatedAmount: string;
@@ -40,6 +58,129 @@ interface BudgetFormDialogProps {
   onUpdate: (request: UpdateBudgetRequest) => Promise<void>;
 }
 
+interface SortableCategoryItemProps {
+  category: ExpenseCategory;
+  isSelected: boolean;
+  draft: CategoryDraft;
+  onToggle: (categoryId: string, checked: boolean) => void;
+  onUpdateDraft: (categoryId: string, field: keyof CategoryDraft, value: string) => void;
+  t: any;
+}
+
+function SortableCategoryItem({
+  category,
+  isSelected,
+  draft,
+  onToggle,
+  onUpdateDraft,
+  t,
+}: SortableCategoryItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.categoryId });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="rounded-xl border p-4 transition-colors hover:border-slate-300 bg-background"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-1 items-center gap-3">
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing touch-none"
+          >
+            <GripVertical className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+          </div>
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={(checked) =>
+              onToggle(category.categoryId, checked === true)
+            }
+          />
+          <div className="flex items-center gap-3 flex-1">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-lg"
+              style={{ backgroundColor: `${category.color}20`, color: category.color }}
+            >
+              {category.icon}
+            </div>
+            <div>
+              <div className="font-medium" style={{ color: category.color }}>
+                {category.displayName}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {isSelected && (
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor={`allocation-${category.categoryId}`}>
+              {t("budget.dialog.allocation")}
+            </Label>
+            <Input
+              id={`allocation-${category.categoryId}`}
+              type="number"
+              inputMode="decimal"
+              min="0"
+              step="0.01"
+              value={draft.allocatedAmount}
+              onChange={(event) =>
+                onUpdateDraft(
+                  category.categoryId,
+                  "allocatedAmount",
+                  event.target.value
+                )
+              }
+              placeholder="0.00"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={`threshold-${category.categoryId}`}>
+              {t("budget.categories.threshold")}
+            </Label>
+            <Input
+              id={`threshold-${category.categoryId}`}
+              type="number"
+              inputMode="decimal"
+              min="0"
+              max="100"
+              step="1"
+              value={draft.alertThresholdPercent}
+              onChange={(event) =>
+                onUpdateDraft(
+                  category.categoryId,
+                  "alertThresholdPercent",
+                  event.target.value
+                )
+              }
+              placeholder="80"
+            />
+            <p className="text-xs text-muted-foreground">
+              {t("budget.dialog.categoryThresholdHint")}
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function BudgetFormDialog({
   open,
   onOpenChange,
@@ -56,9 +197,30 @@ export function BudgetFormDialog({
   const [totalAmount, setTotalAmount] = useState("");
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [categoryDrafts, setCategoryDrafts] = useState<Record<string, CategoryDraft>>({});
+  const [isMaximized, setIsMaximized] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setSelectedCategoryIds((items) => {
+        const oldIndex = items.indexOf(active.id as string);
+        const newIndex = items.indexOf(over.id as string);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
 
   useEffect(() => {
     if (!open) {
+      setIsMaximized(false);
       return;
     }
 
@@ -225,7 +387,19 @@ export function BudgetFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className={`max-h-[90vh] overflow-y-auto ${isMaximized ? 'sm:max-w-6xl' : 'sm:max-w-3xl'} transition-all duration-300`}>
+        <button
+          type="button"
+          onClick={() => setIsMaximized(!isMaximized)}
+          className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-14 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none"
+        >
+          {isMaximized ? (
+            <Minimize2 className="h-4 w-4" />
+          ) : (
+            <Maximize2 className="h-4 w-4" />
+          )}
+          <span className="sr-only">{isMaximized ? "Minimize" : "Maximize"}</span>
+        </button>
         <DialogHeader>
           <DialogTitle>
             {mode === "create"
@@ -297,99 +471,81 @@ export function BudgetFormDialog({
                   {t("budget.dialog.noExpenseCategories")}
                 </div>
               ) : (
-                <div className="grid gap-3 max-h-90 overflow-y-auto pr-1">
-                  {availableCategories.map((category) => {
-                    const isSelected = selectedCategoryIds.includes(category.categoryId);
-                    const draft = categoryDrafts[category.categoryId] ?? {
-                      allocatedAmount: "",
-                      alertThresholdPercent: "80",
-                    };
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <div className="grid gap-3 max-h-90 overflow-y-auto pr-1">
+                    {/* Selected categories (draggable, displayed in order) */}
+                    <SortableContext
+                      items={selectedCategoryIds}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {selectedCategoryIds.map((categoryId) => {
+                        const category = availableCategories.find(
+                          (c) => c.categoryId === categoryId
+                        );
+                        if (!category) return null;
 
-                    return (
-                      <div
-                        key={category.categoryId}
-                        className="rounded-xl border p-4 transition-colors hover:border-slate-300"
-                      >
-                        <div
-                          className="flex items-center justify-between gap-3 cursor-pointer"
-                          onClick={() => handleToggleCategory(category.categoryId, !isSelected)}
-                        >
-                          <div className="flex flex-1 items-center gap-3">
-                            <Checkbox
-                              checked={isSelected}
-                              onCheckedChange={(checked) =>
-                                handleToggleCategory(category.categoryId, checked === true)
-                              }
-                              onClick={(e) => e.stopPropagation()}
-                            />
+                        const draft = categoryDrafts[category.categoryId] ?? {
+                          allocatedAmount: "",
+                          alertThresholdPercent: "80",
+                        };
+
+                        return (
+                          <SortableCategoryItem
+                            key={category.categoryId}
+                            category={category}
+                            isSelected={true}
+                            draft={draft}
+                            onToggle={handleToggleCategory}
+                            onUpdateDraft={updateCategoryDraft}
+                            t={t}
+                          />
+                        );
+                      })}
+                    </SortableContext>
+
+                    {/* Unselected categories (non-draggable) */}
+                    {availableCategories
+                      .filter((category) => !selectedCategoryIds.includes(category.categoryId))
+                      .map((category) => {
+                        return (
+                          <div
+                            key={category.categoryId}
+                            className="rounded-xl border p-4 transition-colors hover:border-slate-300 bg-background"
+                          >
                             <div className="flex items-center gap-3">
-                              <div
-                                className="flex h-10 w-10 items-center justify-center rounded-xl text-lg"
-                                style={{ backgroundColor: `${category.color}20`, color: category.color }}
-                              >
-                                {category.icon}
-                              </div>
-                              <div>
-                                <div className="font-medium" style={{ color: category.color }}>{category.displayName}</div>
+                              <div className="w-5" /> {/* Spacer for alignment */}
+                              <Checkbox
+                                checked={false}
+                                onCheckedChange={(checked) =>
+                                  handleToggleCategory(category.categoryId, checked === true)
+                                }
+                              />
+                              <div className="flex items-center gap-3 flex-1">
+                                <div
+                                  className="flex h-10 w-10 items-center justify-center rounded-xl text-lg"
+                                  style={{
+                                    backgroundColor: `${category.color}20`,
+                                    color: category.color,
+                                  }}
+                                >
+                                  {category.icon}
+                                </div>
+                                <div>
+                                  <div className="font-medium" style={{ color: category.color }}>
+                                    {category.displayName}
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-
-                        {isSelected && (
-                          <div className="mt-4 grid gap-3 md:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label htmlFor={`allocation-${category.categoryId}`}>
-                                {t("budget.dialog.allocation")}
-                              </Label>
-                              <Input
-                                id={`allocation-${category.categoryId}`}
-                                type="number"
-                                inputMode="decimal"
-                                min="0"
-                                step="0.01"
-                                value={draft.allocatedAmount}
-                                onChange={(event) =>
-                                  updateCategoryDraft(
-                                    category.categoryId,
-                                    "allocatedAmount",
-                                    event.target.value
-                                  )
-                                }
-                                placeholder="0.00"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor={`threshold-${category.categoryId}`}>
-                                {t("budget.categories.threshold")}
-                              </Label>
-                              <Input
-                                id={`threshold-${category.categoryId}`}
-                                type="number"
-                                inputMode="decimal"
-                                min="0"
-                                max="100"
-                                step="1"
-                                value={draft.alertThresholdPercent}
-                                onChange={(event) =>
-                                  updateCategoryDraft(
-                                    category.categoryId,
-                                    "alertThresholdPercent",
-                                    event.target.value
-                                  )
-                                }
-                                placeholder="80"
-                              />
-                              <p className="text-xs text-muted-foreground">
-                                {t("budget.dialog.categoryThresholdHint")}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                        );
+                      })}
+                  </div>
+                </DndContext>
               )}
             </div>
           )}

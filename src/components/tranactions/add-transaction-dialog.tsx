@@ -380,11 +380,11 @@ export function AddTransactionDialog({
                     </SelectTrigger>
                     <SelectContent className="max-h-75">
                       {selectedType === "" ? (
-                        <div className="p-4 text-sm text-gray-500">
+                        <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
                           {t("transactions.addDialog.selectTypeFirst")}
                         </div>
                       ) : filteredCategories.length === 0 ? (
-                        <div className="p-4 text-sm text-gray-500">
+                        <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
                           {t("transactions.addDialog.noCategoriesForType")}
                         </div>
                       ) : (

@@ -104,7 +104,7 @@ export function ChatBot() {
     <>
       {/* Chat Interface */}
       <div
-        className={`fixed z-50 right-4 left-4 bottom-56 sm:left-auto sm:right-6 sm:bottom-44 md:bottom-28 sm:w-[25rem] lg:w-[27rem] rounded-3xl border border-sky-200/70 bg-white/95 backdrop-blur-md shadow-[0_24px_64px_-24px_rgba(2,132,199,0.45)] transition-all duration-400 origin-bottom-right ${
+        className={`fixed z-50 right-4 left-4 bottom-56 sm:left-auto sm:right-6 sm:bottom-44 md:bottom-28 sm:w-[25rem] lg:w-[27rem] rounded-3xl border border-sky-200/70 dark:border-sky-800/50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-[0_24px_64px_-24px_rgba(2,132,199,0.45)] transition-all duration-400 origin-bottom-right ${
           isOpen
             ? "opacity-100 translate-y-0 scale-100"
             : "pointer-events-none opacity-0 translate-y-6 scale-95"
@@ -175,7 +175,7 @@ export function ChatBot() {
                   className={`rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm transition-all duration-300 sm:px-4 ${
                     message.isUser
                       ? "rounded-tr-sm bg-linear-to-br from-sky-500 to-cyan-500 text-white"
-                      : "rounded-tl-sm border border-sky-100 bg-white text-slate-700"
+                      : "rounded-tl-sm border border-sky-100 dark:border-sky-800 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
                   }`}
                 >
                   <p className="whitespace-pre-wrap wrap-break-word">
@@ -202,7 +202,7 @@ export function ChatBot() {
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-teal-500 to-cyan-500">
                 <Bot className="h-4 w-4 text-white" />
               </div>
-              <div className="rounded-2xl rounded-tl-sm border border-sky-100 bg-white px-4 py-3 shadow-sm">
+              <div className="rounded-2xl rounded-tl-sm border border-sky-100 dark:border-sky-800 bg-white dark:bg-slate-800 px-4 py-3 shadow-sm">
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-sky-400 rounded-full animate-bounce"></div>
                   <div
@@ -222,7 +222,7 @@ export function ChatBot() {
         </div>
 
         {/* Input */}
-        <div className="rounded-b-3xl border-t border-sky-100 bg-white px-4 py-3.5">
+        <div className="rounded-b-3xl border-t border-sky-100 dark:border-sky-800 bg-white dark:bg-slate-900 px-4 py-3.5">
           <div className="flex gap-2">
             <Input
               ref={inputRef}
@@ -231,7 +231,7 @@ export function ChatBot() {
               onKeyDown={handleKeyPress}
               placeholder={t("chatbot.placeholder")}
               disabled={isLoading}
-              className="h-10 flex-1 rounded-full border-sky-200 px-4 focus:border-sky-400 focus:ring-sky-400"
+              className="h-10 flex-1 rounded-full border-sky-200 dark:border-sky-800 px-4 focus:border-sky-400 dark:focus:border-sky-600 focus:ring-sky-400 dark:focus:ring-sky-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
             />
             <Button
               onClick={handleSendMessage}

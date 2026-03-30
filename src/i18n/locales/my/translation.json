@@ -17,7 +17,19 @@
     "error": "အမှား",
     "success": "အောင်မြင်",
     "warning": "သတိပေးချက်",
-    "info": "သတင်းအချက်အလက်"
+    "info": "သတင်းအချက်အလက်",
+    "january": "ဇန်နဝါရီ",
+    "february": "ဖေဖော်ဝါရီ",
+    "march": "မတ်",
+    "april": "ဧပြီ",
+    "may": "မေ",
+    "june": "ဇွန်",
+    "july": "ဇူလိုင်",
+    "august": "သြဂုတ်",
+    "september": "စက်တင်ဘာ",
+    "october": "အောက်တိုဘာ",
+    "november": "နိုဝင်ဘာ",
+    "december": "ဒီဇင်ဘာ"
   },
   "auth": {
     "login": "ဝင်မည်",
@@ -212,6 +224,8 @@
       "activePlan": "အသုံးပြုနေသည်",
       "noPlan": "အစီအစဉ်မရှိသေးပါ",
       "selectMonth": "ဘတ်ဂျက်လ ရွေးပါ",
+      "month": "လ",
+      "year": "နှစ်",
       "refresh": "ပြန်လည်ရယူမည်",
       "createPlan": "အစီအစဉ်ဖန်တီးမည်",
       "editPlan": "အစီအစဉ်ပြင်မည်",
@@ -276,15 +290,17 @@
       "totalAmount": "စုစုပေါင်းပမာဏ",
       "icon": "အိုင်ကွန်",
       "color": "အရောင်",
-      "leaveBlankHint": "Backend က blank icon သို့မဟုတ် color ကို no change အဖြစ်သတ်မှတ်ရင် amount ကိုသာ update လုပ်နိုင်ပါတယ်။",
+      "leaveBlankHint": "Edit mode တွင် စုစုပေါင်း budget ပမာဏကိုသာ ပြင်ဆင်နိုင်ပါသည်။",
       "allocatedSummary": "ခွဲဝေမှုအကျဉ်းချုပ်",
       "visualHint": "စုစုပေါင်း allocation ကို လစဉ်ဘတ်ဂျက်ထက် မကျော်စေဘဲ စီမံပါ။",
       "allocationOver": "Category allocation စုစုပေါင်းသည် monthly budget ထက် မကျော်ရပါ။",
       "categoryPlanning": "အမျိုးအစားအစီအစဉ်",
-      "selectCategories": "ဒီလအတွက် ထည့်သွင်းမယ့် expense categories တွေကို ရွေးပြီး တစ်ခုချင်းစီအတွက် allocation နဲ့ alert threshold သတ်မှတ်ပါ။",
+      "selectCategories": "ဒီလအတွက် ထည့်သွင်းမယ့် expense categories တွေကို ရွေးပြီး တစ်ခုချင်းစီအတွက် allocation နဲ့ alert threshold သတ်မှတ်ပါ။ ရွေးထားတဲ့ categories တွေကို ဆွဲပြီး အစီအစဉ်ပြောင်းနိုင်ပါတယ်။",
       "noExpenseCategories": "Expense categories မရှိသေးပါ။ အရင် expense category ဖန်တီးပြီး ပြန်လာပါ။",
       "allocation": "အမျိုးအစားခွဲဝေငွေ",
       "categoryThresholdHint": "80 ဆိုတာ ဒီ category ဘတ်ဂျက် 80% သုံးပြီးချိန်မှာ သတိပေးမယ်ဆိုတာကို ဆိုလိုပါတယ်။",
+      "expandDialog": "ကျယ်ကျယ်ဖွင့်မည်",
+      "normalView": "ပုံမှန်မြင်ကွင်း",
       "createSubmit": "ဘတ်ဂျက်ဖန်တီးမည်",
       "updateSubmit": "ဘတ်ဂျက်ပြင်မည်"
     },
@@ -317,7 +333,7 @@
   "transactions": {
     "header": {
       "title": "ကုန်ကျစရိတ်များ",
-      "refresh": "လတ်ဆတ်မည်",
+      "refresh": "ပြန်လည်ရယူမည်",
       "importCsv": "CSV တင်သွင်းမည်",
       "bulkAdd": "အထုအပြုတ်ထည့်မည်",
       "addTransaction": "ငွေသွင်းထုတ်ထည့်မည်"
