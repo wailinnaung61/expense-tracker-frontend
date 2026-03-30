@@ -10,8 +10,10 @@ import { authService } from '@/services/authService'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Lock, Eye, EyeOff } from 'lucide-react'
 import spinnerGif from '@/assets/Spinner.gif'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function ResetPasswordPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const [showPassword, setShowPassword] = useState(false)
@@ -42,10 +44,10 @@ export default function ResetPasswordPage() {
         confirmationCode: data.code,
         newPassword: data.newPassword,
       })
-      toast.success(response.message || 'Password reset successfully!')
+      toast.success(response.message || t('auth.resetPasswordPage.resetSuccess'))
       navigate('/login', { replace: true })
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to reset password')
+      toast.error(error instanceof Error ? error.message : t('auth.resetPasswordPage.resetFailed'))
     }
   }
 
@@ -53,9 +55,9 @@ export default function ResetPasswordPage() {
     setIsResending(true)
     try {
       const response = await authService.forgotPassword(email)
-      toast.success(response.message || 'Reset code resent to your email!')
+      toast.success(response.message || t('auth.resetPasswordPage.resendSuccess'))
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to resend code')
+      toast.error(error instanceof Error ? error.message : t('auth.resetPasswordPage.resendFailed'))
     } finally {
       setIsResending(false)
     }
@@ -138,10 +140,10 @@ export default function ResetPasswordPage() {
 
           {/* Heading */}
           <h1 className="text-center text-2xl font-bold text-gray-900 mb-2 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.2s_forwards]">
-            Reset Password
+            {t('auth.resetPasswordPage.title')}
           </h1>
           <p className="text-center text-sm text-gray-600 mb-7 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.3s_forwards]">
-            Enter the code sent to your email and your new password below.
+            {t('auth.resetPasswordPage.description')}
           </p>
 
           {/* Reset Password Form */}
@@ -149,7 +151,7 @@ export default function ResetPasswordPage() {
             {/* Confirmation Code Field */}
             <div className="space-y-1.5">
               <Label htmlFor="code" className="text-gray-900!">
-                Confirmation Code
+                {t('auth.resetPasswordPage.resetCode')}
               </Label>
               <Input
                 id="code"
@@ -170,7 +172,7 @@ export default function ResetPasswordPage() {
             {/* New Password Field */}
             <div className="space-y-1.5">
               <Label htmlFor="newPassword" className="text-gray-900!">
-                New Password
+                {t('auth.resetPasswordPage.newPassword')}
               </Label>
               <div className="relative">
                 <Input
@@ -196,7 +198,7 @@ export default function ResetPasswordPage() {
             {/* Confirm Password Field */}
             <div className="space-y-1.5">
               <Label htmlFor="confirmPassword" className="text-gray-900!">
-                Confirm Password
+                {t('auth.resetPasswordPage.confirmNewPassword')}
               </Label>
               <div className="relative">
                 <Input
@@ -230,10 +232,10 @@ export default function ResetPasswordPage() {
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
                   <img src={spinnerGif} alt="Loading..." className="w-4 h-4" />
-                  <span>Resetting...</span>
+                  <span>{t('auth.resetPasswordPage.resetting')}</span>
                 </div>
               ) : (
-                'Reset Password'
+                t('auth.resetPasswordPage.resetPassword')
               )}
               </span>
               <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -253,10 +255,10 @@ export default function ResetPasswordPage() {
                 {isResending ? (
                   <span className="inline-flex items-center gap-1">
                     <img src={spinnerGif} alt="Loading" className="w-3 h-3" />
-                    Resending...
+                    {t('common.loading')}
                   </span>
                 ) : (
-                  'Resend Code'
+                  t('auth.resetPasswordPage.resendCode')
                 )}
               </button>
             </p>

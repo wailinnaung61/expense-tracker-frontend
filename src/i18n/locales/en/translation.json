@@ -44,7 +44,89 @@
     "username": "Username",
     "sessionExpired": "Session Expired",
     "sessionExpiredMessage": "Your session has expired. Please login again.",
-    "loginAgain": "Login"
+    "loginAgain": "Login",
+    "loginPage": {
+      "title": "Log in",
+      "usernameOrEmail": "Username or Email Address",
+      "forgotPasswordLink": "Forget your password",
+      "loggingIn": "Logging in...",
+      "continueWithGoogle": "Continue with Google",
+      "or": "OR",
+      "noAccount": "Don't have an account?",
+      "signUpButton": "Sign up",
+      "mfaRequired": "Two-factor authentication required",
+      "googleLoginFailed": "Google login failed",
+      "googleLoginInitFailed": "Failed to initiate Google login"
+    },
+    "signupPage":{
+      "title": "Sign Up",
+      "fullName": "Full Name",
+      "confirmPassword": "Confirm Password",
+      "signingUp": "Signing up...",
+      "hasAccount": "Already have an account?",
+      "loginButton": "Log in",
+      "signupSuccess": "Account created successfully! Please check your email to verify your account.",
+      "signupFailed": "Signup failed"
+    },
+    "forgotPasswordPage": {
+      "title": "Forgot Password",
+      "description": "Enter your email address and we'll send you a code to reset your password.",
+      "sendCode": "Send code",
+      "sending": "Sending...",
+      "backToLogin": "Back to Login",
+      "successMessage": "Password reset code sent! Please check your email.",
+      "failedMessage": "Failed to send reset code"
+    },
+    "resetPasswordPage": {
+      "title": "Reset Password",
+      "description": "Enter the code we sent to your email and create a new password.",
+      "resetCode": "Reset Code",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
+      "resetPassword": "Reset Password",
+      "resetting": "Resetting...",
+      "resendCode": "Resend code",
+      "resendSuccess": "Code resent successfully",
+      "resendFailed": "Failed to resend code",
+      "resetSuccess": "Password reset successfully! You can now login with your new password.",
+      "resetFailed": "Failed to reset password"
+    },
+    "confirmSignupPage": {
+      "title": "Ver ify Account",
+      "description": "Enter the verification code we sent to your email.",
+      "verificationCode": "Verification Code",
+      "verify": "Verify Account",
+      "verifying": "Verifying...",
+      "resendCode": "Resend code",
+      "resendSuccess": "Code resent successfully!",
+      "resendFailed": "Failed to resend code",
+      "verifySuccess": "Account verified successfully! You can now login.",
+      "verifyFailed": "Verification failed"
+    },
+    "totpPage": {
+      "title": "Two-Factor Authentication",
+      "description": "Enter the 6-digit code from your authenticator app.",
+      "code": "Authentication Code",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "useBackupCode": "Use a backup code instead",
+      "backupCodeHint": "Enter one of your backup codes",
+      "verifyFailed": "Verification failed",
+      "invalidCode": "Invalid authentication code"
+    },
+    "disableMfaPage": {
+      "title": "Disable MFA",
+      "description": "Lost access to your authenticator app? Use your backup code to disable MFA.",
+      "warning": "Warning:",
+      "warningMessage": "Disabling MFA will reduce your account security. You can re-enable it later in your account settings.",
+      "backupCode": "Backup Code",
+      "backupCodeHint": "Enter the backup code you received when you first enabled MFA",
+      "disableMfa": "Disable MFA",
+      "disabling": "Disabling...",
+      "backToLogin": "Back to Login",
+      "disableSuccess": "MFA disabled successfully. You can now login without two-factor authentication.",
+      "disableFailed": "Failed to disable MFA"
+    }
   },
   "categories": {
     "title": "Categories",
@@ -298,8 +380,6 @@
       "noExpenseCategories": "No expense categories are available yet. Create expense categories first, then come back to build this budget.",
       "allocation": "Category Allocation",
       "categoryThresholdHint": "80 means the warning should start when the category has used 80% of its budget.",
-      "expandDialog": "Expand Dialog",
-      "normalView": "Normal View",
       "createSubmit": "Create Budget",
       "updateSubmit": "Update Budget"
     },

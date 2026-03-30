@@ -44,7 +44,89 @@
     "username": "ユーザー名",
     "sessionExpired": "セッション期限切れ",
     "sessionExpiredMessage": "セッションの有効期限が切れました。再度ログインしてください。",
-    "loginAgain": "ログイン"
+    "loginAgain": "ログイン",
+    "loginPage": {
+      "title": "ログイン",
+      "usernameOrEmail": "ユーザー名またはメールアドレス",
+      "forgotPasswordLink": "パスワードをお忘れですか",
+      "loggingIn": "ログイン中...",
+      "continueWithGoogle": "Googleで続ける",
+      "or": "または",
+      "noAccount": "アカウントをお持ちでないですか？",
+      "signUpButton": "新規登録",
+      "mfaRequired": "二段階認証が必要です",
+      "googleLoginFailed": "Googleログインに失敗しました",
+      "googleLoginInitFailed": "Googleログインを開始できませんでした"
+    },
+    "signupPage": {
+      "title": "新規登録",
+      "fullName": "フルネーム",
+      "confirmPassword": "パスワード確認",
+      "signingUp": "登録中...",
+      "hasAccount": "すでにアカウントをお持ちですか？",
+      "loginButton": "ログイン",
+      "signupSuccess": "アカウントが作成されました！メールを確認してアカウントを認証してください。",
+      "signupFailed": "登録に失敗しました"
+    },
+    "forgotPasswordPage": {
+      "title": "パスワードを忘れた",
+      "description": "メールアドレスを入力してください。パスワードリセット用のコードを送信します。",
+      "sendCode": "コードを送信",
+      "sending": "送信中...",
+      "backToLogin": "ログインに戻る",
+      "successMessage": "パスワードリセットコードを送信しました！メールをご確認ください。",
+      "failedMessage": "コード送信に失敗しました"
+    },
+    "resetPasswordPage": {
+      "title": "パスワードリセット",
+      "description": "メールで送信されたコードを入力して、新しいパスワードを作成してください。",
+      "resetCode": "リセットコード",
+      "newPassword": "新しいパスワード",
+      "confirmNewPassword": "新しいパスワード確認",
+      "resetPassword": "パスワードリセット",
+      "resetting": "リセット中...",
+      "resendCode": "コードを再送信",
+      "resendSuccess": "コードを再送信しました",
+      "resendFailed": "コード再送信に失敗しました",
+      "resetSuccess": "パスワードがリセットされました！新しいパスワードでログインできます。",
+      "resetFailed": "パスワードリセットに失敗しました"
+    },
+    "confirmSignupPage": {
+      "title": "アカウント認証",
+      "description": "メールで送信された認証コードを入力してください。",
+      "verificationCode": "認証コード",
+      "verify": "アカウント認証",
+      "verifying": "認証中...",
+      "resendCode": "コードを再送信",
+      "resendSuccess": "コードを再送信しました！",
+      "resendFailed": "コード再送信に失敗しました",
+      "verifySuccess": "アカウントが認証されました！ログインできます。",
+      "verifyFailed": "認証に失敗しました"
+    },
+    "totpPage": {
+      "title": "二段階認証",
+      "description": "認証アプリから6桁のコードを入力してください。",
+      "code": "認証コード",
+      "verify": "認証",
+      "verifying": "認証中...",
+      "useBackupCode": "バックアップコードを使用",
+      "backupCodeHint": "バックアップコードの1つを入力してください",
+      "verifyFailed": "認証に失敗しました",
+      "invalidCode": "認証コードが無効です"
+    },
+    "disableMfaPage": {
+      "title": "二段階認証を無効化",
+      "description": "認証アプリにアクセスできなくなりましたか？バックアップコードを使用して二段階認証を無効化できます。",
+      "warning": "警告:",
+      "warningMessage": "二段階認証を無効にすると、アカウントのセキュリティが低下します。後でアカウント設定から再度有効にすることができます。",
+      "backupCode": "バックアップコード",
+      "backupCodeHint": "二段階認証を最初に有効にしたときに受け取ったバックアップコードを入力してください",
+      "disableMfa": "二段階認証を無効化",
+      "disabling": "無効化中...",
+      "backToLogin": "ログインに戻る",
+      "disableSuccess": "二段階認証を無効にしました。二段階認証なしでログインできます。",
+      "disableFailed": "二段階認証の無効化に失敗しました"
+    }
   },
   "categories": {
     "title": "カテゴリー",
@@ -299,8 +381,6 @@
       "noExpenseCategories": "支出カテゴリがまだありません。先にカテゴリを作成してから戻ってきてください。",
       "allocation": "カテゴリ配分額",
       "categoryThresholdHint": "80 は、そのカテゴリ予算の 80% を使った時点で警告することを意味します。",
-      "expandDialog": "ダイアログを拡大",
-      "normalView": "通常表示",
       "createSubmit": "予算を作成",
       "updateSubmit": "予算を更新"
     },

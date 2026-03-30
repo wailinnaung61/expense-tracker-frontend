@@ -9,8 +9,10 @@ import { authService } from '@/services/authService'
 import { Link, useNavigate } from 'react-router-dom'
 import { ShieldOff } from 'lucide-react'
 import spinnerGif from '@/assets/Spinner.gif'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function DisableMfaPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const {
@@ -24,11 +26,11 @@ export default function DisableMfaPage() {
   const onSubmit = async (data: DisableMfaFormData) => {
     try {
       const response = await authService.disableMfaWithBackup(data)
-      toast.success(response.message || 'MFA has been disabled successfully!')
+      toast.success(response.message || t('auth.disableMfaPage.disableSuccess'))
       // Navigate to login page
       navigate('/login', { replace: true })
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to disable MFA')
+      toast.error(error instanceof Error ? error.message : t('auth.disableMfaPage.disableFailed'))
     }
   }
 
@@ -109,17 +111,16 @@ export default function DisableMfaPage() {
 
           {/* Heading */}
           <h1 className="text-center text-2xl font-bold text-gray-900 mb-2 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.2s_forwards]">
-            Disable MFA
+            {t('auth.disableMfaPage.title')}
           </h1>
           <p className="text-center text-sm text-gray-600 mb-7 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.3s_forwards]">
-            Lost access to your authenticator app? Use your backup code to disable MFA.
+            {t('auth.disableMfaPage.description')}
           </p>
 
           {/* Alert Box */}
           <div className="mb-5 p-4 bg-orange-50 border border-orange-200 rounded-xl opacity-0 animate-[fadeInUp_0.7s_ease-out_0.3s_forwards]">
             <p className="text-xs text-orange-800">
-              <strong>Warning:</strong> Disabling MFA will reduce your account security. 
-              You can re-enable it later in your account settings.
+              <strong>{t('auth.disableMfaPage.warning')}:</strong> {t('auth.disableMfaPage.warningMessage')}
             </p>
           </div>
 
@@ -127,7 +128,7 @@ export default function DisableMfaPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.5s_forwards]">
             <div className="space-y-1.5">
               <Label htmlFor="username" className="text-gray-900!">
-                Username
+                {t('auth.username')}
               </Label>
               <Input
                 id="username"
@@ -144,7 +145,7 @@ export default function DisableMfaPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="backupCode" className="text-gray-900!">
-                Backup Code
+                {t('auth.disableMfaPage.backupCode')}
               </Label>
               <Input
                 id="backupCode"
@@ -158,7 +159,7 @@ export default function DisableMfaPage() {
                 <p className="text-sm text-red-600">{errors.backupCode.message}</p>
               )}
               <p className="text-xs text-gray-500 mt-1">
-                Enter the backup code you received when you first enabled MFA
+                {t('auth.disableMfaPage.backupCodeHint')}
               </p>
             </div>
 
@@ -173,10 +174,10 @@ export default function DisableMfaPage() {
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
                   <img src={spinnerGif} alt="Loading..." className="w-4 h-4" />
-                  <span>Disabling MFA...</span>
+                  <span>{t('auth.disableMfaPage.disabling')}</span>
                 </div>
               ) : (
-                'Disable MFA'
+                t('auth.disableMfaPage.disableMfa')
               )}
               </span>
               <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -186,12 +187,11 @@ export default function DisableMfaPage() {
           {/* Back to Login */}
           <div className="mt-6 text-center opacity-0 animate-[fadeIn_0.7s_ease-out_0.6s_forwards]">
             <p className="text-sm text-gray-600">
-              Have access to your authenticator?{' '}
               <Link
                 to="/login"
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
-                Back to Login
+                {t('auth.disableMfaPage.backToLogin')}
               </Link>
             </p>
           </div>

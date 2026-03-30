@@ -10,8 +10,10 @@ import { authService } from '@/services/authService'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Mail } from 'lucide-react'
 import spinnerGif from '@/assets/Spinner.gif'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function ConfirmSignUpPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const [isResending, setIsResending] = useState(false)
@@ -36,10 +38,10 @@ export default function ConfirmSignUpPage() {
   const onSubmit = async (data: ConfirmSignUpFormData) => {
     try {
       const response = await authService.confirm(username, data.code)
-      toast.success(response.message || 'Email confirmed successfully!')
+      toast.success(response.message || t('auth.confirmSignupPage.verifySuccess'))
       navigate('/login', { replace: true })
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Confirmation failed')
+      toast.error(error instanceof Error ? error.message : t('auth.confirmSignupPage.verifyFailed'))
     }
   }
 
@@ -47,9 +49,9 @@ export default function ConfirmSignUpPage() {
     setIsResending(true)
     try {
       const response = await authService.resendConfirmation(username)
-      toast.success(response.message || 'Confirmation code resent!')
+      toast.success(response.message || t('auth.confirmSignupPage.resendSuccess'))
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to resend code')
+      toast.error(error instanceof Error ? error.message : t('auth.confirmSignupPage.resendFailed'))
     } finally {
       setIsResending(false)
     }
@@ -132,19 +134,17 @@ export default function ConfirmSignUpPage() {
 
           {/* Heading */}
           <h1 className="text-center text-2xl font-bold text-gray-900 mb-2 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.2s_forwards]">
-            Confirm Your Email
+            {t('auth.confirmSignupPage.title')}
           </h1>
           <p className="text-center text-sm text-gray-600 mb-7 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.3s_forwards]">
-            We've sent a confirmation code to your email.
-            <br />
-            Enter the code below to verify your account.
+            {t('auth.confirmSignupPage.description')}
           </p>
 
           {/* Confirmation Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.5s_forwards]">
             <div className="space-y-1.5 mb-4">
               <Label htmlFor="code" className="text-gray-900!">
-                Confirmation Code
+                {t('auth.confirmSignupPage.verificationCode')}
               </Label>
               <Input
                 id="code"
@@ -173,10 +173,10 @@ export default function ConfirmSignUpPage() {
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
                   <img src={spinnerGif} alt="Loading..." className="w-4 h-4" />
-                  <span>Confirming...</span>
+                  <span>{t('auth.confirmSignupPage.verifying')}</span>
                 </div>
               ) : (
-                'Confirm Email'
+                t('auth.confirmSignupPage.verify')
               )}
               </span>
               <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -196,10 +196,10 @@ export default function ConfirmSignUpPage() {
                 {isResending ? (
                   <span className="inline-flex items-center gap-1">
                     <img src={spinnerGif} alt="Loading" className="w-3 h-3" />
-                    Resending...
+                    {t('common.loading')}
                   </span>
                 ) : (
-                  'Resend Code'
+                  t('auth.confirmSignupPage.resendCode')
                 )}
               </button>
             </p>

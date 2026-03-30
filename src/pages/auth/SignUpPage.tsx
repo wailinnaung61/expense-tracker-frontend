@@ -13,8 +13,10 @@ import { Eye, EyeOff } from 'lucide-react'
 import spinnerGif from '@/assets/Spinner.gif'
 import { useAuth } from '@/contexts/AuthContext'
 import { Logo } from '@/components/logo'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function SignUpPage() {
+  const { t } = useTranslation()
   const { fetchUser } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -56,7 +58,7 @@ export default function SignUpPage() {
       
       // Check if MFA is required
       if (response.requiresMfa) {
-        toast.info('Two-factor authentication required')
+        toast.info(t('auth.loginPage.mfaRequired'))
         navigate('/verify-totp', {
           state: {
             session: response.mfaChallenge
@@ -69,10 +71,10 @@ export default function SignUpPage() {
       await fetchUser()
       
       // Success - redirect to home
-      toast.success('Sign up successful!')
+      toast.success(t('auth.signupPage.signupSuccess'))
       navigate('/', { replace: true })
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Google sign up failed')
+      toast.error(error instanceof Error ? error.message : t('auth.signupPage.signupFailed'))
       // Clear the URL parameters
       navigate('/signup', { replace: true })
     } finally {
@@ -87,14 +89,14 @@ export default function SignUpPage() {
         email: data.email,
         password: data.password
       })
-      toast.success(response.message || 'Sign up successful!')
+      toast.success(response.message || t('auth.signupPage.signupSuccess'))
       navigate('/confirm-signup', { 
         state: { username: data.userName },
         replace: true 
       })
     } catch (error) {
       console.error('Sign up failed:', error)
-      toast.error(error instanceof Error ? error.message : 'Sign up failed')
+      toast.error(error instanceof Error ? error.message : t('auth.signupPage.signupFailed'))
     }
   }
 
@@ -106,7 +108,7 @@ export default function SignUpPage() {
       // Open Google OAuth in the same window
       window.location.href = authorizationUrl
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to initiate Google sign up')
+      toast.error(error instanceof Error ? error.message : t('auth.loginPage.googleLoginInitFailed'))
       setIsGoogleLoading(false)
     }
   }
@@ -193,7 +195,7 @@ export default function SignUpPage() {
 
           {/* Heading */}
           <h1 className="text-center text-2xl font-bold text-gray-900 mb-7 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.2s_forwards]">
-            Create Account
+            {t('auth.signupPage.title')}
           </h1>
 
           {/* OAuth Buttons */}
@@ -226,10 +228,10 @@ export default function SignUpPage() {
           {isGoogleLoading ? (
             <>
               <img src={spinnerGif} alt="Loading" className="w-5 h-5 mr-2" />
-              Loading...
+              {t('common.loading')}
             </>
           ) : (
-          'Continue with Google'
+          t('auth.loginPage.continueWithGoogle')
           )}                
         </Button>
           </div>
@@ -240,7 +242,7 @@ export default function SignUpPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-4 text-gray-500 uppercase tracking-wider">OR</span>
+              <span className="bg-white px-4 text-gray-500 uppercase tracking-wider">{t('auth.loginPage.or')}</span>
             </div>
           </div>
 
@@ -249,7 +251,7 @@ export default function SignUpPage() {
             {/* Username Field */}
             <div className="space-y-1.5">
               <Label htmlFor="userName" className="text-gray-900!">
-                Username
+                {t('auth.username')}
               </Label>
               <Input
                 id="userName"
@@ -265,7 +267,7 @@ export default function SignUpPage() {
             {/* Email Field */}
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-gray-900!">
-                Email Address
+                {t('auth.email')}
               </Label>
               <Input
                 id="email"
@@ -281,7 +283,7 @@ export default function SignUpPage() {
             {/* Password Field */}
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-gray-900!">
-                Password
+                {t('auth.password')}
               </Label>
               <div className="relative">
                 <Input
@@ -310,7 +312,7 @@ export default function SignUpPage() {
             {/* Confirm Password Field */}
             <div className="space-y-1.5">
               <Label htmlFor="confirmPassword" className="text-gray-900!">
-                Confirm Password
+                {t('auth.signupPage.confirmPassword')}
               </Label>
               <div className="relative">
                 <Input
@@ -348,10 +350,10 @@ export default function SignUpPage() {
               {isSubmitting ? (
                 <span className="flex items-center justify-center">
                   <img src={spinnerGif} alt="Loading" className="w-5 h-5 mr-2" />
-                  Creating account...
+                  {t('auth.signupPage.signingUp')}
                 </span>
               ) : (
-                'Sign up'
+                t('auth.signupPage.title')
               )}
               </span>
               <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -360,14 +362,14 @@ export default function SignUpPage() {
 
           {/* Login Link */}
           <div className="mt-6 text-center opacity-0 animate-[fadeIn_0.7s_ease-out_0.6s_forwards]">
-            <p className="text-sm text-gray-600 mb-3">Already have an account?</p>
+            <p className="text-sm text-gray-600 mb-3">{t('auth.signupPage.hasAccount')}</p>
             <Button
               type="button"
               variant="outline"
               className="w-full h-8 border-2 border-gray-300 bg-white hover:bg-linear-to-r hover:from-sky-50 hover:to-cyan-50 hover:border-sky-300 text-gray-700 font-semibold text-sm transition-all rounded-2xl hover:scale-105 hover:shadow-md"
               onClick={() => navigate('/login')}
             >
-              Log in
+              {t('auth.signupPage.loginButton')}
             </Button>
           </div>
           </div>

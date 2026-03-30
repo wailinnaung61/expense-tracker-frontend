@@ -9,8 +9,10 @@ import { authService } from '@/services/authService'
 import { Link, useNavigate } from 'react-router-dom'
 import { KeyRound } from 'lucide-react'
 import spinnerGif from '@/assets/Spinner.gif'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function ForgotPasswordPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const {
@@ -24,14 +26,14 @@ export default function ForgotPasswordPage() {
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
       const response = await authService.forgotPassword(data.email)
-      toast.success(response.message || 'Password reset code sent to your email!')
+      toast.success(response.message || t('auth.forgotPasswordPage.successMessage'))
       // Navigate to reset password page with email
       navigate('/reset-password', { 
         state: { email: data.email },
         replace: true 
       })
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to send reset email')
+      toast.error(error instanceof Error ? error.message : t('auth.forgotPasswordPage.failedMessage'))
     }
   }
 
@@ -112,17 +114,17 @@ export default function ForgotPasswordPage() {
 
           {/* Heading */}
           <h1 className="text-center text-2xl font-bold text-gray-900 mb-2 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.2s_forwards]">
-            Forgot Password?
+            {t('auth.forgotPasswordPage.title')}
           </h1>
           <p className="text-center text-sm text-gray-600 mb-7 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.3s_forwards]">
-            Enter your email address and we'll send you a link to reset your password.
+            {t('auth.forgotPasswordPage.description')}
           </p>
 
           {/* Forgot Password Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.5s_forwards]">
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-gray-900!">
-                Email Address
+                {t('auth.email')}
               </Label>
               <Input
                 id="email"
@@ -148,10 +150,10 @@ export default function ForgotPasswordPage() {
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
                   <img src={spinnerGif} alt="Loading..." className="w-4 h-4" />
-                  <span>Sending...</span>
+                  <span>{t('auth.forgotPasswordPage.sending')}</span>
                 </div>
               ) : (
-                'Send Reset Link'
+                t('auth.forgotPasswordPage.sendCode')
               )}
               </span>
               <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -161,12 +163,11 @@ export default function ForgotPasswordPage() {
           {/* Back to Login */}
           <div className="mt-6 text-center opacity-0 animate-[fadeIn_0.7s_ease-out_0.6s_forwards]">
             <p className="text-sm text-gray-600">
-              Remember your password?{' '}
               <Link
                 to="/login"
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
-                Back to Login
+                {t('auth.forgotPasswordPage.backToLogin')}
               </Link>
             </p>
           </div>

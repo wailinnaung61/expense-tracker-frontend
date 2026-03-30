@@ -44,7 +44,89 @@
     "username": "အသုံးပြုသူအမည်",
     "sessionExpired": "အချိန်ကုန်သွားပြီ",
     "sessionExpiredMessage": "သင့်အချိန်ကုန်သွားပြီ။ ကျေးဇူးပြု၍ ပြန်လည်ဝင်ရောက်ပါ။",
-    "loginAgain": "ပြန်ဝင်မည်"
+    "loginAgain": "ပြန်ဝင်မည်",
+    "loginPage": {
+      "title": "ဝင်ရောက်ရန်",
+      "usernameOrEmail": "အသုံးပြုသူအမည် သို့မဟုတ် အီးမေးလ်",
+      "forgotPasswordLink": "စကားဝှက်မေ့နေပါသလား",
+      "loggingIn": "ဝင်ရောက်နေသည်...",
+      "continueWithGoogle": "Google ဖြင့် ဆက်လက်လုပ်ဆောင်ရန်",
+      "or": "သို့မဟုတ်",
+      "noAccount": "အကောင့်မရှိသေးဘူးလား?",
+      "signUpButton": "အကောင့်ဖွင့်ရန်",
+      "mfaRequired": "နှစ်ဆင့်စစ်ဆေးမှု လိုအပ်သည်",
+      "googleLoginFailed": "Google ဝင်ရောက်မှု မအောင်မြင်ပါ",
+      "googleLoginInitFailed": "Google ဝင်ရောက်မှု စတင်၍ မရပါ"
+    },
+    "signupPage": {
+      "title": "အကောင့်ဖွင့်ရန်",
+      "fullName": "အမည်အပြည့်အစုံ",
+      "confirmPassword": "စကားဝှက်အတည်ပြုရန်",
+      "signingUp": "အကောင့်ဖွင့်နေသည်...",
+      "hasAccount": "အကောင့်ရှိပြီးသားလား?",
+      "loginButton": "ဝင်ရောက်ရန်",
+      "signupSuccess": "အကောင့်ဖွင့်ပြီးပါပြီ! သင့်အီးမေးလ်ကို စစ်ဆေးပြီး အတည်ပြုပေးပါ။",
+      "signupFailed": "အကောင့်ဖွင့်၍ မရပါ"
+    },
+    "forgotPasswordPage": {
+      "title": "စကားဝှက်မေ့နေပါသလား",
+      "description": "သင့်အီးမေးလ်လိပ်စာကို ထည့်ပါ၊ စကားဝှက်ပြန်လည်သတ်မှတ်ရန် ကုဒ်ပို့ပေးပါမည်။",
+      "sendCode": "ကုဒ်ပို့ရန်",
+      "sending": "ပို့နေသည်...",
+      "backToLogin": "ဝင်ရောက်ရန် ပြန်သွားမည်",
+      "successMessage": "စကားဝှက်ပြန်လည်သတ်မှတ်ရန် ကုဒ်ပို့ပြီးပါပြီ! သင့်အီးမေးလ်ကို စစ်ဆေးပါ။",
+      "failedMessage": "ကုဒ်ပို့၍ မရပါ"
+    },
+    "resetPasswordPage": {
+      "title": "စကားဝှက်ပြန်လည်သတ်မှတ်ရန်",
+      "description": "သင့်အီးမေးလ်သို့ ပို့ထားသော ကုဒ်ကို ထည့်ပြီး စကားဝှက်အသစ်ဖန်တီးပါ။",
+      "resetCode": "ပြန်လည်သတ်မှတ်ရန်ကုဒ်",
+      "newPassword": "စကားဝှက်အသစ်",
+      "confirmNewPassword": "စကားဝှက်အသစ်အတည်ပြုရန်",
+      "resetPassword": "စကားဝှက်ပြန်လည်သတ်မှတ်ရန်",
+      "resetting": "ပြန်လည်သတ်မှတ်နေသည်...",
+      "resendCode": "ကုဒ်ပြန်ပို့ရန်",
+      "resendSuccess": "ကုဒ်ပြန်ပို့ပြီးပါပြီ",
+      "resendFailed": "ကုဒ်ပြန်ပို့၍ မရပါ",
+      "resetSuccess": "စကားဝှက်ပြန်လည်သတ်မှတ်ပြီးပါပြီ! စကားဝှက်အသစ်ဖြင့် ဝင်ရောက်နိုင်ပါပြီ။",
+      "resetFailed": "စကားဝှက်ပြန်လည်သတ်မှတ်၍ မရပါ"
+    },
+    "confirmSignupPage": {
+      "title": "အကောင့်အတည်ပြုရန်",
+      "description": "သင့်အီးမေးလ်သို့ ပို့ထားသော အတည်ပြုကုဒ်ကို ထည့်ပါ။",
+      "verificationCode": "အတည်ပြုကုဒ်",
+      "verify": "အကောင့်အတည်ပြုရန်",
+      "verifying":  "အတည်ပြုနေသည်...",
+      "resendCode": "ကုဒ်ပြန်ပို့ရန်",
+      "resendSuccess": "ကုဒ်ပြန်ပို့ပြီးပါပြီ!",
+      "resendFailed": "ကုဒ်ပြန်ပို့၍ မရပါ",
+      "verifySuccess": "အကောင့်အတည်ပြုပြီးပါပြီ! ယခု ဝင်ရောက်နိုင်ပါပြီ။",
+      "verifyFailed": "အတည်ပြု၍ မရပါ"
+    },
+    "totpPage": {
+      "title": "နှစ်ဆင့်စစ်ဆေးမှု",
+      "description": "သင့် authenticator app မှ ဂဏန်း ၆ လုံး ကုဒ်ကို ထည့်ပါ။",
+      "code": "Authentication ကုဒ်",
+      "verify": "အတည်ပြုရန်",
+      "verifying": "အတည်ပြုနေသည်...",
+      "useBackupCode": "Backup ကုဒ်အသုံးပြုမည်",
+      "backupCodeHint": "သင့် backup ကုဒ်များထဲက တစ်ခုကို ထည့်ပါ",
+      "verifyFailed": "အတည်ပြု၍ မရပါ",
+      "invalidCode": "ကုဒ်မမှန်ကန်ပါ"
+    },
+    "disableMfaPage": {
+      "title": "MFA ပိတ်ရန်",
+      "description": "သင့် authenticator app ကို ဝင်ရောက်၍ မရတော့ဘူးလား? MFA ပိတ်ရန် backup ကုဒ်ကို အသုံးပြုပါ။",
+      "warning": "သတိပေးချက်:",
+      "warningMessage": "MFA ကို ပိတ်လိုက်ခြင်းဖြင့် သင့်အကောင့်လုံခြုံမှု လျော့နည်းသွားပါမည်။ နောက်မှ ပြန်ဖွင့်နိုင်ပါသည်။",
+      "backupCode": "Backup ကုဒ်",
+      "backupCodeHint": "MFA ပထမဆုံး ဖွင့်စဉ်က ရရှိခဲ့သော backup ကုဒ်ကို ထည့်ပါ",
+      "disableMfa": "MFA ပိတ်ရန်",
+      "disabling": "ပိတ်နေသည်...",
+      "backToLogin": "ဝင်ရောက်ရန် ပြန်သွားမည်",
+      "disableSuccess": "MFA ပိတ်ပြီးပါပြီ။ နှစ်ဆင့်စစ်ဆေးမှုမပါဘဲ ဝင်ရောက်နိုင်ပါပြီ။",
+      "disableFailed": "MFA ပိတ်၍ မရပါ"
+    }
   },
   "categories": {
     "title": "အမျိုးအစားများ",
@@ -299,8 +381,6 @@
       "noExpenseCategories": "Expense categories မရှိသေးပါ။ အရင် expense category ဖန်တီးပြီး ပြန်လာပါ။",
       "allocation": "အမျိုးအစားခွဲဝေငွေ",
       "categoryThresholdHint": "80 ဆိုတာ ဒီ category ဘတ်ဂျက် 80% သုံးပြီးချိန်မှာ သတိပေးမယ်ဆိုတာကို ဆိုလိုပါတယ်။",
-      "expandDialog": "ကျယ်ကျယ်ဖွင့်မည်",
-      "normalView": "ပုံမှန်မြင်ကွင်း",
       "createSubmit": "ဘတ်ဂျက်ဖန်တီးမည်",
       "updateSubmit": "ဘတ်ဂျက်ပြင်မည်"
     },

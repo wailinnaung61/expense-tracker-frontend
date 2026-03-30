@@ -10,8 +10,10 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Shield } from 'lucide-react'
 import spinnerGif from '@/assets/Spinner.gif'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function TotpVerificationPage() {
+  const { t } = useTranslation()
   const { fetchUser } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -46,10 +48,10 @@ export default function TotpVerificationPage() {
       // Fetch user data after successful MFA verification
       await fetchUser()
       
-      toast.success('Verification successful!')
+      toast.success(t('common.success'))
       navigate('/dashboard', { replace: true })
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Verification failed')
+      toast.error(error instanceof Error ? error.message : t('auth.totpPage.verifyFailed'))
     }
   }
 
@@ -130,10 +132,10 @@ export default function TotpVerificationPage() {
 
           {/* Heading */}
           <h1 className="text-center text-2xl font-bold text-gray-900 mb-2 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.2s_forwards]">
-            Two-Factor Authentication
+            {t('auth.totpPage.title')}
           </h1>
           <p className="text-center text-sm text-gray-600 mb-1 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.3s_forwards]">
-            Enter the 6-digit code from your authenticator app
+            {t('auth.totpPage.description')}
           </p>
           {email && (
             <p className="text-center text-xs text-gray-500 mb-7">
@@ -146,7 +148,7 @@ export default function TotpVerificationPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.5s_forwards]">
             <div className="space-y-1.5">
               <Label htmlFor="code" className="text-gray-900!">
-                Verification Code
+                {t('auth.totpPage.code')}
               </Label>
               <Input
                 id="code"
@@ -175,10 +177,10 @@ export default function TotpVerificationPage() {
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-2">
                   <img src={spinnerGif} alt="Loading..." className="w-4 h-4" />
-                  <span>Verifying...</span>
+                  <span>{t('auth.totpPage.verifying')}</span>
                 </div>
               ) : (
-                'Verify'
+                t('auth.totpPage.verify')
               )}
               </span>
               <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -198,20 +200,19 @@ export default function TotpVerificationPage() {
           {/* Help Text */}
           <div className="mt-6 p-3 bg-gray-50 rounded-lg opacity-0 animate-[fadeIn_0.7s_ease-out_0.6s_forwards]">
             <p className="text-xs text-gray-600">
-              <strong>Need help?</strong> Open your authenticator app (e.g., Google Authenticator, 
-              Authy) and enter the 6-digit code shown for Expense Tracker.
+              {t('auth.totpPage.backupCodeHint')}
             </p>
           </div>
 
           {/* Lost Access Link */}
           <div className="mt-4 text-center opacity-0 animate-[fadeIn_0.7s_ease-out_0.6s_forwards]">
             <p className="text-xs text-gray-600">
-              Lost access to your authenticator?{' '}
+              {t('auth.totpPage.useBackupCode')}{' '}
               <Link
                 to="/disable-mfa"
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
-                Use backup code
+                {t('auth.totpPage.useBackupCode')}
               </Link>
             </p>
           </div>
