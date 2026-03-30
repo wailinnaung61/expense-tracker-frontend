@@ -115,8 +115,8 @@ export function AddCategoryDialog({
         });
         Swal.fire({
           icon: "success",
-          title: "Success!",
-          text: "Category updated successfully",
+          title: t('common.success'),
+          text: t('categories.updateSuccessMessage'),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -130,7 +130,7 @@ export function AddCategoryDialog({
         });
         Swal.fire({
           icon: "success",
-          title: t('categories.createSuccess'),
+          title: t('common.success'),
           text: t('categories.createSuccessMessage'),
           timer: 2000,
           showConfirmButton: false,
@@ -281,7 +281,7 @@ export function AddCategoryDialog({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : category ? "Update" : "Create"}

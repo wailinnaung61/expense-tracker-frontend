@@ -24,6 +24,7 @@ import Swal from "sweetalert2";
 import { AddRecurringPaymentDialog } from "./add-recurring-payment-dialog";
 import spinnerGif from "@/assets/Spinner.gif";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface UpcomingPaymentsProps {
   startDate?: string;
@@ -34,6 +35,7 @@ interface UpcomingPaymentsProps {
 
 export function UpcomingPayments({ startDate, endDate, onTransactionCreated, refreshKey: externalRefreshKey = 0 }: UpcomingPaymentsProps) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [payments, setPayments] = useState<RecurringPayment[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -74,22 +76,22 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
     if (daysLeft < 0)
       return (
         <Badge className="bg-red-500/10 text-red-600 hover:bg-red-500 hover:text-white">
-          Overdue
+          {t("transactions.upcoming.overdue")}
         </Badge>
       );
     if (daysLeft <= 3)
       return (
         <Badge className="bg-red-500/10 text-red-600 hover:bg-red-500 hover:text-white">
-          Due Soon
+          {t("transactions.upcoming.dueSoon")}
         </Badge>
       );
     if (daysLeft <= 7)
       return (
         <Badge className="bg-yellow-400/10 text-yellow-600 hover:bg-yellow-500 hover:text-white">
-          This Week
+          {t("transactions.upcoming.thisWeek")}
         </Badge>
       );
-    return <Badge variant="outline">Upcoming</Badge>;
+    return <Badge variant="outline">{t("transactions.upcoming.upcoming")}</Badge>;
   };
 
   const getStatusColor = (daysLeft: number): string => {
@@ -101,14 +103,14 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
 
   const handlePayNow = async (payment: RecurringPayment) => {
     const result = await Swal.fire({
-      title: "Mark as Paid?",
-      text: `Mark "${payment.name}" as paid and create transaction?`,
+      title: t("transactions.upcoming.payConfirmTitle"),
+      text: t("transactions.upcoming.payConfirmText", { name: payment.name }),
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#22c55e",
       cancelButtonColor: "#6b7280",
-      confirmButtonText: "Yes, mark as paid",
-      cancelButtonText: "Cancel",
+      confirmButtonText: t("transactions.upcoming.payConfirmButton"),
+      cancelButtonText: t("common.cancel"),
     });
 
     if (result.isConfirmed) {
@@ -131,7 +133,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Payment marked as paid and transaction created",
+          text: t("transactions.upcoming.paySuccess"),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -150,14 +152,14 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
 
   const handleDelete = async (payment: RecurringPayment) => {
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: `Delete recurring payment "${payment.name}"?`,
+      title: t("transactions.upcoming.deleteConfirmTitle"),
+      text: t("transactions.upcoming.deleteConfirmText", { name: payment.name }),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#ef4444",
       cancelButtonColor: "#6b7280",
-      confirmButtonText: "Yes, delete it",
-      cancelButtonText: "Cancel",
+      confirmButtonText: t("transactions.upcoming.deleteConfirmButton"),
+      cancelButtonText: t("common.cancel"),
     });
 
     if (result.isConfirmed) {
@@ -165,8 +167,8 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
         await recurringPaymentService.deleteRecurringPayment(payment.recurringId);
         Swal.fire({
           icon: "success",
-          title: "Deleted",
-          text: "Recurring payment deleted successfully",
+          title: t("transactions.upcoming.deleteSuccessTitle"),
+          text: t("transactions.upcoming.deleteSuccessText"),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -213,15 +215,15 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
             <div>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Calendar className="h-5 w-5" />
-                Upcoming Payments
+                {t("transactions.upcoming.title")}
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Recurring bills and payments
+                {t("transactions.upcoming.description")}
               </CardDescription>
             </div>
             <Button size="sm" onClick={handleAddNew}>
               <Plus className="h-4 w-4 mr-1" />
-              Add New
+              {t("transactions.upcoming.addNew")}
             </Button>
           </div>
         </CardHeader>
@@ -233,7 +235,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
             </div>
           ) : payments.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              No upcoming payments found
+              {t("transactions.upcoming.noPayments")}
             </div>
           ) : (
             <>
@@ -272,15 +274,15 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
                             <Badge
                               className="px-1.5 py-0.5 text-xs bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400 border-red-500/20 hover:bg-red-500 hover:text-white"
                             >
-                              ⚠️ {payment.missedCount} missed
+                              ⚠️ {t("transactions.upcoming.missed", { count: payment.missedCount })}
                             </Badge>
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {payment.categoryName || 'Unknown Category'} &bull; Due{" "}
+                          {payment.categoryName || t("transactions.upcoming.unknownCategory")} &bull; {t("transactions.upcoming.due")}{" "}
                           {format(new Date(payment.nextDueDate), "MMM dd")}
                           {payment.lastPaidDate && (
-                            <> &bull; Last paid {format(new Date(payment.lastPaidDate), "MMM dd")}</>
+                            <> &bull; {t("transactions.upcoming.lastPaid")} {format(new Date(payment.lastPaidDate), "MMM dd")}</>
                           )}
                         </div>
                       </div>
@@ -301,7 +303,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
                         className="whitespace-nowrap text-xs"
                         onClick={() => handlePayNow(payment)}
                       >
-                        Pay Now
+                        {t("transactions.upcoming.payNow")}
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -311,13 +313,13 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => handleEdit(payment)}>
-                            Edit
+                            {t("transactions.upcoming.edit")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDelete(payment)}
                             className="text-red-600"
                           >
-                            Delete
+                            {t("transactions.upcoming.delete")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -329,7 +331,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
               {/* Footer */}
               <div className="pt-4 mt-2 flex flex-col sm:flex-row sm:items-center justify-between border-t border-border gap-2">
                 <div className="text-sm text-muted-foreground pt-2">
-                  Total upcoming:{" "}
+                  {t("transactions.upcoming.totalUpcoming")}{" "}
                   <span className="font-medium text-foreground">
                     {formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0))}
                   </span>
@@ -341,7 +343,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
                     onClick={() => setShowAll(true)}
                     className="whitespace-nowrap"
                   >
-                    View All Bills ({payments.length})
+                    {t("transactions.upcoming.viewAll", { count: payments.length })}
                   </Button>
                 )}
               </div>

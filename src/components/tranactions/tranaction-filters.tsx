@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Popover,
   PopoverContent,
@@ -13,10 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/hooks/useTranslation";
 import { categoryService } from "@/services/categoryService";
 import type { ExpenseCategory, CategoryListParams } from "@/types/category";
 import { format } from "date-fns";
-import { CalendarIcon, Search } from "lucide-react";
+import { AlertTriangle, CalendarIcon, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface TransactionFiltersProps {
@@ -48,6 +50,7 @@ export function TransactionFilters({
   onStartDateChange,
   onEndDateChange,
 }: TransactionFiltersProps) {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [startDateLocal, setStartDateLocal] = useState<Date | undefined>(
     startDate ? new Date(startDate) : undefined
@@ -55,6 +58,10 @@ export function TransactionFilters({
   const [endDateLocal, setEndDateLocal] = useState<Date | undefined>(
     endDate ? new Date(endDate) : undefined
   );
+  const hasInvalidDateRange =
+    !!startDateLocal &&
+    !!endDateLocal &&
+    startDateLocal.getTime() > endDateLocal.getTime();
 
   const handleStartDateSelect = (date: Date | undefined) => {
     setStartDateLocal(date);
@@ -93,7 +100,11 @@ export function TransactionFilters({
         const seen = new Map<string, ExpenseCategory>();
         (response.items || []).forEach(cat => {
           const existing = seen.get(cat.categoryId);
-          if (!existing || cat.updatedAt > existing.updatedAt) {
+          if (
+            !existing ||
+            (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) ||
+            (cat.updatedAt && !existing.updatedAt)
+          ) {
             seen.set(cat.categoryId, cat);
           }
         });
@@ -124,7 +135,7 @@ export function TransactionFilters({
           <div className="relative flex-1 min-w-0">
             <Search className="absolute inset-s-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
-              placeholder="Search transactions..."
+              placeholder={t("transactions.filters.searchPlaceholder")}
               className="ps-10 h-11 border-muted-foreground/20 focus-visible:ring-2"
               value={keyword}
               onChange={(e) => onKeywordChange(e.target.value)}
@@ -137,9 +148,9 @@ export function TransactionFilters({
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="0">Income</SelectItem>
-                <SelectItem value="1">Expense</SelectItem>
+                <SelectItem value="all">{t("transactions.filters.allTypes")}</SelectItem>
+                <SelectItem value="0">{t("transactions.type.income")}</SelectItem>
+                <SelectItem value="1">{t("transactions.type.expense")}</SelectItem>
               </SelectContent>
             </Select>
             
@@ -148,10 +159,10 @@ export function TransactionFilters({
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="0">Pending</SelectItem>
-                <SelectItem value="1">Completed</SelectItem>
-                <SelectItem value="2">Failed</SelectItem>
+                <SelectItem value="all">{t("transactions.filters.allStatus")}</SelectItem>
+                <SelectItem value="0">{t("transactions.status.pending")}</SelectItem>
+                <SelectItem value="1">{t("transactions.status.completed")}</SelectItem>
+                <SelectItem value="2">{t("transactions.status.failed")}</SelectItem>
               </SelectContent>
             </Select>
             
@@ -160,7 +171,7 @@ export function TransactionFilters({
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent className="max-h-100">
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="all">{t("transactions.filters.allCategories")}</SelectItem>
                 {categories.map((cat) => (
                   <SelectItem key={cat.categoryId} value={cat.categoryId}>
                     {cat.icon} {cat.displayName}
@@ -183,7 +194,7 @@ export function TransactionFilters({
                 {startDateLocal ? (
                   <span className="font-medium">{format(startDateLocal, "PPP")}</span>
                 ) : (
-                  <span className="text-muted-foreground">Start Date</span>
+                  <span className="text-muted-foreground">{t("transactions.filters.startDate")}</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -207,7 +218,7 @@ export function TransactionFilters({
                 {endDateLocal ? (
                   <span className="font-medium">{format(endDateLocal, "PPP")}</span>
                 ) : (
-                  <span className="text-muted-foreground">End Date</span>
+                  <span className="text-muted-foreground">{t("transactions.filters.endDate")}</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -221,6 +232,15 @@ export function TransactionFilters({
             </PopoverContent>
           </Popover>
         </div>
+        {hasInvalidDateRange && (
+          <Alert className="border-amber-500/40 bg-amber-50 text-amber-900">
+            <AlertTriangle className="text-amber-700" />
+            <AlertTitle>{t("transactions.filters.invalidDateRangeTitle")}</AlertTitle>
+            <AlertDescription>
+              {t("transactions.filters.invalidDateRangeMessage")}
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
     </div>
   );

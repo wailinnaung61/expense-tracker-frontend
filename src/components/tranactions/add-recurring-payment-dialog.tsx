@@ -44,6 +44,7 @@ import { Controller, useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface AddRecurringPaymentDialogProps {
   open: boolean;
@@ -76,6 +77,7 @@ export function AddRecurringPaymentDialog({
 }: AddRecurringPaymentDialogProps) {
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   const {
     register,
@@ -173,7 +175,7 @@ export function AddRecurringPaymentDialog({
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Recurring payment updated successfully",
+          text: t("transactions.recurringDialog.updateSuccess"),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -191,7 +193,7 @@ export function AddRecurringPaymentDialog({
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Recurring payment created successfully",
+          text: t("transactions.recurringDialog.createSuccess"),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -213,22 +215,22 @@ export function AddRecurringPaymentDialog({
       <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>
-            {recurringPayment ? "Edit Recurring Payment" : "Add Recurring Payment"}
+            {recurringPayment ? t("transactions.recurringDialog.editTitle") : t("transactions.recurringDialog.addTitle")}
           </DialogTitle>
           <DialogDescription>
             {recurringPayment
-              ? "Update the recurring payment details"
-              : "Create a new recurring payment"}
+              ? t("transactions.recurringDialog.editDescription")
+              : t("transactions.recurringDialog.addDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t("transactions.recurringDialog.nameLabel")}</Label>
             <Input
               id="name"
-              placeholder="Enter payment name"
+              placeholder={t("transactions.recurringDialog.namePlaceholder")}
               {...register("name")}
             />
             {errors.name && (
@@ -238,7 +240,7 @@ export function AddRecurringPaymentDialog({
 
           {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="amount">{t("transactions.recurringDialog.amountLabel")}</Label>
             <Input
               id="amount"
               type="number"
@@ -253,14 +255,14 @@ export function AddRecurringPaymentDialog({
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="categoryId">Category</Label>
+            <Label htmlFor="categoryId">{t("transactions.recurringDialog.categoryLabel")}</Label>
             <Controller
               name="categoryId"
               control={control}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder={t("transactions.recurringDialog.categoryPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -282,27 +284,27 @@ export function AddRecurringPaymentDialog({
 
           {/* Frequency */}
           <div className="space-y-2">
-            <Label htmlFor="frequency">Frequency</Label>
+            <Label htmlFor="frequency">{t("transactions.recurringDialog.frequencyLabel")}</Label>
             <Controller
               name="frequency"
               control={control}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select frequency" />
+                    <SelectValue placeholder={t("transactions.recurringDialog.frequencyPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={RecurringFrequency.Daily.toString()}>
-                      Daily
+                      {t("transactions.recurringDialog.daily")}
                     </SelectItem>
                     <SelectItem value={RecurringFrequency.Weekly.toString()}>
-                      Weekly
+                      {t("transactions.recurringDialog.weekly")}
                     </SelectItem>
                     <SelectItem value={RecurringFrequency.Monthly.toString()} >
-                      Monthly
+                      {t("transactions.recurringDialog.monthly")}
                     </SelectItem>
                     <SelectItem value={RecurringFrequency.Yearly.toString()}>
-                      Yearly
+                      {t("transactions.recurringDialog.yearly")}
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -315,7 +317,7 @@ export function AddRecurringPaymentDialog({
 
           {/* Next Due Date */}
           <div className="space-y-2">
-            <Label>Next Due Date</Label>
+            <Label>{t("transactions.recurringDialog.dueDateLabel")}</Label>
             <Controller
               name="nextDueDate"
               control={control}
@@ -330,7 +332,7 @@ export function AddRecurringPaymentDialog({
                       {field.value ? (
                         format(field.value, "PPP")
                       ) : (
-                        <span>Pick a date</span>
+                        <span>{t("transactions.recurringDialog.pickDate")}</span>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -365,7 +367,7 @@ export function AddRecurringPaymentDialog({
               )}
             />
             <Label htmlFor="autoPay" className="font-normal cursor-pointer">
-              Enable Auto Pay (automatically process this payment)
+              {t("transactions.recurringDialog.autoPay")}
             </Label>
           </div>
 
@@ -376,11 +378,11 @@ export function AddRecurringPaymentDialog({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {recurringPayment ? "Update" : "Create"}
+              {recurringPayment ? t("transactions.recurringDialog.update") : t("transactions.recurringDialog.create")}
             </Button>
           </DialogFooter>
         </form>

@@ -38,6 +38,7 @@ import { Controller, useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface AddTransactionDialogProps {
   open: boolean;
@@ -76,6 +77,7 @@ export function AddTransactionDialog({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   const {
     control,
@@ -276,8 +278,8 @@ export function AddTransactionDialog({
         await transactionService.updateTransaction(transaction.tranactionId, payload);
         Swal.fire({
           icon: "success",
-          title: "Success!",
-          text: "Transaction updated successfully",
+          title: t("common.success"),
+          text: t("transactions.addDialog.updateSuccess"),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -286,8 +288,8 @@ export function AddTransactionDialog({
         await transactionService.createTransaction(payload);
         Swal.fire({
           icon: "success",
-          title: "Success!",
-          text: "Transaction created successfully",
+          title: t("common.success"),
+          text: t("transactions.addDialog.createSuccess"),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -308,19 +310,19 @@ export function AddTransactionDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {transaction && transaction.tranactionId ? "Edit Transaction" : "Add New Transaction"}
+            {transaction && transaction.tranactionId ? t("transactions.addDialog.editTitle") : t("transactions.addDialog.addTitle")}
           </DialogTitle>
           <DialogDescription>
             {transaction && transaction.tranactionId
-              ? "Update the transaction details below"
-              : "Fill in the details to add a new transaction"}
+              ? t("transactions.addDialog.editDescription")
+              : t("transactions.addDialog.addDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Transaction Type */}
           <div>
-            <Label>Transaction Type</Label>
+            <Label>{t("transactions.addDialog.typeLabel")}</Label>
             <Controller
               name="type"
               control={control}
@@ -340,7 +342,7 @@ export function AddTransactionDialog({
                       htmlFor="expense"
                       className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
                     >
-                      <span>Expense</span>
+                      <span>{t("transactions.type.expense")}</span>
                     </Label>
                   </div>
                   <div>
@@ -353,7 +355,7 @@ export function AddTransactionDialog({
                       htmlFor="income"
                       className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
                     >
-                      <span>Income</span>
+                      <span>{t("transactions.type.income")}</span>
                     </Label>
                   </div>
                 </RadioGroup>
@@ -367,23 +369,23 @@ export function AddTransactionDialog({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Category */}
             <div>
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">{t("transactions.addDialog.categoryLabel")}</Label>
               <Controller
                 name="categoryId"
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger id="category">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder={t("transactions.addDialog.categoryPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent className="max-h-75">
                       {selectedType === "" ? (
                         <div className="p-4 text-sm text-gray-500">
-                          Please select a transaction type first
+                          {t("transactions.addDialog.selectTypeFirst")}
                         </div>
                       ) : filteredCategories.length === 0 ? (
                         <div className="p-4 text-sm text-gray-500">
-                          No categories available for this type
+                          {t("transactions.addDialog.noCategoriesForType")}
                         </div>
                       ) : (
                         filteredCategories.map((category) => (
@@ -411,7 +413,7 @@ export function AddTransactionDialog({
 
             {/* Amount */}
             <div>
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">{t("transactions.addDialog.amountLabel")}</Label>
               <Input
                 id="amount"
                 type="number"
@@ -428,7 +430,7 @@ export function AddTransactionDialog({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Transaction Date */}
             <div>
-              <Label>Transaction Date</Label>
+              <Label>{t("transactions.addDialog.dateLabel")}</Label>
               <Controller
                 name="tranactionDate"
                 control={control}
@@ -444,7 +446,7 @@ export function AddTransactionDialog({
                         {field.value ? (
                           format(field.value, "PPP")
                         ) : (
-                          <span>Pick a date</span>
+                          <span>{t("transactions.addDialog.pickDate")}</span>
                         )}
                       </Button>
                     </PopoverTrigger>
@@ -466,24 +468,24 @@ export function AddTransactionDialog({
 
             {/* Payment Status */}
             <div>
-              <Label htmlFor="status">Payment Status</Label>
+              <Label htmlFor="status">{t("transactions.addDialog.statusLabel")}</Label>
               <Controller
                 name="status"
                 control={control}
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger id="status">
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder={t("transactions.addDialog.statusPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={String(PaymentStatus.Completed)}>
-                        Completed
+                        {t("transactions.status.completed")}
                       </SelectItem>
                       <SelectItem value={String(PaymentStatus.Pending)}>
-                        Pending
+                        {t("transactions.status.pending")}
                       </SelectItem>
                       <SelectItem value={String(PaymentStatus.Failed)}>
-                        Failed
+                        {t("transactions.status.failed")}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -497,29 +499,29 @@ export function AddTransactionDialog({
 
           {/* Description */}
           <div>
-            <Label htmlFor="description">Description (Optional)</Label>
+            <Label htmlFor="description">{t("transactions.addDialog.descriptionLabel")}</Label>
             <Input
               id="description"
               type="text"
-              placeholder="Enter description"
+              placeholder={t("transactions.addDialog.descriptionPlaceholder")}
               {...register("description")}
             />
           </div>
 
           {/* Note */}
           <div>
-            <Label htmlFor="note">Note (Optional)</Label>
+            <Label htmlFor="note">{t("transactions.addDialog.noteLabel")}</Label>
             <Input
               id="note"
               type="text"
-              placeholder="Additional notes"
+              placeholder={t("transactions.addDialog.notePlaceholder")}
               {...register("note")}
             />
           </div>
 
           {/* Receipt Upload */}
           <div>
-            <Label htmlFor="receipt">Receipt (Optional)</Label>
+            <Label htmlFor="receipt">{t("transactions.addDialog.receiptLabel")}</Label>
             <div className="space-y-3">
               {/* File Input */}
               <div className="flex items-center gap-2">
@@ -539,7 +541,7 @@ export function AddTransactionDialog({
                   disabled={uploading}
                 >
                   <Upload className="mr-2 h-4 w-4" />
-                  {selectedFile ? 'Change Receipt' : 'Upload Receipt'}
+                  {selectedFile ? t("transactions.addDialog.changeReceipt") : t("transactions.addDialog.uploadReceipt")}
                 </Button>
               </div>
 
@@ -577,7 +579,7 @@ export function AddTransactionDialog({
               )}
 
               <p className="text-xs text-muted-foreground">
-                Supports: JPEG, PNG, GIF, WebP, PDF (Max 5MB)
+                {t("transactions.addDialog.receiptFormats")}
               </p>
             </div>
           </div>
@@ -589,18 +591,18 @@ export function AddTransactionDialog({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting || uploading}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting || uploading}>
               {uploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Uploading...
+                  {t("transactions.addDialog.uploading")}
                 </>
               ) : isSubmitting ? (
-                "Saving..."
+                t("transactions.addDialog.saving")
               ) : (
-                "Save Transaction"
+                t("transactions.addDialog.save")
               )}
             </Button>
           </DialogFooter>

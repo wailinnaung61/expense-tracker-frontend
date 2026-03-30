@@ -27,6 +27,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { ChevronLeft, ChevronRight, PiggyBank, TrendingUp, ArrowRight, Wallet, CreditCard, Receipt } from "lucide-react";
 import { format, addMonths, subMonths } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TransactionStatsProps {
   currency?: string;
@@ -54,6 +55,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+  const { t } = useTranslation();
 
   const fetchExpenseBreakdown = useCallback(async (date: Date) => {
     setLoading(true);
@@ -136,8 +138,8 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <CardTitle>Monthly Overview</CardTitle>
-            <CardDescription>
+            <CardTitle className="dark:text-white">{t("transactions.stats.title")}</CardTitle>
+            <CardDescription className="dark:text-slate-400">
               {monthlyData ? (
                 <>
                   <span className="text-xs">
@@ -145,7 +147,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                   </span>
                 </>
               ) : (
-                `${format(currentMonth, "MMMM yyyy")} financial summary`
+                t("transactions.stats.financialSummary", { month: format(currentMonth, "MMMM yyyy") })
               )}
             </CardDescription>
           </div>
@@ -172,7 +174,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-muted-foreground">Month</label>
+                      <label className="text-xs font-semibold text-muted-foreground">{t("transactions.stats.month")}</label>
                       <Select value={String(currentMonth.getMonth())} onValueChange={handleMonthChange}>
                         <SelectTrigger className="h-9 bg-background">
                           <SelectValue />
@@ -194,7 +196,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-semibold text-muted-foreground">Year</label>
+                      <label className="text-xs font-semibold text-muted-foreground">{t("transactions.stats.year")}</label>
                       <Select value={String(currentMonth.getFullYear())} onValueChange={handleYearChange}>
                         <SelectTrigger className="h-9 bg-background">
                           <SelectValue />
@@ -214,7 +216,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                     className="w-full h-9" 
                     onClick={() => setMonthPickerOpen(false)}
                   >
-                    Done
+                    {t("transactions.stats.done")}
                   </Button>
                 </div>
               </PopoverContent>
@@ -226,7 +228,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                 onClick={handleCurrentMonth}
                 className="h-7 px-2 text-xs"
               >
-                Today
+                {t("transactions.stats.today")}
               </Button>
             )}
             <Button
@@ -249,12 +251,12 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-sm text-muted-foreground mb-2">{error}</p>
             <Button variant="outline" size="sm" onClick={() => fetchExpenseBreakdown(currentMonth)}>
-              Retry
+              {t("transactions.stats.retry")}
             </Button>
           </div>
         ) : !data || chartData.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm text-muted-foreground">No expenses for this month</p>
+            <p className="text-sm text-muted-foreground">{t("transactions.stats.noExpenses")}</p>
           </div>
         ) : (
           <>
@@ -262,81 +264,97 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
             {monthlyData && (
               <div className="space-y-4 mb-6">
                 {/* Financial Summary Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-lg border bg-linear-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 p-3.5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                        <Wallet className="w-4 h-4 text-white" />
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Income Card */}
+                  <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500/10 via-green-500/5 to-transparent dark:from-emerald-500/20 dark:via-green-500/10 p-4 hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-emerald-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+                    <div className="relative">
+                      <div className="w-11 h-11 rounded-xl bg-linear-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/30 flex items-center justify-center mb-3">
+                        <Wallet className="w-5 h-5 text-white" />
                       </div>
-                      <div className="text-xs font-medium text-green-700 dark:text-green-300">Income</div>
-                    </div>
-                    <div className="text-lg font-bold text-green-700 dark:text-green-300">
-                      +{formatCurrency(monthlyData.income, currency)}
+                      <div className="text-xs font-medium text-emerald-700 dark:text-emerald-300 mb-1.5">{t("transactions.stats.income")}</div>
+                      <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                        +{formatCurrency(monthlyData.income, currency)}
+                      </div>
                     </div>
                   </div>
-                  <div className="rounded-lg border bg-linear-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 p-3.5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
-                        <CreditCard className="w-4 h-4 text-white" />
+
+                  {/* Expenses Card */}
+                  <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-rose-500/10 via-red-500/5 to-transparent dark:from-rose-500/20 dark:via-red-500/10 p-4 hover:shadow-lg hover:shadow-rose-500/20 transition-all duration-300">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-rose-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+                    <div className="relative">
+                      <div className="w-11 h-11 rounded-xl bg-linear-to-br from-rose-500 to-red-600 shadow-lg shadow-rose-500/30 flex items-center justify-center mb-3">
+                        <CreditCard className="w-5 h-5 text-white" />
                       </div>
-                      <div className="text-xs font-medium text-red-700 dark:text-red-300">Expenses</div>
-                    </div>
-                    <div className="text-lg font-bold text-red-700 dark:text-red-300">
-                      -{formatCurrency(monthlyData.expense, currency)}
+                      <div className="text-xs font-medium text-rose-700 dark:text-rose-300 mb-1.5">{t("transactions.stats.expenses")}</div>
+                      <div className="text-xl font-bold text-rose-600 dark:text-rose-400">
+                        -{formatCurrency(monthlyData.expense, currency)}
+                      </div>
                     </div>
                   </div>
-                  <Link to="/saving" className="block rounded-lg border bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 p-3.5 hover:scale-[1.02] transition-all cursor-pointer group">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                          <PiggyBank className="w-4 h-4 text-white" />
+
+                  {/* Saving Card */}
+                  <Link to="/saving" className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-500/10 via-cyan-500/5 to-transparent dark:from-blue-500/20 dark:via-cyan-500/10 p-4 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-blue-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+                    <div className="relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-11 h-11 rounded-xl bg-linear-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/30 flex items-center justify-center">
+                          <PiggyBank className="w-5 h-5 text-white" />
                         </div>
-                        <div className="text-xs font-medium text-blue-700 dark:text-blue-300">Saving</div>
+                        <ArrowRight className="w-4 h-4 text-blue-500 dark:text-blue-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
                       </div>
-                      <ArrowRight className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform" />
+                      <div className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1.5">{t("transactions.stats.saving")}</div>
+                      <div className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                        {formatCurrency(monthlyData.saving, currency)}
+                      </div>
+                      <div className="text-[10px] text-blue-600/70 dark:text-blue-400/70">{t("transactions.stats.savingTagline")}</div>
                     </div>
-                    <div className="text-lg font-bold text-blue-700 dark:text-blue-300 mb-1">
-                      {formatCurrency(monthlyData.saving, currency)}
-                    </div>
-                    <div className="text-[10px] text-blue-600 dark:text-blue-400">Track your savings goals</div>
                   </Link>
-                  <Link to="/investment" className="block rounded-lg border bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 p-3.5 hover:scale-[1.02] transition-all cursor-pointer group">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
-                          <TrendingUp className="w-4 h-4 text-white" />
+
+                  {/* Investment Card */}
+                  <Link to="/investment" className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-500/10 via-violet-500/5 to-transparent dark:from-purple-500/20 dark:via-violet-500/10 p-4 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-purple-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+                    <div className="relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="w-11 h-11 rounded-xl bg-linear-to-br from-purple-500 to-violet-600 shadow-lg shadow-purple-500/30 flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 text-white" />
                         </div>
-                        <div className="text-xs font-medium text-purple-700 dark:text-purple-300">Investment</div>
+                        <ArrowRight className="w-4 h-4 text-purple-500 dark:text-purple-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
                       </div>
-                      <ArrowRight className="w-4 h-4 text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform" />
+                      <div className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-1.5">{t("transactions.stats.investment")}</div>
+                      <div className="text-xl font-bold text-purple-600 dark:text-purple-400 mb-1">
+                        {formatCurrency(monthlyData.investment, currency)}
+                      </div>
+                      <div className="text-[10px] text-purple-600/70 dark:text-purple-400/70">{t("transactions.stats.investmentTagline")}</div>
                     </div>
-                    <div className="text-lg font-bold text-purple-700 dark:text-purple-300 mb-1">
-                      {formatCurrency(monthlyData.investment, currency)}
-                    </div>
-                    <div className="text-[10px] text-purple-600 dark:text-purple-400">View your investments</div>
                   </Link>
                   
                   {/* Net Savings - Highlighted */}
-                  <div className={`col-span-2 rounded-lg border-2 p-4 ${
+                  <div className={`col-span-2 group relative overflow-hidden rounded-2xl p-5 ${
                     monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment >= 0
-                      ? 'bg-linear-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900 border-green-300 dark:border-green-700'
-                      : 'bg-linear-to-br from-red-50 to-rose-100 dark:from-red-950 dark:to-rose-900 border-red-300 dark:border-red-700'
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      ? 'bg-linear-to-br from-emerald-500/15 via-green-500/10 to-teal-500/5 dark:from-emerald-500/25 dark:via-green-500/15 hover:shadow-xl hover:shadow-emerald-500/25'
+                      : 'bg-linear-to-br from-rose-500/15 via-red-500/10 to-orange-500/5 dark:from-rose-500/25 dark:via-red-500/15 hover:shadow-xl hover:shadow-rose-500/25'
+                  } transition-all duration-300`}>
+                    <div className={`absolute top-0 left-0 w-48 h-48 rounded-full blur-3xl opacity-30 group-hover:scale-125 transition-transform duration-500 ${
+                      monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment >= 0
+                        ? 'bg-linear-to-br from-emerald-400 to-green-500'
+                        : 'bg-linear-to-br from-rose-400 to-red-500'
+                    }`} />
+                    <div className="relative flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-14 h-14 rounded-2xl shadow-xl flex items-center justify-center ${
                           monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment >= 0
-                            ? 'bg-green-500'
-                            : 'bg-red-500'
+                            ? 'bg-linear-to-br from-emerald-500 to-green-600 shadow-emerald-500/40'
+                            : 'bg-linear-to-br from-rose-500 to-red-600 shadow-rose-500/40'
                         }`}>
-                          <Wallet className="w-5 h-5 text-white" />
+                          <Wallet className="w-7 h-7 text-white" />
                         </div>
                         <div>
-                          <div className="text-xs font-medium text-muted-foreground mb-1">Net Savings</div>
-                          <div className={`text-2xl font-bold ${
+                          <div className="text-xs font-medium text-muted-foreground dark:text-slate-400 mb-1.5">{t("transactions.stats.netSavings")}</div>
+                          <div className={`text-3xl font-bold tracking-tight ${
                           monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment >= 0 
-                            ? 'text-green-700 dark:text-green-300' 
-                            : 'text-red-700 dark:text-red-300'
+                            ? 'text-emerald-600 dark:text-emerald-400' 
+                            : 'text-rose-600 dark:text-rose-400'
                         }`}>
                             {monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment >= 0 ? '+' : ''}
                             {formatCurrency(monthlyData.income - monthlyData.expense - monthlyData.saving - monthlyData.investment, currency)}
@@ -344,11 +362,11 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="flex items-center justify-end gap-2 mb-1">
-                          <Receipt className="w-4 h-4 text-muted-foreground" />
-                          <div className="text-xs text-muted-foreground">Transactions</div>
+                        <div className="flex items-center justify-end gap-2 mb-1.5">
+                          <Receipt className="w-4 h-4 text-muted-foreground dark:text-slate-400" />
+                          <div className="text-xs text-muted-foreground dark:text-slate-400">{t("transactions.stats.transactionCount")}</div>
                         </div>
-                        <div className="text-xl font-bold">{monthlyData.transactionCount}</div>
+                        <div className="text-2xl font-bold dark:text-white">{monthlyData.transactionCount}</div>
                       </div>
                     </div>
                   </div>
@@ -358,7 +376,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
 
             {/* Expense Breakdown Chart */}
             <div className="border-t pt-4">
-              <h3 className="text-sm font-medium mb-4">Expense Breakdown</h3>
+              <h3 className="text-sm font-medium mb-4 dark:text-white">{t("transactions.stats.expenseBreakdown")}</h3>
               <div className="relative h-60 flex items-center justify-center">
               <ResponsiveContainer>
                 <PieChart>
@@ -379,7 +397,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-                <div className={`font-bold ${
+                <div className={`font-bold dark:text-white ${
                   formatCurrency(data.totalExpenses, currency).length > 15 
                     ? 'text-xs' 
                     : formatCurrency(data.totalExpenses, currency).length > 12 
@@ -390,7 +408,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                 } wrap-break-word text-center max-w-full`}>
                   {formatCurrency(data.totalExpenses, currency)}
                 </div>
-                <div className="text-xs text-muted-foreground">Total Expenses</div>
+                <div className="text-xs text-muted-foreground dark:text-slate-400">{t("transactions.stats.totalExpenses")}</div>
               </div>
             </div>
 
@@ -402,9 +420,9 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                       className="h-3 w-3 rounded-full shrink-0"
                       style={{ backgroundColor: entry.color }}
                     />
-                    <span className="text-sm truncate">{entry.name}</span>
+                    <span className="text-sm truncate dark:text-slate-200">{entry.name}</span>
                   </div>
-                  <div className="text-sm font-medium whitespace-nowrap ml-2">
+                  <div className="text-sm font-medium whitespace-nowrap ml-2 dark:text-slate-100">
                     {formatCurrency(entry.value, currency)} ({Math.round(entry.percentage)}%)
                   </div>
                 </div>
@@ -413,21 +431,21 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
 
             {data.comparison && (
               <div className="mt-6 space-y-3">
-                <div className="text-sm font-medium">Monthly Comparison</div>
+                <div className="text-sm font-medium dark:text-white">{t("transactions.stats.monthlyComparison")}</div>
                 <div className="flex items-center justify-between text-sm">
-                  <span>Last Month</span>
-                  <span className="font-medium">
+                  <span className="dark:text-slate-300">{t("transactions.stats.lastMonth")}</span>
+                  <span className="font-medium dark:text-slate-100">
                     {formatCurrency(data.comparison.lastMonth, currency)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span>This Month</span>
-                  <span className="font-medium">
+                  <span className="dark:text-slate-300">{t("transactions.stats.thisMonth")}</span>
+                  <span className="font-medium dark:text-slate-100">
                     {formatCurrency(data.comparison.thisMonth, currency)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span>Difference</span>
+                  <span className="dark:text-slate-300">{t("transactions.stats.difference")}</span>
                   <span
                     className={`font-medium ${
                       data.comparison.difference >= 0

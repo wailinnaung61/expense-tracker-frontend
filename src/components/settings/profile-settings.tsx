@@ -36,6 +36,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import type { ProfileResponse, UpdateProfileFormData } from "@/types/profile";
 import { updateProfileSchema, SUPPORTED_CURRENCIES } from "@/types/profile";
+import { useTranslation } from "@/hooks/useTranslation";
 
 // Auth profile validation schema (userName as displayName, email)
 const authProfileSchema = z.object({
@@ -48,6 +49,7 @@ type AuthProfileFormData = z.infer<typeof authProfileSchema>;
 
 export function ProfileSettings() {
   const { user, fetchUser } = useAuth();
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -95,7 +97,7 @@ export function ProfileSettings() {
         });
       } catch (error: any) {
         console.error("Failed to fetch profile:", error);
-        toast.error(error?.message || "Failed to load profile settings");
+        toast.error(error?.message || t('settings.profile.loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -137,7 +139,7 @@ export function ProfileSettings() {
         if (data.email !== profile?.email) {
           emailChangedFlag = true;
           setPendingEmailVerification(true);
-          toast.info("Verification code has been sent to your new email address. Please check your inbox.");
+          toast.info(t('settings.profile.verificationSent'));
           setEmailVerificationOpen(true);
         }
       }
@@ -159,8 +161,8 @@ export function ProfileSettings() {
       if ((authChanged || profileChanged) && !emailChangedFlag) {
         Swal.fire({
           icon: "success",
-          title: "Success!",
-          text: "Profile updated successfully",
+          title: t('common.success'),
+          text: t('settings.profile.updateSuccess'),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -169,7 +171,7 @@ export function ProfileSettings() {
       reset(data);
     } catch (error: any) {
       console.error("Failed to update profile:", error);
-      toast.error(error?.message || "Failed to update profile");
+      toast.error(error?.message || t('settings.profile.updateError'));
     } finally {
       setIsSaving(false);
     }
@@ -179,16 +181,16 @@ export function ProfileSettings() {
   const handleResendVerification = async () => {
     try {
       await authService.resendEmailVerification();
-      toast.success("Verification code has been resent to your email");
+      toast.success(t('settings.profile.verificationResent'));
     } catch (error: any) {
-      toast.error(error?.message || "Failed to resend verification code");
+      toast.error(error?.message || t('settings.profile.resendError'));
     }
   };
 
   // Confirm email change
   const handleConfirmEmail = async () => {
     if (!verificationCode || verificationCode.length !== 6) {
-      toast.warning("Please enter a 6-digit verification code");
+      toast.warning(t('settings.profile.enterCode'));
       return;
     }
 
@@ -200,8 +202,8 @@ export function ProfileSettings() {
       
       Swal.fire({
         icon: "success",
-        title: "Success!",
-        text: "Email verified successfully",
+        title: t('common.success'),
+        text: t('settings.profile.emailVerified'),
         timer: 2000,
         showConfirmButton: false,
       });
@@ -218,7 +220,7 @@ export function ProfileSettings() {
       });
       await fetchUser();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to verify email");
+      toast.error(error?.message || t('settings.profile.verifyError'));
     }
   };
 
@@ -226,8 +228,8 @@ export function ProfileSettings() {
     <>
       <Card className="w-full max-w-5xl mx-auto">
         <CardHeader>
-          <CardTitle>Profile Settings</CardTitle>
-          <CardDescription>Manage your account information and preferences</CardDescription>
+          <CardTitle>{t('settings.profile.title')}</CardTitle>
+          <CardDescription>{t('settings.profile.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -252,11 +254,11 @@ export function ProfileSettings() {
               {/* Account Details Section */}
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-base font-semibold mb-4">Account Details</h3>
+                  <h3 className="text-base font-semibold mb-4">{t('settings.profile.accountDetails')}</h3>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="username" className="flex items-center gap-2 text-sm">
-                        Username
+                        {t('settings.profile.username')}
                         <Lock className="h-3 w-3 text-muted-foreground" />
                       </Label>
                       <Input
@@ -266,15 +268,15 @@ export function ProfileSettings() {
                         className="bg-muted/50"
                       />
                       <p className="text-xs text-muted-foreground">
-                        Your login username cannot be changed
+                        {t('settings.profile.usernameHint')}
                       </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="userName">Display Name</Label>
+                      <Label htmlFor="userName">{t('settings.profile.displayName')}</Label>
                       <Input
                         id="userName"
-                        placeholder="Enter your display name"
+                        placeholder={t('settings.profile.displayNamePlaceholder')}
                         {...register("userName")}
                         disabled={isLoading}
                       />
@@ -286,11 +288,11 @@ export function ProfileSettings() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
+                      <Label htmlFor="email">{t('settings.profile.email')}</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="Enter email"
+                        placeholder={t('settings.profile.emailPlaceholder')}
                         {...register("email")}
                         disabled={isLoading}
                       />
@@ -301,9 +303,9 @@ export function ProfileSettings() {
                       )}
                       {pendingEmailVerification && (
                         <div className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800 rounded-md">
-                          <Mail className="h-4 w-4 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+                          <Mail className="h-4 w-4 text-yellow-600 dark:text-yellow-400 shrink-0" />
                           <p className="text-xs text-yellow-700 dark:text-yellow-300 flex-1">
-                            Email verification pending
+                            {t('settings.profile.verificationPending')}
                           </p>
                           <Button
                             type="button"
@@ -312,21 +314,21 @@ export function ProfileSettings() {
                             className="h-auto p-0 text-xs text-yellow-700 dark:text-yellow-300 underline hover:text-yellow-900 dark:hover:text-yellow-100"
                             onClick={() => setEmailVerificationOpen(true)}
                           >
-                            Verify Now
+                            {t('settings.profile.verifyNow')}
                           </Button>
                         </div>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        Changing your email will require verification
+                        {t('settings.profile.emailHint')}
                       </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="phoneNumber">Phone Number</Label>
+                      <Label htmlFor="phoneNumber">{t('settings.profile.phone')}</Label>
                       <Input
                         id="phoneNumber"
                         type="tel"
-                        placeholder="+1 (555) 123-4567"
+                        placeholder={t('settings.profile.phonePlaceholder')}
                         {...register("phoneNumber")}
                         disabled={isLoading}
                       />
@@ -343,17 +345,17 @@ export function ProfileSettings() {
               {/* Preferences Section */}
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-base font-semibold mb-4">Preferences</h3>
+                  <h3 className="text-base font-semibold mb-4">{t('settings.profile.preferences')}</h3>
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="currency">Preferred Currency</Label>
+                      <Label htmlFor="currency">{t('settings.profile.currency')}</Label>
                       <Select
                         value={selectedCurrency}
                         onValueChange={(value) => setValue("currency", value as any, { shouldDirty: true })}
                         disabled={isLoading}
                       >
                         <SelectTrigger id="currency">
-                          <SelectValue placeholder="Select currency" />
+                          <SelectValue placeholder={t('settings.profile.selectCurrency')} />
                         </SelectTrigger>
                         <SelectContent>
                           {SUPPORTED_CURRENCIES.map((currency) => (
@@ -371,7 +373,7 @@ export function ProfileSettings() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="dailyLimit">Daily Spending Limit</Label>
+                      <Label htmlFor="dailyLimit">{t('settings.profile.dailyLimit')}</Label>
                       <Input
                         id="dailyLimit"
                         type="number"
@@ -387,7 +389,7 @@ export function ProfileSettings() {
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        Set to 0 for no limit
+                        {t('settings.profile.dailyLimitHint')}
                       </p>
                     </div>
                   </div>
@@ -403,7 +405,7 @@ export function ProfileSettings() {
                 className="min-w-32"
               >
                 {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                {isSaving ? "Saving..." : "Save Changes"}
+                {isSaving ? t('settings.profile.saving') : t('settings.profile.saveChanges')}
               </Button>
             </div>
           </form>
@@ -414,9 +416,9 @@ export function ProfileSettings() {
       <Dialog open={emailVerificationOpen} onOpenChange={setEmailVerificationOpen}>
         <DialogContent className="sm:max-w-105">
           <DialogHeader>
-            <DialogTitle>Verify Email Change</DialogTitle>
+            <DialogTitle>{t('settings.profile.verifyEmailTitle')}</DialogTitle>
             <DialogDescription>
-              Enter the 6-digit verification code sent to your new email address
+              {t('settings.profile.verifyEmailDescription')}
             </DialogDescription>
           </DialogHeader>
 
@@ -426,7 +428,7 @@ export function ProfileSettings() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="verificationCode">Verification Code</Label>
+              <Label htmlFor="verificationCode">{t('settings.profile.verificationCode')}</Label>
               <Input
                 id="verificationCode"
                 type="text"
@@ -444,7 +446,7 @@ export function ProfileSettings() {
               onClick={handleResendVerification}
               className="w-full"
             >
-              Resend Verification Code
+              {t('settings.profile.resendCode')}
             </Button>
           </div>
 
@@ -456,13 +458,13 @@ export function ProfileSettings() {
                 setVerificationCode("");
               }}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={handleConfirmEmail}
               disabled={verificationCode.length !== 6}
             >
-              Verify Email
+              {t('settings.profile.verifyEmail')}
             </Button>
           </DialogFooter>
         </DialogContent>

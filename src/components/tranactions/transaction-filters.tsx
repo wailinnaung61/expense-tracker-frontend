@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Popover,
   PopoverContent,
@@ -13,10 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/hooks/useTranslation";
 import { categoryService } from "@/services/categoryService";
 import type { CategoryListParams, ExpenseCategory } from "@/types/category";
 import { format } from "date-fns";
-import { CalendarIcon, Search } from "lucide-react";
+import { AlertTriangle, CalendarIcon, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface TransactionFiltersProps {
@@ -48,6 +50,7 @@ export function TransactionFilters({
   onStartDateChange,
   onEndDateChange,
 }: TransactionFiltersProps) {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [startDateLocal, setStartDateLocal] = useState<Date | undefined>(
     startDate ? new Date(startDate) : undefined
@@ -55,6 +58,10 @@ export function TransactionFilters({
   const [endDateLocal, setEndDateLocal] = useState<Date | undefined>(
     endDate ? new Date(endDate) : undefined
   );
+  const hasInvalidDateRange =
+    !!startDateLocal &&
+    !!endDateLocal &&
+    startDateLocal.getTime() > endDateLocal.getTime();
 
   const handleStartDateSelect = (date: Date | undefined) => {
     setStartDateLocal(date);
@@ -127,7 +134,7 @@ export function TransactionFilters({
           <div className="relative flex-1">
             <Search className="absolute inset-s-2.5 top-2.5 h-4 w-4 border-muted text-muted-foreground" />
             <Input
-              placeholder="Search transactions..."
+              placeholder={t("transactions.filters.searchPlaceholder")}
               className="ps-8 bg-transparent"
               value={keyword}
               onChange={(e) => onKeywordChange(e.target.value)}
@@ -139,9 +146,9 @@ export function TransactionFilters({
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="0">Income</SelectItem>
-                <SelectItem value="1">Expense</SelectItem>
+                <SelectItem value="all">{t("transactions.filters.allTypes")}</SelectItem>
+                <SelectItem value="0">{t("transactions.type.income")}</SelectItem>
+                <SelectItem value="1">{t("transactions.type.expense")}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={status} onValueChange={onStatusChange}>
@@ -149,10 +156,10 @@ export function TransactionFilters({
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="0">Pending</SelectItem>
-                <SelectItem value="1">Completed</SelectItem>
-                <SelectItem value="2">Failed</SelectItem>
+                <SelectItem value="all">{t("transactions.filters.allStatus")}</SelectItem>
+                <SelectItem value="0">{t("transactions.status.pending")}</SelectItem>
+                <SelectItem value="1">{t("transactions.status.completed")}</SelectItem>
+                <SelectItem value="2">{t("transactions.status.failed")}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={categoryId} onValueChange={onCategoryChange}>
@@ -160,7 +167,7 @@ export function TransactionFilters({
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent className="max-h-75">
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="all">{t("transactions.filters.allCategories")}</SelectItem>
                 {categories.map((cat) => (
                   <SelectItem key={cat.categoryId} value={cat.categoryId}>
                     <div className="flex items-center gap-2" style={{ color: cat.color }}>
@@ -184,7 +191,7 @@ export function TransactionFilters({
                   className="w-full justify-start text-left font-normal bg-transparent"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDateLocal ? format(startDateLocal, "PPP") : <span>Start Date</span>}
+                  {startDateLocal ? format(startDateLocal, "PPP") : <span>{t("transactions.filters.startDate")}</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -205,7 +212,7 @@ export function TransactionFilters({
                   className="w-full justify-start text-left font-normal bg-transparent"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDateLocal ? format(endDateLocal, "PPP") : <span>End Date</span>}
+                  {endDateLocal ? format(endDateLocal, "PPP") : <span>{t("transactions.filters.endDate")}</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -219,6 +226,15 @@ export function TransactionFilters({
             </Popover>
           </div>
         </div>
+        {hasInvalidDateRange && (
+          <Alert className="border-amber-500/40 bg-amber-50 text-amber-900">
+            <AlertTriangle className="text-amber-700" />
+            <AlertTitle>{t("transactions.filters.invalidDateRangeTitle")}</AlertTitle>
+            <AlertDescription>
+              {t("transactions.filters.invalidDateRangeMessage")}
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
     </div>
   );

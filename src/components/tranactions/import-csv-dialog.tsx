@@ -16,6 +16,7 @@ import { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { parse, format } from "date-fns";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ImportCsvDialogProps {
   open: boolean;
@@ -48,6 +49,7 @@ export function ImportCsvDialog({
   const [validCount, setValidCount] = useState(0);
   const [invalidCount, setInvalidCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   // Fetch categories
   useEffect(() => {
@@ -312,7 +314,7 @@ export function ImportCsvDialog({
       Swal.fire({
         icon: "success",
         title: "Success!",
-        text: `${validRows.length} transaction(s) imported successfully`,
+        text: t("transactions.importCsv.importSuccess", { count: validRows.length }),
         timer: 2000,
         showConfirmButton: false,
       });
@@ -347,9 +349,9 @@ Expense,Transport,15.00,2026-03-17,Completed,Bus fare,`;
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle>Import Transactions from CSV</DialogTitle>
+          <DialogTitle>{t("transactions.importCsv.title")}</DialogTitle>
           <DialogDescription>
-            Upload a CSV file to import multiple transactions at once.
+            {t("transactions.importCsv.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -371,10 +373,10 @@ Expense,Transport,15.00,2026-03-17,Completed,Bus fare,`;
               <Upload className="h-12 w-12 text-muted-foreground" />
               <div>
                 <p className="font-medium">
-                  {selectedFile ? selectedFile.name : "Click to upload CSV file"}
+                  {selectedFile ? selectedFile.name : t("transactions.importCsv.clickUpload")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  or drag and drop your file here
+                  {t("transactions.importCsv.dragDrop")}
                 </p>
               </div>
             </label>
@@ -385,14 +387,14 @@ Expense,Transport,15.00,2026-03-17,Completed,Bus fare,`;
             <div className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-muted-foreground" />
               <div>
-                <p className="font-medium text-sm">Need a template?</p>
+                <p className="font-medium text-sm">{t("transactions.importCsv.templateTitle")}</p>
                 <p className="text-xs text-muted-foreground">
-                  Download a sample CSV file to get started
+                  {t("transactions.importCsv.templateDescription")}
                 </p>
               </div>
             </div>
             <Button onClick={downloadTemplate} variant="outline" size="sm">
-              Download Template
+              {t("transactions.importCsv.downloadTemplate")}
             </Button>
           </div>
 
@@ -404,7 +406,7 @@ Expense,Transport,15.00,2026-03-17,Completed,Bus fare,`;
                   <FileText className="h-5 w-5 text-blue-600" />
                   <div>
                     <p className="text-2xl font-bold text-blue-600">{parsedData.length}</p>
-                    <p className="text-xs text-blue-600">Total Rows</p>
+                    <p className="text-xs text-blue-600">{t("transactions.importCsv.totalRows")}</p>
                   </div>
                 </div>
               </div>
@@ -413,7 +415,7 @@ Expense,Transport,15.00,2026-03-17,Completed,Bus fare,`;
                   <CheckCircle className="h-5 w-5 text-green-600" />
                   <div>
                     <p className="text-2xl font-bold text-green-600">{validCount}</p>
-                    <p className="text-xs text-green-600">Valid</p>
+                    <p className="text-xs text-green-600">{t("transactions.importCsv.valid")}</p>
                   </div>
                 </div>
               </div>
@@ -422,7 +424,7 @@ Expense,Transport,15.00,2026-03-17,Completed,Bus fare,`;
                   <XCircle className="h-5 w-5 text-red-600" />
                   <div>
                     <p className="text-2xl font-bold text-red-600">{invalidCount}</p>
-                    <p className="text-xs text-red-600">Invalid</p>
+                    <p className="text-xs text-red-600">{t("transactions.importCsv.invalid")}</p>
                   </div>
                 </div>
               </div>
@@ -436,12 +438,12 @@ Expense,Transport,15.00,2026-03-17,Completed,Bus fare,`;
                 <thead className="bg-muted sticky top-0">
                   <tr>
                     <th className="p-2 text-left">#</th>
-                    <th className="p-2 text-left">Type</th>
-                    <th className="p-2 text-left">Category</th>
-                    <th className="p-2 text-left">Amount</th>
-                    <th className="p-2 text-left">Date</th>
-                    <th className="p-2 text-left">Status</th>
-                    <th className="p-2 text-left">Validation</th>
+                    <th className="p-2 text-left">{t("transactions.importCsv.colType")}</th>
+                    <th className="p-2 text-left">{t("transactions.importCsv.colCategory")}</th>
+                    <th className="p-2 text-left">{t("transactions.importCsv.colAmount")}</th>
+                    <th className="p-2 text-left">{t("transactions.importCsv.colDate")}</th>
+                    <th className="p-2 text-left">{t("transactions.importCsv.colStatus")}</th>
+                    <th className="p-2 text-left">{t("transactions.importCsv.colValidation")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -478,7 +480,7 @@ Expense,Transport,15.00,2026-03-17,Completed,Bus fare,`;
           {/* CSV Format Info */}
           {parsedData.length === 0 && (
             <div className="p-4 bg-muted/50 rounded-lg space-y-2">
-              <p className="font-medium text-sm">CSV Format:</p>
+              <p className="font-medium text-sm">{t("transactions.importCsv.formatTitle")}</p>
               <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
                 <li>
                   <strong>Type:</strong> "Income", "Expense", "0" (Income), or "1" (Expense)
@@ -508,13 +510,13 @@ Expense,Transport,15.00,2026-03-17,Completed,Bus fare,`;
 
         <DialogFooter>
           <Button onClick={() => onOpenChange(false)} variant="outline" disabled={isImporting}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={handleImport}
             disabled={validCount === 0 || isImporting}
           >
-            {isImporting ? "Importing..." : `Import ${validCount} Transaction(s)`}
+            {isImporting ? t("transactions.importCsv.importing") : t("transactions.importCsv.importButton", { count: validCount })}
           </Button>
         </DialogFooter>
       </DialogContent>

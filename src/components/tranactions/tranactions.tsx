@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import Swal from "sweetalert2";
 import { transactionService } from "@/services/tranactionService";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -52,6 +53,8 @@ export default function TransactionsTable({
   currency = "USD",
 }: TransactionsTableProps) {
 
+  const { t } = useTranslation();
+
   const getCategoryById = (categoryId: string) => {
     return categories.find((cat) => cat.categoryId === categoryId);
   };
@@ -67,13 +70,13 @@ export default function TransactionsTable({
   const getStatusLabel = (status: number) => {
     switch (status) {
       case PaymentStatus.Completed:
-        return "Completed";
+        return t("transactions.status.completed");
       case PaymentStatus.Pending:
-        return "Pending";
+        return t("transactions.status.pending");
       case PaymentStatus.Failed:
-        return "Failed";
+        return t("transactions.status.failed");
       default:
-        return "Unknown";
+        return t("transactions.status.unknown");
     }
   };
 
@@ -92,14 +95,14 @@ export default function TransactionsTable({
 
   const handleDelete = async (transactionId: string) => {
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to delete this transaction? This action cannot be undone.",
+      title: t("transactions.table.deleteConfirmTitle"),
+      text: t("transactions.table.deleteConfirmText"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#ef4444",
       cancelButtonColor: "#6b7280",
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
+      confirmButtonText: t("transactions.table.deleteConfirmButton"),
+      cancelButtonText: t("common.cancel"),
     });
 
     if (result.isConfirmed) {
@@ -107,8 +110,8 @@ export default function TransactionsTable({
         await transactionService.deleteTransaction(transactionId);
         Swal.fire({
           icon: "success",
-          title: "Deleted!",
-          text: "Transaction has been deleted.",
+          title: t("transactions.table.deleteSuccess"),
+          text: t("transactions.table.deleteSuccessText"),
           timer: 2000,
           showConfirmButton: false,
         });
@@ -134,7 +137,7 @@ export default function TransactionsTable({
       Swal.fire({
         icon: "success",
         title: "Success!",
-        text: "Transaction status updated",
+        text: t("transactions.table.statusUpdateSuccess"),
         timer: 2000,
         showConfirmButton: false,
       });
@@ -147,7 +150,7 @@ export default function TransactionsTable({
   if (transactions.length === 0) {
     return (
       <div className="border rounded-lg p-8 text-center">
-        <p className="text-muted-foreground">No transactions found.</p>
+        <p className="text-muted-foreground">{t("transactions.table.noTransactions")}</p>
       </div>
     );
   }
@@ -159,17 +162,17 @@ export default function TransactionsTable({
           <Table>
             <TableHeader className="bg-accent text-accent-foreground">
               <TableRow>
-                <TableHead className="px-4 py-2 font-medium">Category</TableHead>
-                <TableHead className="px-4 py-2 font-medium">Type</TableHead>
-                <TableHead className="px-4 py-2 font-medium">Date</TableHead>
-                <TableHead className="px-4 py-2 font-medium">Amount</TableHead>
-                <TableHead className="px-4 py-2 font-medium">Status</TableHead>
+                <TableHead className="px-4 py-2 font-medium">{t("transactions.table.colCategory")}</TableHead>
+                <TableHead className="px-4 py-2 font-medium">{t("transactions.table.colType")}</TableHead>
+                <TableHead className="px-4 py-2 font-medium">{t("transactions.table.colDate")}</TableHead>
+                <TableHead className="px-4 py-2 font-medium">{t("transactions.table.colAmount")}</TableHead>
+                <TableHead className="px-4 py-2 font-medium">{t("transactions.table.colStatus")}</TableHead>
                 <TableHead className="px-4 py-2 font-medium">
-                  Description
+                  {t("transactions.table.colDescription")}
                 </TableHead>
-                <TableHead className="px-4 py-2 font-medium">Note</TableHead>
+                <TableHead className="px-4 py-2 font-medium">{t("transactions.table.colNote")}</TableHead>
                 <TableHead className="px-4 py-2 font-medium text-right">
-                  Action
+                  {t("transactions.table.colAction")}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -187,7 +190,7 @@ export default function TransactionsTable({
                           </>
                         )}
                         {!category && (
-                          <span className="text-sm text-muted-foreground">Unknown</span>
+                          <span className="text-sm text-muted-foreground">{t("transactions.table.unknownCategory")}</span>
                         )}
                       </div>
                     </TableCell>
@@ -199,7 +202,7 @@ export default function TransactionsTable({
                             : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
                         }`}
                       >
-                        {transaction.type === TransactionType.Income ? "Income" : "Expense"}
+                        {transaction.type === TransactionType.Income ? t("transactions.type.income") : t("transactions.type.expense")}
                       </span>
                     </TableCell>
                     <TableCell className="px-4 py-3 min-w-32">
@@ -220,7 +223,7 @@ export default function TransactionsTable({
                       </span>
                     </TableCell>
                     <TableCell className="px-4 py-3 max-w-xs truncate">
-                      {transaction.description || "No description"}
+                      {transaction.description || t("transactions.table.noDescription")}
                     </TableCell>
                     <TableCell className="px-4 py-3 max-w-xs truncate">
                       {transaction.note || "-"}
@@ -236,32 +239,32 @@ export default function TransactionsTable({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => onEdit(transaction)}>
-                            Edit
+                            {t("transactions.table.edit")}
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onDuplicate(transaction)}>
-                            Duplicate
+                            {t("transactions.table.duplicate")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleStatusChange(transaction, PaymentStatus.Completed)}
                           >
-                            Mark as Completed
+                            {t("transactions.table.markCompleted")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleStatusChange(transaction, PaymentStatus.Pending)}
                           >
-                            Mark as Pending
+                            {t("transactions.table.markPending")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-red-600"
                             onClick={() => handleStatusChange(transaction, PaymentStatus.Failed)}
                           >
-                            Mark as Failed
+                            {t("transactions.table.markFailed")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-red-600"
                             onClick={() => handleDelete(transaction.tranactionId)}
                           >
-                            Delete
+                            {t("transactions.table.delete")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -277,7 +280,7 @@ export default function TransactionsTable({
         {(hasNextPage || hasPreviousPage) && (
           <div className="flex flex-wrap justify-between items-center">
             <span className="text-sm text-muted-foreground mb-1 md:mb-0">
-              Page {currentPage} · {totalCount} items
+              {t("transactions.table.pagination", { current: currentPage, count: totalCount })}
             </span>
           <div className="flex gap-2">
             {hasPreviousPage && (

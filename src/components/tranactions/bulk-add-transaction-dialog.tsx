@@ -30,6 +30,7 @@ import { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface BulkAddTransactionDialogProps {
   open: boolean;
@@ -83,6 +84,7 @@ export function BulkAddTransactionDialog({
   const [rowErrors, setRowErrors] = useState<Record<string, RowErrors>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const amountInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const { t } = useTranslation();
 
   // Fetch categories
   useEffect(() => {
@@ -287,7 +289,7 @@ export function BulkAddTransactionDialog({
       Swal.fire({
         icon: "success",
         title: "Success!",
-        text: `${rows.length} transaction(s) created successfully`,
+        text: t("transactions.bulkAdd.createSuccess", { count: rows.length }),
         timer: 2000,
         showConfirmButton: false,
       });
@@ -305,9 +307,9 @@ export function BulkAddTransactionDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[90vw]! w-[90vw]! max-h-[90vh] flex flex-col p-0">
         <DialogHeader className="sticky top-0 bg-background pb-4 pt-6 px-6 z-20">
-          <DialogTitle>Bulk Add Transactions</DialogTitle>
+          <DialogTitle>{t("transactions.bulkAdd.title")}</DialogTitle>
           <DialogDescription>
-            Add multiple transactions at once - easier than Excel! Use "Duplicate Last Row" for same category or "Copy from above" for individual rows.
+            {t("transactions.bulkAdd.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -316,14 +318,14 @@ export function BulkAddTransactionDialog({
             <thead className="sticky top-0 bg-muted z-10">
               <tr>
                 <th className="text-left p-2 text-sm font-semibold w-12">#</th>
-                <th className="text-left p-2 text-sm font-semibold w-28">Type</th>
-                <th className="text-left p-2 text-sm font-semibold w-48">Category *</th>
-                <th className="text-left p-2 text-sm font-semibold w-28">Amount *</th>
-                <th className="text-left p-2 text-sm font-semibold w-36">Date</th>
-                <th className="text-left p-2 text-sm font-semibold w-32">Status</th>
-                <th className="text-left p-2 text-sm font-semibold w-48">Description</th>
-                <th className="text-left p-2 text-sm font-semibold w-48">Note</th>
-                <th className="text-center p-2 text-sm font-semibold w-32">Actions</th>
+                <th className="text-left p-2 text-sm font-semibold w-28">{t("transactions.bulkAdd.colType")}</th>
+                <th className="text-left p-2 text-sm font-semibold w-48">{t("transactions.bulkAdd.colCategory")}</th>
+                <th className="text-left p-2 text-sm font-semibold w-28">{t("transactions.bulkAdd.colAmount")}</th>
+                <th className="text-left p-2 text-sm font-semibold w-36">{t("transactions.bulkAdd.colDate")}</th>
+                <th className="text-left p-2 text-sm font-semibold w-32">{t("transactions.bulkAdd.colStatus")}</th>
+                <th className="text-left p-2 text-sm font-semibold w-48">{t("transactions.bulkAdd.colDescription")}</th>
+                <th className="text-left p-2 text-sm font-semibold w-48">{t("transactions.bulkAdd.colNote")}</th>
+                <th className="text-center p-2 text-sm font-semibold w-32">{t("transactions.bulkAdd.colActions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -352,13 +354,13 @@ export function BulkAddTransactionDialog({
                         <SelectItem value={String(TransactionType.Expense)}>
                           <span className="flex items-center gap-2">
                             <span className="text-red-600">−</span>
-                            <span>Expense</span>
+                            <span>{t("transactions.type.expense")}</span>
                           </span>
                         </SelectItem>
                         <SelectItem value={String(TransactionType.Income)}>
                           <span className="flex items-center gap-2">
                             <span className="text-green-600">+</span>
-                            <span>Income</span>
+                            <span>{t("transactions.type.income")}</span>
                           </span>
                         </SelectItem>
                       </SelectContent>
@@ -373,12 +375,12 @@ export function BulkAddTransactionDialog({
                         onValueChange={(value) => updateRow(row.id, "categoryId", value)}
                       >
                         <SelectTrigger className={`h-9 w-full ${rowErrors[row.id]?.categoryId ? 'border-destructive' : ''}`}>
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder={t("transactions.bulkAdd.categoryPlaceholder")} />
                         </SelectTrigger>
                         <SelectContent position="popper" className="max-h-60 w-(--radix-select-trigger-width) max-w-75" sideOffset={4}>
                           {getFilteredCategories(row.type).length === 0 ? (
                             <div className="p-4 text-sm text-muted-foreground">
-                              No categories available
+                              {t("transactions.bulkAdd.noCategories")}
                             </div>
                           ) : (
                             getFilteredCategories(row.type).map((category) => (
@@ -452,9 +454,9 @@ export function BulkAddTransactionDialog({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent position="popper" sideOffset={4}>
-                        <SelectItem value={String(PaymentStatus.Completed)}>Completed</SelectItem>
-                        <SelectItem value={String(PaymentStatus.Pending)}>Pending</SelectItem>
-                        <SelectItem value={String(PaymentStatus.Failed)}>Failed</SelectItem>
+                        <SelectItem value={String(PaymentStatus.Completed)}>{t("transactions.status.completed")}</SelectItem>
+                        <SelectItem value={String(PaymentStatus.Pending)}>{t("transactions.status.pending")}</SelectItem>
+                        <SelectItem value={String(PaymentStatus.Failed)}>{t("transactions.status.failed")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </td>
@@ -462,7 +464,7 @@ export function BulkAddTransactionDialog({
                   {/* Description */}
                   <td className="p-2">
                     <Input
-                      placeholder="Description"
+                      placeholder={t("transactions.bulkAdd.descriptionPlaceholder")}
                       value={row.description}
                       onChange={(e) => updateRow(row.id, "description", e.target.value)}
                       className="h-9"
@@ -472,7 +474,7 @@ export function BulkAddTransactionDialog({
                   {/* Note */}
                   <td className="p-2">
                     <Input
-                      placeholder="Note"
+                      placeholder={t("transactions.bulkAdd.notePlaceholder")}
                       value={row.note}
                       onChange={(e) => updateRow(row.id, "note", e.target.value)}
                       className="h-9"
@@ -489,7 +491,7 @@ export function BulkAddTransactionDialog({
                           size="icon"
                           onClick={() => copyFromAbove(index)}
                           className="h-8 w-8 hover:bg-primary/10"
-                          title="Copy from above"
+                          title={t("transactions.bulkAdd.copyFromAbove")}
                         >
                           <Copy className="h-4 w-4 text-primary" />
                         </Button>
@@ -501,7 +503,7 @@ export function BulkAddTransactionDialog({
                         onClick={() => removeRow(row.id)}
                         disabled={rows.length === 1}
                         className="h-8 w-8 hover:bg-destructive/10"
-                        title="Delete row"
+                          title={t("transactions.bulkAdd.deleteRow")}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
@@ -526,7 +528,7 @@ export function BulkAddTransactionDialog({
                 className="gap-2"
               >
                 <Plus className="h-4 w-4" />
-                Add Row
+                {t("transactions.bulkAdd.addRow")}
               </Button>
               <Button
                 type="button"
@@ -537,22 +539,22 @@ export function BulkAddTransactionDialog({
                 className="gap-2"
               >
                 <CopyPlus className="h-4 w-4" />
-                Duplicate Last
+                {t("transactions.bulkAdd.duplicateLast")}
               </Button>
             </div>
 
             {/* Right side - Form actions */}
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button onClick={handleSubmit} disabled={isSubmitting || rows.length === 0}>
-                {isSubmitting ? "Creating..." : `Create ${rows.length} Transaction(s)`}
+                {isSubmitting ? t("transactions.bulkAdd.creating") : t("transactions.bulkAdd.createButton", { count: rows.length })}
               </Button>
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            💡 Tip: Use "Copy from above" button to quickly copy settings from previous row
+            {t("transactions.bulkAdd.tip")}
           </p>
         </div>
       </DialogContent>

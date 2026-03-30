@@ -1,20 +1,35 @@
-import {UpcomingPayments} from "@/components/tranactions/upcoming-payments"
-import { ExpensesHeader } from "@/components/tranactions/tranactions-header"
-import { TransactionFilters } from "@/components/tranactions/tranaction-filters"
-import TransactionsTable from "@/components/tranactions/tranactions"
-import ClientTransactionStats from "@/components/tranactions/client-transaction-stats"
-import type { Transaction, TransactionListParams } from "@/types/transaction"
-import type { ExpenseCategory } from "@/types/category"
+import { UpcomingPayments } from "@/components/tranactions/upcoming-payments";
+import { ExpensesHeader } from "@/components/tranactions/tranactions-header";
+import { TransactionFilters } from "@/components/tranactions/tranaction-filters";
+import TransactionsTable from "@/components/tranactions/tranactions";
+import ClientTransactionStats from "@/components/tranactions/client-transaction-stats";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import type { Transaction, TransactionListParams } from "@/types/transaction";
+import type { ExpenseCategory } from "@/types/category";
 import { useEffect, useState, useCallback, useMemo } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import spinnerGif from "@/assets/Spinner.gif";
-import { transactionService } from "@/services/tranactionService"
-import { categoryService } from "@/services/categoryService"
-import { AddTransactionDialog } from "@/components/tranactions/add-transaction-dialog"
-import { BulkAddTransactionDialog } from "@/components/tranactions/bulk-add-transaction-dialog"
-import { ImportCsvDialog } from "@/components/tranactions/import-csv-dialog"
-import { useAuth } from "@/contexts/AuthContext"
+import { transactionService } from "@/services/tranactionService";
+import { categoryService } from "@/services/categoryService";
+import { budgetService } from "@/services/budgetService";
+import { AddTransactionDialog } from "@/components/tranactions/add-transaction-dialog";
+import { BulkAddTransactionDialog } from "@/components/tranactions/bulk-add-transaction-dialog";
+import { ImportCsvDialog } from "@/components/tranactions/import-csv-dialog";
+import { useAuth } from "@/contexts/AuthContext";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { CHATBOT_REFRESH_EVENT, type ChatbotRefreshEventDetail } from "@/lib/chatbot-refresh";
+import { ApiError } from "@/lib/api";
+import { formatCurrency } from "@/lib/utils";
+import { Wallet, CreditCard, Banknote } from "lucide-react";
+
+type BudgetInsight = {
+  hasBudget: boolean;
+  totalBudget: number;
+  totalSpent: number;
+  remaining: number;
+  usagePercent: number;
+};
 
 export default function Tranactions() {
   const { user } = useAuth();
@@ -25,8 +40,7 @@ export default function Tranactions() {
   const [status, setStatus] = useState<string>("all");
   const [categoryId, setCategoryId] = useState<string>("all");
   const [keyword, setKeyword] = useState<string>("");
-  
-  // Memoize current month range
+
   const currentMonthRange = useMemo(() => {
     const now = new Date();
     return {
@@ -34,7 +48,7 @@ export default function Tranactions() {
       end: format(endOfMonth(now), "yyyy-MM-dd"),
     };
   }, []);
-  
+
   const [startDate, setStartDate] = useState<string>(currentMonthRange.start);
   const [endDate, setEndDate] = useState<string>(currentMonthRange.end);
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,9 +67,27 @@ export default function Tranactions() {
   const [summaryRefreshKey, setSummaryRefreshKey] = useState(0);
   const [categoriesRefreshKey, setCategoriesRefreshKey] = useState(0);
   const [recurringPaymentsRefreshKey, setRecurringPaymentsRefreshKey] = useState(0);
+  const [budgetRefreshKey, setBudgetRefreshKey] = useState(0);
+  const [budgetLoading, setBudgetLoading] = useState(false);
+  const [budgetInsight, setBudgetInsight] = useState<BudgetInsight>({
+    hasBudget: false,
+    totalBudget: 0,
+    totalSpent: 0,
+    remaining: 0,
+    usagePercent: 0,
+  });
 
+  const { t } = useTranslation();
   const pageSize = 10;
-  
+  const currency = user?.currency || "USD";
+
+  const budgetMonthLabel = useMemo(() => {
+    const reference = startDate ? new Date(`${startDate}T00:00:00`) : new Date();
+    return Number.isNaN(reference.getTime())
+      ? format(new Date(), "MMM yyyy")
+      : format(reference, "MMM yyyy");
+  }, [startDate]);
+
   const fetchCategories = useCallback(async () => {
     try {
       const response = await categoryService.getCategories({
@@ -63,81 +95,133 @@ export default function Tranactions() {
       });
 
       const seen = new Map<string, ExpenseCategory>();
-      (response.items || []).forEach(cat => {
+      (response.items || []).forEach((cat) => {
         const existing = seen.get(cat.categoryId);
-        if (!existing || (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) || (cat.updatedAt && !existing.updatedAt)) {
+        if (
+          !existing ||
+          (cat.updatedAt && existing.updatedAt && cat.updatedAt > existing.updatedAt) ||
+          (cat.updatedAt && !existing.updatedAt)
+        ) {
           seen.set(cat.categoryId, cat);
         }
       });
 
       setCategories(Array.from(seen.values()));
-    } catch (error) {
-      // Silent fail - categories will be empty array
+    } catch {
+      // Silent fail - categories remain empty.
     }
   }, []);
 
   useEffect(() => {
-    fetchCategories();
+    void fetchCategories();
   }, [fetchCategories, categoriesRefreshKey]);
 
-  const fetchTransactions = useCallback(async (cursor: string | null = null, cursorId: string | null = null) => {
-    setLoading(true);
-    try {
-      const params: TransactionListParams = {
-        pageSize,
-      };
-      
-      // Add cursor-based pagination if we have cursor values
-      if (cursor && cursorId) {
-        params.cursor = cursor;
-        params.cursorId = cursorId;
-      }
-      
-      if (type !== "all") {
-        params.type = type;
-      }
-      if (status !== "all") {
-        params.status = status;
-      }
-      if (categoryId && categoryId !== "all") {
-        params.categoryId = categoryId;
-      }
-      if (keyword.trim()) {
-        params.keyword = keyword.trim();
-      }
-      if (startDate) {
-        params.startDate = startDate;
-      }
-      if (endDate) {
-        params.endDate = endDate;
-      }
-      const response = await transactionService.getTransactions(params);
-      
-      // Remove duplicates by tranactionId - keep the latest version (ISO strings are sortable)
-      const seen = new Map<string, Transaction>();
-      (response.items || []).forEach(trans => {
-        const existing = seen.get(trans.tranactionId);
-        if (!existing || (trans.updatedAt && existing.updatedAt && trans.updatedAt > existing.updatedAt) || (trans.updatedAt && !existing.updatedAt)) {
-          seen.set(trans.tranactionId, trans);
+  const fetchTransactions = useCallback(
+    async (cursor: string | null = null, cursorId: string | null = null) => {
+      setLoading(true);
+      try {
+        const params: TransactionListParams = {
+          pageSize,
+        };
+
+        if (cursor && cursorId) {
+          params.cursor = cursor;
+          params.cursorId = cursorId;
         }
-      });
-      
-      setTransactions(Array.from(seen.values()));
-      setTotalCount(response.totalCount);
-      setNextCursor(response.nextCursor || null);
-      setNextCursorId(response.nextCursorId || null);
-      setHasNextPage(response.hasNextPage);
-      
-    } catch (error) {
-      console.error("Failed to fetch transactions:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [type, status, categoryId, keyword, startDate, endDate, pageSize]);
+
+        if (type !== "all") {
+          params.type = type;
+        }
+        if (status !== "all") {
+          params.status = status;
+        }
+        if (categoryId && categoryId !== "all") {
+          params.categoryId = categoryId;
+        }
+        if (keyword.trim()) {
+          params.keyword = keyword.trim();
+        }
+        if (startDate) {
+          params.startDate = startDate;
+        }
+        if (endDate) {
+          params.endDate = endDate;
+        }
+
+        const response = await transactionService.getTransactions(params);
+
+        const seen = new Map<string, Transaction>();
+        (response.items || []).forEach((trans) => {
+          const existing = seen.get(trans.tranactionId);
+          if (
+            !existing ||
+            (trans.updatedAt && existing.updatedAt && trans.updatedAt > existing.updatedAt) ||
+            (trans.updatedAt && !existing.updatedAt)
+          ) {
+            seen.set(trans.tranactionId, trans);
+          }
+        });
+
+        setTransactions(Array.from(seen.values()));
+        setTotalCount(response.totalCount);
+        setNextCursor(response.nextCursor || null);
+        setNextCursorId(response.nextCursorId || null);
+        setHasNextPage(response.hasNextPage);
+      } catch (error) {
+        console.error("Failed to fetch transactions:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [type, status, categoryId, keyword, startDate, endDate, pageSize]
+  );
 
   useEffect(() => {
-    fetchTransactions(currentCursor, currentCursorId);
+    void fetchTransactions(currentCursor, currentCursorId);
   }, [fetchTransactions, transactionsRefreshKey, currentCursor, currentCursorId]);
+
+  const fetchBudgetInsight = useCallback(async () => {
+    const reference = startDate ? new Date(`${startDate}T00:00:00`) : new Date();
+
+    if (Number.isNaN(reference.getTime())) {
+      setBudgetInsight((current) => ({ ...current, hasBudget: false }));
+      return;
+    }
+
+    setBudgetLoading(true);
+    try {
+      const response = await budgetService.getBudgetByMonth(
+        reference.getFullYear(),
+        reference.getMonth() + 1
+      );
+
+      setBudgetInsight({
+        hasBudget: Boolean(response.budgetId),
+        totalBudget: response.summary.totalBudget,
+        totalSpent: response.summary.totalSpent,
+        remaining: response.summary.remaining,
+        usagePercent: response.summary.usagePercent,
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        setBudgetInsight({
+          hasBudget: false,
+          totalBudget: 0,
+          totalSpent: 0,
+          remaining: 0,
+          usagePercent: 0,
+        });
+      } else {
+        console.error("Failed to fetch budget insight:", error);
+      }
+    } finally {
+      setBudgetLoading(false);
+    }
+  }, [startDate]);
+
+  useEffect(() => {
+    void fetchBudgetInsight();
+  }, [fetchBudgetInsight, budgetRefreshKey]);
 
   useEffect(() => {
     const onChatbotRefresh = (event: Event) => {
@@ -147,6 +231,7 @@ export default function Tranactions() {
       if (target === "transactions") {
         setTransactionsRefreshKey((prev) => prev + 1);
         setSummaryRefreshKey((prev) => prev + 1);
+        setBudgetRefreshKey((prev) => prev + 1);
       }
 
       if (target === "summary") {
@@ -218,8 +303,8 @@ export default function Tranactions() {
 
   const handleNextPage = useCallback(() => {
     if (hasNextPage && nextCursor && nextCursorId) {
-      setCursorHistory(prev => [...prev, {cursor: currentCursor, cursorId: currentCursorId}]);
-      setCurrentPage(prev => prev + 1);
+      setCursorHistory((prev) => [...prev, { cursor: currentCursor, cursorId: currentCursorId }]);
+      setCurrentPage((prev) => prev + 1);
       setCurrentCursor(nextCursor);
       setCurrentCursorId(nextCursorId);
     }
@@ -230,7 +315,7 @@ export default function Tranactions() {
       const newHistory = [...cursorHistory];
       const prevCursors = newHistory.pop();
       setCursorHistory(newHistory);
-      setCurrentPage(prev => prev - 1);
+      setCurrentPage((prev) => prev - 1);
       setCurrentCursor(prevCursors?.cursor || null);
       setCurrentCursorId(prevCursors?.cursorId || null);
     }
@@ -248,59 +333,136 @@ export default function Tranactions() {
   const handleImportCsvClick = useCallback(() => {
     setCsvImportDialogOpen(true);
   }, []);
-  
+
   const handleEditClick = useCallback((transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setDialogOpen(true);
   }, []);
 
   const handleDuplicateClick = useCallback((transaction: Transaction) => {
-    // Create a copy without the ID to treat as a new transaction
     const duplicatedTransaction: Transaction = {
       ...transaction,
-      tranactionId: '', // Clear ID so it creates a new one
-      tranactionDate: format(new Date(), "yyyy-MM-dd"), // Set to today
+      tranactionId: "",
+      tranactionDate: format(new Date(), "yyyy-MM-dd"),
     };
     setSelectedTransaction(duplicatedTransaction);
     setDialogOpen(true);
   }, []);
 
   const handleDialogSuccess = useCallback(() => {
-    setCurrentPage(1); // Reset to first page
-    // Only reset dates if they are at default (current month)
-    // If user has chosen custom dates, preserve them
+    setCurrentPage(1);
     if (startDate === currentMonthRange.start && endDate === currentMonthRange.end) {
-      // Dates are at default, reset to current month
       setStartDate(currentMonthRange.start);
       setEndDate(currentMonthRange.end);
     }
-    // If dates are custom, don't reset - just refresh with current dates
-    // Reset pagination state
     setCurrentCursor(null);
     setCurrentCursorId(null);
     setCursorHistory([]);
-    // Trigger refresh after state updates
-    setTransactionsRefreshKey(prev => prev + 1);
-    setSummaryRefreshKey(prev => prev + 1);
+    setTransactionsRefreshKey((prev) => prev + 1);
+    setSummaryRefreshKey((prev) => prev + 1);
+    setBudgetRefreshKey((prev) => prev + 1);
   }, [currentMonthRange, startDate, endDate]);
 
   const handleDeleteSuccess = useCallback(() => {
-    setTransactionsRefreshKey(prev => prev + 1);
-    setSummaryRefreshKey(prev => prev + 1);
+    setTransactionsRefreshKey((prev) => prev + 1);
+    setSummaryRefreshKey((prev) => prev + 1);
+    setBudgetRefreshKey((prev) => prev + 1);
+  }, []);
+
+  const handleRefreshClick = useCallback(() => {
+    setCurrentPage(1);
+    setCurrentCursor(null);
+    setCurrentCursorId(null);
+    setCursorHistory([]);
+    setTransactionsRefreshKey((prev) => prev + 1);
+    setSummaryRefreshKey((prev) => prev + 1);
+    setCategoriesRefreshKey((prev) => prev + 1);
+    setRecurringPaymentsRefreshKey((prev) => prev + 1);
+    setBudgetRefreshKey((prev) => prev + 1);
   }, []);
 
   return (
     <div className="space-y-6">
-      <ExpensesHeader 
-        onAddClick={handleAddClick} 
+      <ExpensesHeader
+        onRefresh={handleRefreshClick}
+        onAddClick={handleAddClick}
         onBulkAddClick={handleBulkAddClick}
         onImportCsvClick={handleImportCsvClick}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content - Left */}
-        <div className="lg:col-span-2 space-y-6">
-          <TransactionFilters  
+      <Card className="border-slate-200 dark:border-slate-700 bg-card">
+        <CardContent className="space-y-4 p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-semibold tracking-wide text-slate-900 dark:text-white">{t("transactions.budgetPulse.title", { month: budgetMonthLabel })}</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                {budgetInsight.hasBudget
+                  ? t("transactions.budgetPulse.subtitle")
+                  : t("transactions.budgetPulse.nobudget")}
+              </p>
+            </div>
+            <a href="/budget" className="text-xs font-semibold text-blue-700 dark:text-blue-400 hover:underline">
+              {t("transactions.budgetPulse.openBudget")}
+            </a>
+          </div>
+
+          {budgetLoading ? (
+            <div className="text-sm text-slate-600 dark:text-slate-400">{t("transactions.budgetPulse.loading")}</div>
+          ) : budgetInsight.hasBudget ? (
+            <>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {/* Total Budget Card */}
+                <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-500/10 via-cyan-500/5 to-transparent dark:from-blue-500/20 dark:via-cyan-500/10 p-5 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-blue-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+                  <div className="relative">
+                    <div className="w-11 h-11 rounded-xl bg-linear-to-br from-blue-500 to-cyan-600 shadow-lg shadow-blue-500/30 flex items-center justify-center mb-3">
+                      <Wallet className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.15em] font-medium text-blue-700 dark:text-blue-300 mb-2">{t("transactions.budgetPulse.totalBudget")}</div>
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{formatCurrency(budgetInsight.totalBudget, currency)}</div>
+                  </div>
+                </div>
+
+                {/* Spent Card */}
+                <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-rose-500/10 via-red-500/5 to-transparent dark:from-rose-500/20 dark:via-red-500/10 p-5 hover:shadow-lg hover:shadow-rose-500/20 transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-rose-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+                  <div className="relative">
+                    <div className="w-11 h-11 rounded-xl bg-linear-to-br from-rose-500 to-red-600 shadow-lg shadow-rose-500/30 flex items-center justify-center mb-3">
+                      <CreditCard className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.15em] font-medium text-rose-700 dark:text-rose-300 mb-2">{t("transactions.budgetPulse.spent")}</div>
+                    <div className="text-2xl font-bold text-rose-600 dark:text-rose-400">{formatCurrency(budgetInsight.totalSpent, currency)}</div>
+                  </div>
+                </div>
+
+                {/* Remaining Card */}
+                <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500/10 via-green-500/5 to-transparent dark:from-emerald-500/20 dark:via-green-500/10 p-5 hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-emerald-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+                  <div className="relative">
+                    <div className="w-11 h-11 rounded-xl bg-linear-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/30 flex items-center justify-center mb-3">
+                      <Banknote className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.15em] font-medium text-emerald-700 dark:text-emerald-300 mb-2">{t("transactions.budgetPulse.remaining")}</div>
+                    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(budgetInsight.remaining, currency)}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300">
+                  <span>{t("transactions.budgetPulse.usage")}</span>
+                  <span className="font-medium text-slate-900 dark:text-white">{budgetInsight.usagePercent}%</span>
+                </div>
+                <Progress value={Math.min(budgetInsight.usagePercent, 100)} className="h-2" />
+              </div>
+            </>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          <TransactionFilters
             type={type}
             status={status}
             categoryId={categoryId}
@@ -314,9 +476,10 @@ export default function Tranactions() {
             onStartDateChange={handleStartDateChange}
             onEndDateChange={handleEndDateChange}
           />
+
           {loading ? (
             <div className="flex items-center justify-center p-12">
-              <img src={spinnerGif} alt="Loading" className="w-12 h-12" />
+              <img src={spinnerGif} alt="Loading" className="h-12 w-12" />
             </div>
           ) : (
             <TransactionsTable
@@ -331,19 +494,18 @@ export default function Tranactions() {
               onEdit={handleEditClick}
               onDuplicate={handleDuplicateClick}
               onDelete={handleDeleteSuccess}
-              currency={user?.currency || "USD"}
+              currency={currency}
             />
           )}
 
-          <UpcomingPayments 
-            startDate={startDate} 
-            endDate={endDate} 
+          <UpcomingPayments
+            startDate={startDate}
+            endDate={endDate}
             onTransactionCreated={handleDialogSuccess}
             refreshKey={recurringPaymentsRefreshKey}
           />
         </div>
 
-        {/* Stats Sidebar - Right */}
         <div className="lg:col-span-1">
           <ClientTransactionStats refreshKey={summaryRefreshKey} />
         </div>
@@ -368,5 +530,5 @@ export default function Tranactions() {
         onSuccess={handleDialogSuccess}
       />
     </div>
-  )
+  );
 }
