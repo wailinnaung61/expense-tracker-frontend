@@ -6,6 +6,7 @@ import type {
   UpdateBudgetRequest,
 } from "@/types/budget";
 import type { ExpenseCategory } from "@/types/category";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -38,7 +39,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Maximize2, Minimize2 } from "lucide-react";
+import { AlertTriangle, GripVertical, Maximize2, Minimize2, Target } from "lucide-react";
 
 type CategoryDraft = {
   allocatedAmount: string;
@@ -432,27 +433,56 @@ export function BudgetFormDialog({
             </div>
           </div>
 
-          <div className="rounded-xl border bg-muted/30 p-4">
-            <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-              <div>
+          <div className={`rounded-xl border p-4 ${allocationOverflow ? 'border-red-300 dark:border-red-700 bg-red-50/80 dark:bg-red-950/50' : 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/30 dark:bg-emerald-950/30'}`}>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <div className="text-sm font-medium">
+                    {t("budget.dialog.allocatedSummary")}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {mode === "create"
+                      ? t("budget.dialog.visualHint")
+                      : t("budget.dialog.leaveBlankHint")}
+                  </div>
+                </div>
                 <div className="text-sm font-medium">
-                  {t("budget.dialog.allocatedSummary")}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {mode === "create"
-                    ? t("budget.dialog.visualHint")
-                    : t("budget.dialog.leaveBlankHint")}
+                  {formatCurrency(allocatedTotal, currency)} / {formatCurrency(Number.isFinite(totalAmountValue) ? totalAmountValue : 0, currency)}
                 </div>
               </div>
-              <div className="text-sm font-medium">
-                {formatCurrency(allocatedTotal, currency)} / {formatCurrency(Number.isFinite(totalAmountValue) ? totalAmountValue : 0, currency)}
+              
+              {/* Unassigned Amount Display */}
+              <div className={`flex items-center justify-between rounded-lg p-3 ${allocationOverflow ? 'bg-red-100 dark:bg-red-900/50' : 'bg-emerald-100 dark:bg-emerald-900/50'}`}>
+                <div className="flex items-center gap-2">
+                  <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${allocationOverflow ? 'bg-red-500' : 'bg-emerald-500'}`}>
+                    <Target className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium text-muted-foreground">
+                      {allocationOverflow ? t("budget.dialog.overAllocated") : t("budget.dialog.unassigned")}
+                    </div>
+                    <div className={`text-lg font-bold ${allocationOverflow ? 'text-red-700 dark:text-red-300' : 'text-emerald-700 dark:text-emerald-300'}`}>
+                      {formatCurrency(Math.abs(totalAmountValue - allocatedTotal), currency)}
+                    </div>
+                  </div>
+                </div>
+                {allocationOverflow && (
+                  <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                )}
               </div>
+              
+              {allocationOverflow && (
+                <Alert className="border-red-300 dark:border-red-700 bg-red-100 dark:bg-red-900/50">
+                  <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                  <AlertTitle className="text-red-900 dark:text-red-100">
+                    {t("budget.dialog.cannotExceedTitle")}
+                  </AlertTitle>
+                  <AlertDescription className="text-red-800 dark:text-red-200">
+                    {t("budget.dialog.allocationOver")}
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
-            {allocationOverflow && (
-              <p className="mt-3 text-sm text-red-600 dark:text-red-400">
-                {t("budget.dialog.allocationOver")}
-              </p>
-            )}
           </div>
 
           {mode === "create" && (

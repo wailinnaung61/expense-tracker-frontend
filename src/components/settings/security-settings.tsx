@@ -26,14 +26,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { MfaSetupDialog } from "./mfa-setup-dialog";
+import { authService } from "@/services/authService";
+import { useTranslation } from "@/hooks/useTranslation";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 import {
     CheckCircle2,
-    Copy,
     Globe,
     Laptop,
     Lock,
+    Loader2,
     MoreHorizontal,
     PhoneIcon,
     Shield,
@@ -42,9 +47,11 @@ import {
 } from "lucide-react";
 
 export function SecuritySettings() {
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [showQRCode, setShowQRCode] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
+  const { t } = useTranslation();
+  const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [loadingMfaStatus, setLoadingMfaStatus] = useState(true);
+  const [showMfaSetup, setShowMfaSetup] = useState(false);
+  const [disablingMfa, setDisablingMfa] = useState(false);
   const [passwordChangeOpen, setPasswordChangeOpen] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -52,16 +59,55 @@ export function SecuritySettings() {
     confirmPassword: "",
   });
 
-  const [backupCodes, _setBackupCodes] = useState([
-    "ABCD-EFGH-IJKL",
-    "MNOP-QRST-UVWX",
-    "1234-5678-9012",
-    "3456-7890-1234",
-    "5678-9012-3456",
-    "7890-1234-5678",
-    "9012-3456-7890",
-    "2345-6789-0123",
-  ]);
+  // Load MFA status on component mount
+  useEffect(() => {
+    loadMfaStatus();
+  }, []);
+
+  const loadMfaStatus = async () => {
+    try {
+      const status = await authService.getMfaStatus();
+      setMfaEnabled(status.mfaEnabled);
+    } catch (error) {
+      console.error("Failed to load MFA status:", error);
+    } finally {
+      setLoadingMfaStatus(false);
+    }
+  };
+
+  const handleMfaToggle = async (checked: boolean) => {
+    if (checked) {
+      // Open setup dialog
+      setShowMfaSetup(true);
+    } else {
+      // Disable MFA
+      setDisablingMfa(true);
+      try {
+        await authService.disableMfa();
+        setMfaEnabled(false);
+        
+        // Show success with SweetAlert
+        Swal.fire({
+          icon: "success",
+          title: t("settings.security.mfaDisabled"),
+          text: t("settings.security.mfaDisabledMessage"),
+          confirmButtonText: t("common.confirm"),
+          timer: 3000,
+          timerProgressBar: true,
+        });
+      } catch (error: any) {
+        console.error("Failed to disable MFA:", error);
+        toast.error(error.message || t("settings.security.mfaDisableFailed"));
+      } finally {
+        setDisablingMfa(false);
+      }
+    }
+  };
+
+  const handleMfaSetupSuccess = () => {
+    setMfaEnabled(true);
+    loadMfaStatus();
+  };
 
   const devices = [
     {
@@ -122,15 +168,8 @@ export function SecuritySettings() {
     }
   };
 
-  const handleVerifyCode = () => {
-    if (verificationCode === "123456") {
-      setTwoFactorEnabled(true);
-      setShowQRCode(false);
-    }
-  };
-
   const handleRemoveDevice = (_id: string | number) => {
-
+    // TODO: Implement device removal
   };
 
   const handlePasswordChange = () => {
@@ -138,7 +177,6 @@ export function SecuritySettings() {
       alert("Passwords do not match");
       return;
     }
-
 
     setPasswordForm({
       currentPassword: "",
@@ -156,96 +194,49 @@ export function SecuritySettings() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary shrink-0" />
-              Two-Factor Authentication
+              {t("settings.security.mfaTitle")}
             </CardTitle>
             <CardDescription>
-              Add an extra layer of security to your account
+              {t("settings.security.mfaDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="2fa">Enable 2FA</Label>
+                <Label htmlFor="2fa">{t("settings.security.enableMfa")}</Label>
                 <p className="text-xs text-muted-foreground">
-                  Send a code to your phone or email when logging in.
+                  {t("settings.security.mfaHelp")}
                 </p>
               </div>
-              <Switch
-                id="2fa"
-                checked={twoFactorEnabled}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setShowQRCode(true);
-                  } else {
-                    setTwoFactorEnabled(false);
-                  }
-                }}
-              />
+              {loadingMfaStatus ? (
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              ) : (
+                <Switch
+                  id="2fa"
+                  checked={mfaEnabled}
+                  disabled={disablingMfa}
+                  onCheckedChange={handleMfaToggle}
+                />
+              )}
             </div>
 
-            {showQRCode && !twoFactorEnabled && (
-              <div className="rounded-md border p-4 space-y-4">
-                <div className="text-center">
-                  <p className="mb-2 font-medium">Scan this QR code</p>
-                  <img
-                    src="/placeholder.svg"
-                    width={180}
-                    height={180}
-                    alt="QR Code"
-                    className="mx-auto"
-                  />
-                  <p className="text-sm mt-2 text-muted-foreground">
-                    Or enter code manually:{" "}
-                    <code className="font-mono">ABCD EFGH</code>
-                  </p>
-                </div>
-                <div>
-                  <Label>Verification Code</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={verificationCode}
-                      onChange={(e) => setVerificationCode(e.target.value)}
-                      placeholder="Enter 6-digit code"
-                    />
-                    <Button onClick={handleVerifyCode}>Verify</Button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {twoFactorEnabled && (
-              <>
-                <Alert className="bg-green-50 dark:bg-green-900 border-green-300 dark:border-green-700">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  <AlertDescription>
-                    Two-factor authentication is enabled.
-                  </AlertDescription>
-                </Alert>
-
-                <div className="space-y-2">
-                  <Label>Backup Codes</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {backupCodes.map((code, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between bg-muted rounded px-2 py-1 text-sm font-mono"
-                      >
-                        {code}
-                        <Button size="icon" variant="ghost" className="h-6 w-6">
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex gap-2 pt-2">
-                    <Button variant="outline">Download</Button>
-                    <Button variant="outline">Generate New</Button>
-                  </div>
-                </div>
-              </>
+            {mfaEnabled && (
+              <Alert className="bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700">
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <AlertDescription className="text-green-900 dark:text-green-100">
+                  {t("settings.security.mfaEnabledMessage")}
+                </AlertDescription>
+              </Alert>
             )}
           </CardContent>
         </Card>
+
+        {/* MFA Setup Dialog */}
+        <MfaSetupDialog
+          open={showMfaSetup}
+          onOpenChange={setShowMfaSetup}
+          onSuccess={handleMfaSetupSuccess}
+        />
 
         {/* Device Management */}
         <Card>
@@ -258,10 +249,10 @@ export function SecuritySettings() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="devices" className="space-y-4">
-              <TabsList className="flex bg-muteed border p-[1px] h-11 border-border rounded-md text-foreground w-fit">
+              <TabsList className="flex bg-muteed border p-px h-11 border-border rounded-md text-foreground w-fit">
                 <TabsTrigger
                   value="devices"
-                  className="h-10 bg-muted rounded-r-none me-[1px]"
+                  className="h-10 bg-muted rounded-r-none me-px"
                 >
                   Devices
                 </TabsTrigger>
@@ -428,7 +419,7 @@ export function SecuritySettings() {
 
       {/* Change Password Dialog */}
       <Dialog open={passwordChangeOpen} onOpenChange={setPasswordChangeOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-106.25">
           <DialogHeader>
             <DialogTitle>Change Password</DialogTitle>
             <DialogDescription>

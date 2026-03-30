@@ -45,7 +45,9 @@ export function formatCurrency(
     .replace(/￥/g, '¥')   // JPY: full-width yen → half-width yen
     .replace(/＄/g, '$')   // USD/SGD: full-width dollar → half-width dollar
     .replace(/￡/g, '£')   // GBP: full-width pound → half-width pound
-    .replace(/€/g, '€');  // EUR: ensure proper euro symbol
+    .replace(/€/g, '€')   // EUR: ensure proper euro symbol
+    .replace(/\sK$/g, ' Ks')   // MMK: K → Ks
+    .replace(/^K\s/g, 'Ks ');  // MMK: K at start → Ks
 }
 
 /**

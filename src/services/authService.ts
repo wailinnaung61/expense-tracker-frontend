@@ -15,7 +15,11 @@ import type {
   OAuthUrlResponse,
   GoogleSignInRequest,
   DisableMfaWithBackupCodeRequest,
-  TokenResponse
+  TokenResponse,
+  MfaSetupResponse,
+  MfaVerifySetupRequest,
+  MfaVerifySetupResponse,
+  MfaStatusResponse
 } from '@/types/auth'
 
 export interface SignUpData {
@@ -54,14 +58,13 @@ export const authService = {
   },
 
   // Verify TOTP code for MFA
-  async verifyTotp(data: VerifyTotpData): Promise<UserSignInResponse> {
-    const mfaRequest: MfaVerifyRequest = {
+  async verifyTotp(data: VerifyTotpData): Promise<TokenResponse> {
+    const response = await apiClient.post<TokenResponse>('/api/Auth/mfa/verify', {
       session: data.session,
       username: data.username,
       totpCode: data.totpCode
-    }
-    const response = await apiClient.post<UserSignInResponse>('/api/Auth/mfa/verify', mfaRequest)
-    this.storeTokens(response.tokens)
+    })
+    this.storeTokens(response)
     // Store username for refresh token requests
     localStorage.setItem('username', data.username)
     return response
@@ -150,6 +153,27 @@ export const authService = {
       backupCode: data.backupCode
     }
     return apiClient.post('/api/Auth/mfa/disable-with-backup', disableRequest)
+  },
+
+  // MFA Setup - Get QR code and secret
+  async setupMfa(): Promise<MfaSetupResponse> {
+    const response = await apiClient.post<MfaSetupResponse>('/api/Auth/mfa/setup')
+    return response
+  },
+
+  // MFA Setup - Verify TOTP code
+  async verifyMfaSetup(data: MfaVerifySetupRequest): Promise<MfaVerifySetupResponse> {
+    return apiClient.post<MfaVerifySetupResponse>('/api/Auth/mfa/setup/verify', data)
+  },
+
+  // MFA Status - Check if MFA is enabled
+  async getMfaStatus(): Promise<MfaStatusResponse> {
+    return apiClient.get<MfaStatusResponse>('/api/Auth/mfa/status')
+  },
+
+  // Disable MFA
+  async disableMfa(): Promise<{ message: string }> {
+    return apiClient.post('/api/Auth/mfa/disable')
   },
 
   // Sign out

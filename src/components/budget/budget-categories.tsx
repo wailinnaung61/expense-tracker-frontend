@@ -226,12 +226,18 @@ export function BudgetCategories({
                       category.alertThreshold,
                       category.allocated
                     ));
+              
+              // Calculate what total would be if this category is saved
+              const totalAllocatedWithChange = totalAllocated - category.allocated + allocatedAmount;
+              const wouldExceedBudget = totalAllocatedWithChange > totalBudget;
+              
               const isInvalid =
                 !Number.isFinite(allocatedAmount) ||
                 allocatedAmount < 0 ||
                 !Number.isFinite(alertThresholdPercent) ||
                 alertThresholdPercent < 0 ||
-                alertThresholdPercent > 100;
+                alertThresholdPercent > 100 ||
+                wouldExceedBudget;
 
               return (
                 <div key={category.budgetCategoryId} className="rounded-3xl border bg-card p-5 shadow-xs transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm">
@@ -380,6 +386,22 @@ export function BudgetCategories({
                       </div>
                     </div>
                   )}
+                  
+                  {wouldExceedBudget && hasChanges && (
+                    <div className="mt-4 rounded-2xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/50 p-3 text-sm text-orange-700 dark:text-orange-300">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="mt-0.5 h-4 w-4" />
+                        <div>
+                          <div className="font-medium mb-1">{t("budget.categories.exceedsBudgetTitle")}</div>
+                          <div>{t("budget.categories.exceedsBudgetMessage", {
+                            newTotal: formatCurrency(totalAllocatedWithChange, currency),
+                            totalBudget: formatCurrency(totalBudget, currency),
+                            excess: formatCurrency(totalAllocatedWithChange - totalBudget, currency)
+                          })}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -393,47 +415,72 @@ export function BudgetCategories({
               {t("budget.categories.addCategory")}
             </div>
             <div className="space-y-2">
-              {untrackedCategories.map((cat) => (
-                <div key={cat.categoryId} className="flex items-center gap-3 rounded-xl border bg-card p-3">
-                  <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
-                    style={{ backgroundColor: `${cat.color}18`, color: cat.color, borderColor: `${cat.color}30` }}
-                  >
-                    {cat.icon}
+              {untrackedCategories.map((cat) => {
+                const addAmount = Number(addAmounts[cat.categoryId] ?? 0);
+                const totalWithNewCategory = totalAllocated + addAmount;
+                const wouldExceedBudget = addAmount > 0 && totalWithNewCategory > totalBudget;
+                const isInvalidAmount = !addAmounts[cat.categoryId] || addAmount <= 0;
+                
+                return (
+                  <div key={cat.categoryId} className="space-y-2">
+                    <div className="flex items-center gap-3 rounded-xl border bg-card p-3">
+                      <div
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
+                        style={{ backgroundColor: `${cat.color}18`, color: cat.color, borderColor: `${cat.color}30` }}
+                      >
+                        {cat.icon}
+                      </div>
+                      <span className="flex-1 text-sm font-medium" style={{ color: cat.color }}>
+                        {cat.displayName}
+                      </span>
+                      <Input
+                        type="number"
+                        inputMode="decimal"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="w-28 text-sm"
+                        value={addAmounts[cat.categoryId] ?? ""}
+                        onChange={(e) =>
+                          setAddAmounts((prev) => ({ ...prev, [cat.categoryId]: e.target.value }))
+                        }
+                      />
+                      <Button
+                        size="sm"
+                        disabled={isInvalidAmount || wouldExceedBudget}
+                        onClick={async () => {
+                          const wasAdded = await onAddCategory(
+                            cat.categoryId,
+                            Number(addAmounts[cat.categoryId] ?? 0)
+                          );
+                          if (wasAdded) {
+                            setAddAmounts((prev) => ({ ...prev, [cat.categoryId]: "" }));
+                          }
+                        }}
+                      >
+                        <Plus className="mr-1 h-3.5 w-3.5" />
+                        {t("budget.categories.add")}
+                      </Button>
+                    </div>
+                    
+                    {wouldExceedBudget && (
+                      <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/50 p-2.5 text-xs text-orange-700 dark:text-orange-300">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                          <div>
+                            <div className="font-medium mb-0.5">{t("budget.categories.exceedsBudgetTitle")}</div>
+                            <div>{t("budget.categories.exceedsBudgetMessage", {
+                              newTotal: formatCurrency(totalWithNewCategory, currency),
+                              totalBudget: formatCurrency(totalBudget, currency),
+                              excess: formatCurrency(totalWithNewCategory - totalBudget, currency)
+                            })}</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <span className="flex-1 text-sm font-medium" style={{ color: cat.color }}>
-                    {cat.displayName}
-                  </span>
-                  <Input
-                    type="number"
-                    inputMode="decimal"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    className="w-28 text-sm"
-                    value={addAmounts[cat.categoryId] ?? ""}
-                    onChange={(e) =>
-                      setAddAmounts((prev) => ({ ...prev, [cat.categoryId]: e.target.value }))
-                    }
-                  />
-                  <Button
-                    size="sm"
-                    disabled={!addAmounts[cat.categoryId] || Number(addAmounts[cat.categoryId]) <= 0}
-                    onClick={async () => {
-                      const wasAdded = await onAddCategory(
-                        cat.categoryId,
-                        Number(addAmounts[cat.categoryId] ?? 0)
-                      );
-                      if (wasAdded) {
-                        setAddAmounts((prev) => ({ ...prev, [cat.categoryId]: "" }));
-                      }
-                    }}
-                  >
-                    <Plus className="mr-1 h-3.5 w-3.5" />
-                    {t("budget.categories.add")}
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

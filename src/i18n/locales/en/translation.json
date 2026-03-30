@@ -18,6 +18,10 @@
     "success": "Success",
     "warning": "Warning",
     "info": "Info",
+    "download": "Download",
+    "done": "Done",
+    "verify": "Verify",
+    "verifying": "Verifying...",
     "january": "January",
     "february": "February",
     "march": "March",
@@ -56,7 +60,8 @@
       "signUpButton": "Sign up",
       "mfaRequired": "Two-factor authentication required",
       "googleLoginFailed": "Google login failed",
-      "googleLoginInitFailed": "Failed to initiate Google login"
+      "googleLoginInitFailed": "Failed to initiate Google login",
+      "loginSuccessful": "Login successful! Welcome back!"
     },
     "signupPage":{
       "title": "Sign Up",
@@ -112,7 +117,11 @@
       "useBackupCode": "Use a backup code instead",
       "backupCodeHint": "Enter one of your backup codes",
       "verifyFailed": "Verification failed",
-      "invalidCode": "Invalid authentication code"
+      "invalidCode": "Invalid authentication code",
+      "oneTimeAttempt": "Note: You only get one attempt. Incorrect code requires re-login.",
+      "sessionExpired": "Please log in again to get a new verification session.",
+      "backToLogin": "Back to Login",
+      "verificationSuccess": "Verification successful! Welcome back!"
     },
     "disableMfaPage": {
       "title": "Disable MFA",
@@ -357,6 +366,8 @@
       "statusWarning": "Warning",
       "statusOver": "Over Budget",
       "overBudgetHint": "This category is already at risk. If you lower the allocation below current spending, it will stay over budget until you rebalance the month.",
+      "exceedsBudgetTitle": "Cannot Exceed Total Budget",
+      "exceedsBudgetMessage": "This would make total allocated {{newTotal}}, exceeding your budget of {{totalBudget}} by {{excess}}. Reduce this allocation or increase the total budget first.",
       "lockedNoticeTitle": "Some expense categories are not tracked this month",
       "lockedNoticeDescription": "These categories exist but are not part of this month's budget. Use the Add Category section below to include them.",
       "noCategories": "This budget exists, but there are no category allocations to manage yet.",
@@ -375,6 +386,9 @@
       "allocatedSummary": "Allocation Summary",
       "visualHint": "Keep total allocated within the monthly total so the plan remains realistic.",
       "allocationOver": "Allocated category amounts cannot be greater than the total monthly budget.",
+      "unassigned": "Unassigned",
+      "overAllocated": "Over Allocated",
+      "cannotExceedTitle": "Cannot Exceed Budget",
       "categoryPlanning": "Category Planning",
       "selectCategories": "Select expense categories to include in this month and give each one its own allocation and alert threshold. Drag selected categories to reorder them.",
       "noExpenseCategories": "No expense categories are available yet. Create expense categories first, then come back to build this budget.",
@@ -671,5 +685,40 @@
       "verificationCode": "Verification Code",
       "resendCode": "Resend Code",
       "verifyEmail": "Verify Email"
-    }  }
+    },
+    "security": {
+      "mfaTitle": "Two-Factor Authentication",
+      "mfaDescription": "Add an extra layer of security to your account",
+      "enableMfa": "Enable 2FA",
+      "mfaHelp": "Require authentication code from your phone when logging in",
+      "mfaEnabledMessage": "Two-factor authentication is active and protecting your account",
+      "mfaDisabled": "MFA Disabled Successfully",
+      "mfaDisabledMessage": "Two-factor authentication has been disabled. You can re-enable it anytime from security settings.",
+      "mfaDisableFailed": "Failed to disable two-factor authentication",
+      "setupMfaTitle": "Set Up Two-Factor Authentication",
+      "mfaSetupDescription": "Scan the QR code with your authenticator app",
+      "mfaVerifyDescription": "Enter the code from your authenticator app",
+      "mfaCompleteDescription": "Save your backup codes in a safe place",
+      "preparingMfa": "Preparing your setup...",
+      "scanWithApp": "Scan with Google Authenticator, Authy, or similar app",
+      "manualEntry": "Manual Entry Code",
+      "manualEntryHelp": "If you can't scan, enter this code manually in your authenticator app",
+      "nextVerify": "Next: Verify Code",
+      "verifyCodeTitle": "Enter the 6-digit code",
+      "verifyCodeDescription": "Open your authenticator app and enter the code shown for this account",
+      "verificationCode": "Verification Code",
+      "invalidCodeLength": "Code must be 6 digits",
+      "verificationFailed": "Verification failed. Please try again",
+      "mfaSetupSuccess": "Two-factor authentication enabled successfully!",
+      "mfaSetupFailed": "Failed to start MFA setup",
+      "mfaSetupComplete": "Setup Complete!",
+      "mfaSetupSuccessTitle": "All Set!",
+      "mfaSetupSuccessMessage": "Your account is now protected with two-factor authentication",
+      "backupCodes": "Backup Codes",
+      "backupCodesWarning": "Save these codes! You can use them to access your account if you lose your phone.",
+      "backupCodesDownloaded": "Backup codes downloaded",
+      "secretCopied": "Secret code copied to clipboard",
+      "codeCopied": "Code copied to clipboard"
+    }
+  }
 }

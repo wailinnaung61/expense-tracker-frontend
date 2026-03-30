@@ -42,12 +42,16 @@ export interface UserSignInRequest {
   password: string
 }
 
+export interface MfaChallenge {
+  session: string
+  username: string
+  challengeName: string
+}
+
 export interface AuthSignInResult {
   requiresMfa: boolean
   tokens?: TokenResponse
-  mfaChallenge?: string
-  session?: string
-  userName?: string
+  mfaChallenge?: MfaChallenge
 }
 
 export interface UserSignInResponse {
@@ -122,16 +126,18 @@ export interface MfaVerifyRequest {
 export interface MfaSetupResponse {
   secretCode: string
   qrCodeUri: string
+  session: string
 }
 
 export interface MfaVerifySetupRequest {
   totpCode: string
+  session?: string
 }
 
 export interface MfaVerifySetupResponse {
-  status: string
+  success: boolean
+  backUpCodes: string[]
   message: string
-  backupCodes: string[]
 }
 
 export interface DisableMfaWithBackupCodeRequest {

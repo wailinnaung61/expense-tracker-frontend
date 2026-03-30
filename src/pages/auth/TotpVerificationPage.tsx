@@ -48,10 +48,20 @@ export default function TotpVerificationPage() {
       // Fetch user data after successful MFA verification
       await fetchUser()
       
-      toast.success(t('common.success'))
-      navigate('/dashboard', { replace: true })
+      toast.success(t('auth.totpPage.verificationSuccess'))
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true })
+      }, 500)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('auth.totpPage.verifyFailed'))
+      // Session is one-time use - redirect to login for new session
+      const errorMessage = error instanceof Error ? error.message : t('auth.totpPage.verifyFailed')
+      toast.error(errorMessage)
+      toast.info(t('auth.totpPage.sessionExpired'))
+      
+      // Redirect to login after brief delay
+      setTimeout(() => {
+        navigate('/login', { replace: true })
+      }, 2000)
     }
   }
 
@@ -137,6 +147,9 @@ export default function TotpVerificationPage() {
           <p className="text-center text-sm text-gray-600 mb-1 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.3s_forwards]">
             {t('auth.totpPage.description')}
           </p>
+          <p className="text-center text-xs text-amber-600 mb-1 opacity-0 animate-[fadeInUp_0.7s_ease-out_0.35s_forwards]">
+            ⚠️ {t('auth.totpPage.oneTimeAttempt')}
+          </p>
           {email && (
             <p className="text-center text-xs text-gray-500 mb-7">
               for {email}
@@ -189,10 +202,10 @@ export default function TotpVerificationPage() {
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => navigate('/login')}
-                className="text-sm text-gray-600 hover:text-gray-900"
+                onClick={() => navigate('/login', { replace: true })}
+                className="text-sm text-gray-600 hover:text-gray-900 underline"
               >
-                Back to login
+                {t('auth.totpPage.backToLogin')}
               </button>
             </div>
           </form>

@@ -18,6 +18,10 @@
     "success": "အောင်မြင်",
     "warning": "သတိပေးချက်",
     "info": "သတင်းအချက်အလက်",
+    "download": "ဒေါင်းလုဒ်လုပ်ပါ",
+    "done": "ပြီးပါပြီ",
+    "verify": "အတည်ပြုပါ",
+    "verifying": "အတည်ပြုနေသည်...",
     "january": "ဇန်နဝါရီ",
     "february": "ဖေဖော်ဝါရီ",
     "march": "မတ်",
@@ -56,7 +60,8 @@
       "signUpButton": "အကောင့်ဖွင့်ရန်",
       "mfaRequired": "နှစ်ဆင့်စစ်ဆေးမှု လိုအပ်သည်",
       "googleLoginFailed": "Google ဝင်ရောက်မှု မအောင်မြင်ပါ",
-      "googleLoginInitFailed": "Google ဝင်ရောက်မှု စတင်၍ မရပါ"
+      "googleLoginInitFailed": "Google login စတင်၍ မရပါ",
+      "loginSuccessful": "အောင်မြင်စွာ ဝင်ရောက်ပြီးပါပြီ! ပြန်လည်ကြိုဆိုပါတယ်!"
     },
     "signupPage": {
       "title": "အကောင့်ဖွင့်ရန်",
@@ -112,7 +117,11 @@
       "useBackupCode": "Backup ကုဒ်အသုံးပြုမည်",
       "backupCodeHint": "သင့် backup ကုဒ်များထဲက တစ်ခုကို ထည့်ပါ",
       "verifyFailed": "အတည်ပြု၍ မရပါ",
-      "invalidCode": "ကုဒ်မမှန်ကန်ပါ"
+      "invalidCode": "ကုဒ်မမှန်ကန်ပါ",
+      "oneTimeAttempt": "သတိပေးချက်: တစ်ကြိမ်သာ ကြိုးစားခွင့်ရှိသည်။ မှားယွင်းလျှင် ပြန်လည် login လုပ်ရမည်။",
+      "sessionExpired": "အတည်ပြုမှု session အသစ်ရရှိရန် ပြန်လည် login လုပ်ပါ။",
+      "backToLogin": "Login စာမျက်နှာသို့ ပြန်သွားမည်",
+      "verificationSuccess": "အောင်မြင်စွာ အတည်ပြုပြီးပါပြီ! ပြန်လည်ကြိုဆိုပါတယ်!"
     },
     "disableMfaPage": {
       "title": "MFA ပိတ်ရန်",
@@ -358,6 +367,8 @@
       "statusWarning": "သတိပေး",
       "statusOver": "ဘတ်ဂျက်ကျော်",
       "overBudgetHint": "ဒီအမျိုးအစားက အန္တရာယ်ရှိနေပါပြီ။ လက်ရှိ spend ထက် allocation ကို လျှော့ချရင် လချုပ်မပြန်ညှိမချင်း over budget အဖြစ် ဆက်ရှိနေပါမယ်။",
+      "exceedsBudgetTitle": "ဘတ်ဂျက်ထက် မကျော်လွန်နိုင်ပါ",
+      "exceedsBudgetMessage": "ဒါက စုစုပေါင်းခွဲဝေမှု {{newTotal}} ဖြစ်မှာ၊ ဗျူဂျက် {{totalBudget}} ကနေ {{excess}} ပို ကျော်လွန်ပါ။ ဒီခွဲဝေမှုကို လျှော့ပါ (သို့) စုစုပေါင်း budget ကို အရင်မြှင့်ပါ။",
       "lockedNoticeTitle": "ဒီလမှာ မပါဝင်သော expense category များ ရှိနေသည်",
       "lockedNoticeDescription": "ဤ categories များ ရှိသော်လည်း ဒီလ budget တွင် မပါဝင်သေးပါ။ အောက်ရှိ Add Category မှ ထည့်သွင်းနိုင်သည်။",
       "noCategories": "ဒီ budget ရှိပေမယ့် စီမံရန် category allocation မရှိသေးပါ။",
@@ -376,6 +387,9 @@
       "allocatedSummary": "ခွဲဝေမှုအကျဉ်းချုပ်",
       "visualHint": "စုစုပေါင်း allocation ကို လစဉ်ဘတ်ဂျက်ထက် မကျော်စေဘဲ စီမံပါ။",
       "allocationOver": "Category allocation စုစုပေါင်းသည် monthly budget ထက် မကျော်ရပါ။",
+      "unassigned": "မသတ်မှတ်ရှိသေး",
+      "overAllocated": "ပို၍ဝေပြီး",
+      "cannotExceedTitle": "ဘတ်ဂျက်တက် မကျော်လွန်နိုင်ပါ",
       "categoryPlanning": "အမျိုးအစားအစီအစဉ်",
       "selectCategories": "ဒီလအတွက် ထည့်သွင်းမယ့် expense categories တွေကို ရွေးပြီး တစ်ခုချင်းစီအတွက် allocation နဲ့ alert threshold သတ်မှတ်ပါ။ ရွေးထားတဲ့ categories တွေကို ဆွဲပြီး အစီအစဉ်ပြောင်းနိုင်ပါတယ်။",
       "noExpenseCategories": "Expense categories မရှိသေးပါ။ အရင် expense category ဖန်တီးပြီး ပြန်လာပါ။",
@@ -415,7 +429,7 @@
       "title": "ကုန်ကျစရိတ်များ",
       "refresh": "ပြန်လည်ရယူမည်",
       "importCsv": "CSV တင်သွင်းမည်",
-      "bulkAdd": "အထုအပြုတ်ထည့်မည်",
+      "bulkAdd": "အစုလိုက် ထည့်သွင်းမည်",
       "addTransaction": "ငွေသွင်းထုတ်ထည့်မည်"
     },
     "budgetPulse": {
@@ -477,11 +491,11 @@
     },
     "upcoming": {
       "title": "ဆောင်ရွက်မည့် ငွေပေးချေမှုများ",
-      "description": "ပုမှန် ဘေးငွေ ငွေပေးချေမှုများ",
+      "description": "ပုမှန် ဘောက်ချာ ငွေပေးချေမှုများ",
       "addNew": "အသစ်ထည့်မည်",
       "noPayments": "ဆောင်ရွက်မည့် ငွေပေးချေမှု မတွေ့ပါ",
       "totalUpcoming": "စုစုပေါင်း:",
-      "viewAll": "ဘေးငွေများအားလုံး ကြည့်ရှုမည် ({{count}})",
+      "viewAll": "ဘောက်ချာများအားလုံး ကြည့်ရှုမည် ({{count}})",
       "overdue": "ကျော်လွန်",
       "dueSoon": "မကြာမီ ချေရမည်",
       "thisWeek": "ဤအပတ်",
@@ -546,9 +560,9 @@
       "descriptionPlaceholder": "ဖော်ပြချက် ရိုက်ထည့်ပါ",
       "noteLabel": "မှတ်ချက် (ရှိလျှင်)",
       "notePlaceholder": "နောက်ထပ် မှတ်ချက်",
-      "receiptLabel": "ဘေးငွေ (ရှိလျှင်)",
-      "uploadReceipt": "ဘေးငွေ တင်မည်",
-      "changeReceipt": "ဘေးငွေ ပြောင်းမည်",
+      "receiptLabel": "ဘောက်ချာ (ရှိလျှင်)",
+      "uploadReceipt": "ဘောက်ချာ တင်မည်",
+      "changeReceipt": "ဘောက်ချာ ပြောင်းမည်",
       "receiptFormats": "ထောက်ပံ့သော ဖိုင်: JPEG, PNG, GIF, WebP, PDF (အများဆုံး 5MB)",
       "uploading": "တင်နေသည်...",
       "saving": "သိမ်းနေသည်...",
@@ -579,7 +593,7 @@
       "importSuccess": "ငွေသွင်းထုတ် {{count}} ခု အောင်မြင်စွာ တင်သွင်းပြီးပြီ"
     },
     "bulkAdd": {
-      "title": "ငွေသွင်းထုတ်များ အထုအပြုတ် ထည့်မည်",
+      "title": "ငွေသွင်းထုတ်များ အစုလိုက် ထည့်သွင်းမည်",
       "description": "တစ်ကြိမ်တည်း ငွေသွင်းထုတ်များစွာ ထည့်ပါ - Excel ထက် ပိုလွယ်သည်!",
       "colType": "အမျိုး",
       "colCategory": "အမျိုးအစား *",
@@ -672,5 +686,40 @@
       "verificationCode": "အတည်ပြုချက် ကုဒ်များ",
       "resendCode": "ကုဒ်ပြန်ပို့ပါ",
       "verifyEmail": "အီးမေးလ် အတည်ပြုပါ"
-    }  }
+    },
+    "security": {
+      "mfaTitle": "နှစ်ဆင့် အတည်ပြုချက်",
+      "mfaDescription": "သင့်အကောင့်အတွက် လုံခြုံမှု အလွှာထပ်တိုး ထည့်ပါ",
+      "enableMfa": "2FA ဖွင့်ပါ",
+      "mfaHelp": "ဝင်ရောက်သည့်အချိန်တွင် သင့်ဖုန်းမှ အတည်ပြုချက်ကုဒ် လိုအပ်သည်",
+      "mfaEnabledMessage": "နှစ်ဆင့် အတည်ပြုချက်သည် သင့်အကောင့်ကို ကာကွယ်နေပါပြီ",
+      "mfaDisabled": "MFA ကို အောင်မြင်စွာ ပိတ်လိုက်ပါပြီ",
+      "mfaDisabledMessage": "နှစ်ဆင့် အတည်ပြုချက်ကို ပိတ်လိုက်ပါပြီ။ လုံခြုံရေး ဆက်တင်များမှ အချိန်မရွေး ပြန်လည်ဖွင့်နိုင်ပါသည်။",
+      "mfaDisableFailed": "နှစ်ဆင့် အတည်ပြုချက်ကို ပိတ်ခြင်း မအောင်မြင်ပါ",
+      "setupMfaTitle": "နှစ်ဆင့် အတည်ပြုချက် တပ်ဆင်ပါ",
+      "mfaSetupDescription": "သင့် authenticator အက်ပ်ဖြင့် QR ကုဒ်ကို စကန်ဖတ်ပါ",
+      "mfaVerifyDescription": "သင့် authenticator အက်ပ်မှ ကုဒ်ကို ရိုက်ထည့်ပါ",
+      "mfaCompleteDescription": "သင့် backup ကုဒ်များကို လုံခြုံသောနေရာတွင် သိမ်းဆည်းပါ",
+      "preparingMfa": "သင့်အတွက် ပြင်ဆင်နေသည်...",
+      "scanWithApp": "Google Authenticator၊ Authy သို့မဟုတ် အလားတူအက်ပ်ဖြင့် စကန်ဖတ်ပါ",
+      "manualEntry": "လက်ဖြင့် ထည့်ရမည့် ကုဒ်",
+      "manualEntryHelp": "စကန်မဖတ်နိုင်ပါက၊ ဤကုဒ်ကို သင့် authenticator အက်ပ်တွင် လက်ဖြင့်ရိုက်ထည့်ပါ",
+      "nextVerify": "နောက်တစ်ဆင့်: ကုဒ်အတည်ပြုပါ",
+      "verifyCodeTitle": "6 လုံး ကုဒ်ထည့်ပါ",
+      "verifyCodeDescription": "သင့် authenticator အက်ပ်ကို ဖွင့်ပြီး ဤအကောင့်အတွက် ပြသထားသော ကုဒ်ကို ရိုက်ထည့်ပါ",
+      "verificationCode": "အတည်ပြုချက် ကုဒ်",
+      "invalidCodeLength": "ကုဒ်သည် 6 လုံး ဖြစ်ရမည်",
+      "verificationFailed": "အတည်ပြုခြင်း မအောင်မြင်ပါ။ ထပ်စမ်းကြည့်ပါ",
+      "mfaSetupSuccess": "နှစ်ဆင့် အတည်ပြုချက်ကို အောင်မြင်စွာ ဖွင့်ပြီးပြီ!",
+      "mfaSetupFailed": "MFA တပ်ဆင်ခြင်း မအောင်မြင်ပါ",
+      "mfaSetupComplete": "တပ်ဆင်မှု ပြီးပါပြီ!",
+      "mfaSetupSuccessTitle": "အဆင်သင့်ပါပြီ!",
+      "mfaSetupSuccessMessage": "သင့်အကောင့်ကို နှစ်ဆင့် အတည်ပြုချက်ဖြင့် ကာကွယ်ပြီးပါပြီ",
+      "backupCodes": "Backup ကုဒ်များ",
+      "backupCodesWarning": "ဤကုဒ်များကို သိမ်းဆည်းပါ! သင့်ဖုန်း ပျောက်သွားပါက ဤကုဒ်များဖြင့် အကောင့်ကို ဝင်ရောက်နိုင်ပါသည်။",
+      "backupCodesDownloaded": "Backup ကုဒ်များကို ဒေါင်းလုဒ်လုပ်ပြီးပြီ",
+      "secretCopied": "လျှို့ဝှက် ကုဒ်ကို ကော်ပီကူးပြီးပြီ",
+      "codeCopied": "ကုဒ်ကို ကော်ပီကူးပြီးပြီ"
+    }
+  }
 }

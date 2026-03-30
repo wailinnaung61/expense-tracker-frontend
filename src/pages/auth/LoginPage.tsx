@@ -56,7 +56,8 @@ export default function LoginPage() {
         toast.info(t('auth.loginPage.mfaRequired'))
         navigate('/verify-totp', {
           state: {
-            session: response.mfaChallenge
+            session: response.mfaChallenge?.session,
+            userName: response.mfaChallenge?.username
           }
         })
         return
@@ -64,7 +65,10 @@ export default function LoginPage() {
       
       // Fetch user data after successful login
       await fetchUser()
-      navigate('/', { replace: true })
+      toast.success(t('auth.loginPage.loginSuccessful'))
+      setTimeout(() => {
+        navigate('/', { replace: true })
+      }, 500)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t('auth.loginPage.googleLoginFailed'))
       // Clear the URL parameters
@@ -83,14 +87,18 @@ export default function LoginPage() {
         toast.info(t('auth.loginPage.mfaRequired'))
         navigate('/verify-totp', {
           state: {
-            session: response.mfaChallenge,
+            session: response.mfaChallenge?.session,
+            userName: response.mfaChallenge?.username,
             email: data.email
           }
         })
         return
       }    
       // No MFA - login successful
-      navigate('/dashboard')
+      toast.success(t('auth.loginPage.loginSuccessful'))
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 500)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Login failed')
     }

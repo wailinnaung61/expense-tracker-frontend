@@ -18,6 +18,10 @@
     "success": "成功",
     "warning": "警告",
     "info": "情報",
+    "download": "ダウンロード",
+    "done": "完了",
+    "verify": "検証",
+    "verifying": "検証中...",
     "january": "1月",
     "february": "2月",
     "march": "3月",
@@ -56,7 +60,8 @@
       "signUpButton": "新規登録",
       "mfaRequired": "二段階認証が必要です",
       "googleLoginFailed": "Googleログインに失敗しました",
-      "googleLoginInitFailed": "Googleログインを開始できませんでした"
+      "googleLoginInitFailed": "Googleログインの開始に失敗しました",
+      "loginSuccessful": "ログインに成功しました！おかえりなさい！"
     },
     "signupPage": {
       "title": "新規登録",
@@ -112,7 +117,11 @@
       "useBackupCode": "バックアップコードを使用",
       "backupCodeHint": "バックアップコードの1つを入力してください",
       "verifyFailed": "認証に失敗しました",
-      "invalidCode": "認証コードが無効です"
+      "invalidCode": "認証コードが無効です",
+      "oneTimeAttempt": "注意: 1回のみ試行できます。コードが間違っている場合は、再度ログインが必要です。",
+      "sessionExpired": "新しい確認セッションを取得するには、再度ログインしてください。",
+      "backToLogin": "ログインに戻る",
+      "verificationSuccess": "認証に成功しました！おかえりなさい！"
     },
     "disableMfaPage": {
       "title": "二段階認証を無効化",
@@ -358,6 +367,8 @@
       "statusWarning": "警告",
       "statusOver": "予算超過",
       "overBudgetHint": "このカテゴリはすでに危険水準です。現在の支出より下に配分を下げると、月内で再調整するまで予算超過のままになります。",
+      "exceedsBudgetTitle": "総予算を超えられません",
+      "exceedsBudgetMessage": "これにより合計配分が{{newTotal}}になり、予算{{totalBudget}}を{{excess}}超過します。この配分を減らすか、まず総予算を増やしてください。",
       "lockedNoticeTitle": "今月追跡されていないカテゴリがあります",
       "lockedNoticeDescription": "これらのカテゴリは存在しますが、今月の予算に含まれていません。下の「カテゴリを追加」セクションから追加できます。",
       "noCategories": "この予算は存在しますが、管理するカテゴリ配分はまだありません。",
@@ -376,6 +387,9 @@
       "allocatedSummary": "配分サマリー",
       "visualHint": "計画を現実的に保つため、カテゴリ配分の合計は月間総予算内に収めてください。",
       "allocationOver": "カテゴリ配分の合計は月間総予算を超えられません。",
+      "unassigned": "未割当",
+      "overAllocated": "超過割当",
+      "cannotExceedTitle": "予算を超えられません",
       "categoryPlanning": "カテゴリ計画",
       "selectCategories": "今月含める支出カテゴリを選び、それぞれに配分額とアラートしきい値を設定してください。選択したカテゴリをドラッグして並べ替えできます。",
       "noExpenseCategories": "支出カテゴリがまだありません。先にカテゴリを作成してから戻ってきてください。",
@@ -673,6 +687,40 @@
       "verificationCode": "確認コード",
       "resendCode": "コードを再送信",
       "verifyEmail": "メールを確認"
+    },
+    "security": {
+      "mfaTitle": "二要素認証",
+      "mfaDescription": "アカウントにセキュリティレイヤーを追加します",
+      "enableMfa": "2FAを有効にする",
+      "mfaHelp": "ログイン時に電話からの認証コードが必要になります",
+      "mfaEnabledMessage": "二要素認証が有効で、アカウントを保護しています",
+      "mfaDisabled": "MFAが正常に無効化されました",
+      "mfaDisabledMessage": "二要素認証が無効になりました。セキュリティ設定からいつでも再度有効にできます。",
+      "mfaDisableFailed": "二要素認証の無効化に失敗しました",
+      "setupMfaTitle": "二要素認証のセットアップ",
+      "mfaSetupDescription": "認証アプリでQRコードをスキャンしてください",
+      "mfaVerifyDescription": "認証アプリからコードを入力してください",
+      "mfaCompleteDescription": "バックアップコードを安全な場所に保存してください",
+      "preparingMfa": "セットアップを準備中...",
+      "scanWithApp": "Google Authenticator、Authy、または同様のアプリでスキャン",
+      "manualEntry": "手動入力コード",
+      "manualEntryHelp": "スキャンできない場合は、認証アプリにこのコードを手動で入力してください",
+      "nextVerify": "次へ：コードを確認",
+      "verifyCodeTitle": "6桁のコードを入力",
+      "verifyCodeDescription": "認証アプリを開き、このアカウントに表示されているコードを入力してください",
+      "verificationCode": "確認コード",
+      "invalidCodeLength": "コードは6桁である必要があります",
+      "verificationFailed": "確認に失敗しました。もう一度お試しください",
+      "mfaSetupSuccess": "二要素認証が正常に有効になりました！",
+      "mfaSetupFailed": "MFAセットアップの開始に失敗しました",
+      "mfaSetupComplete": "セットアップ完了！",
+      "mfaSetupSuccessTitle": "準備完了！",
+      "mfaSetupSuccessMessage": "アカウントは二要素認証で保護されています",
+      "backupCodes": "バックアップコード",
+      "backupCodesWarning": "これらのコードを保存してください！電話を紛失した場合、これらのコードでアカウントにアクセスできます。",
+      "backupCodesDownloaded": "バックアップコードをダウンロードしました",
+      "secretCopied": "シークレットコードをクリップボードにコピーしました",
+      "codeCopied": "コードをクリップボードにコピーしました"
     }
   }
 }
