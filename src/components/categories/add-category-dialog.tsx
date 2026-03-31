@@ -151,7 +151,7 @@ export function AddCategoryDialog({
             {category ? t('categories.editCategory') : t('categories.addCategory')}
           </DialogTitle>
           <DialogDescription>
-            {category ? "Update the category details below." : "Create a new category by filling in the details below."}
+            {category ? t('categories.editDescription') : t('categories.addDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -161,7 +161,7 @@ export function AddCategoryDialog({
             <Label htmlFor="name">{t('categories.categoryName')} *</Label>
             <Input
               id="name"
-              placeholder="e.g., Groceries, Rent, Salary"
+              placeholder={t('categories.categoryNamePlaceholder')}
               {...register("displayName")}
             />
             {errors.displayName && (
@@ -179,7 +179,7 @@ export function AddCategoryDialog({
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger id="type">
-                      <SelectValue placeholder="Select type" />
+                      <SelectValue placeholder={t('categories.selectType')} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={String(TransactionTypeEnum.Income)}>
@@ -187,12 +187,6 @@ export function AddCategoryDialog({
                       </SelectItem>
                       <SelectItem value={String(TransactionTypeEnum.Expense)}>
                         {t('categories.expense')}
-                      </SelectItem>
-                      <SelectItem value={String(TransactionTypeEnum.Investment)}>
-                        {t('categories.investment')}
-                      </SelectItem>
-                      <SelectItem value={String(TransactionTypeEnum.Savings)}>
-                        {t('categories.savings')}
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -206,7 +200,7 @@ export function AddCategoryDialog({
 
           {/* Icon Selection */}
           <div className="space-y-2">
-            <Label>Icon *</Label>
+            <Label>{t('categories.icon')} *</Label>
             <Controller
               name="icon"
               control={control}
@@ -236,7 +230,7 @@ export function AddCategoryDialog({
 
           {/* Color Selection */}
           <div className="space-y-2">
-            <Label>Color *</Label>
+            <Label>{t('categories.color')} *</Label>
             <Controller
               name="color"
               control={control}
@@ -265,11 +259,11 @@ export function AddCategoryDialog({
 
           {/* Preview */}
           <div className="space-y-2">
-            <Label>Preview</Label>
+            <Label>{t('categories.preview')}</Label>
             <div className="flex items-center gap-2 p-3 border rounded-md">
               <span className="text-2xl">{selectedIcon}</span>
               <span className="font-medium" style={{ color: selectedColor }}>
-                {displayName || "Category Name"}
+                {displayName || t('categories.categoryName')}
               </span>
             </div>
           </div>
@@ -284,7 +278,7 @@ export function AddCategoryDialog({
               {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : category ? "Update" : "Create"}
+              {isSubmitting ? t('categories.saving') : category ? t('categories.update') : t('categories.create')}
             </Button>
           </DialogFooter>
         </form>

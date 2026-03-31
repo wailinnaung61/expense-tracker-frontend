@@ -4,7 +4,8 @@ export type ChatRefreshTarget =
   | "transactions"
   | "summary"
   | "categories"
-  | "recurring_payments";
+  | "recurring_payments"
+  | "investments";
 
 export interface ChatbotRefreshEventDetail {
   target: ChatRefreshTarget;
@@ -15,7 +16,8 @@ export const isChatRefreshTarget = (value: unknown): value is ChatRefreshTarget 
     value === "transactions" ||
     value === "summary" ||
     value === "categories" ||
-    value === "recurring_payments"
+    value === "recurring_payments" ||
+    value === "investments"
   );
 };
 

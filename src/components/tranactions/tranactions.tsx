@@ -282,30 +282,30 @@ export default function TransactionsTable({
             <span className="text-sm text-muted-foreground mb-1 md:mb-0">
               {t("transactions.table.pagination", { current: currentPage, count: totalCount })}
             </span>
-          <div className="flex gap-2">
-            {hasPreviousPage && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onPreviousPage}
-                className="px-3 py-2 rtl:rotate-180"
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
-              </Button>
-            )}
-            {hasNextPage && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onNextPage}
-                className="px-3 py-2 rtl:rotate-180"
-              >
-                Next
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            )}
-          </div>
+            <div className="flex gap-2">
+              {hasPreviousPage && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onPreviousPage}
+                  className="px-3 py-2"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  {t("common.previous")}
+                </Button>
+              )}
+              {hasNextPage && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onNextPage}
+                  className="px-3 py-2"
+                >
+                  {t("common.next")}
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              )}
+            </div>
         </div>
       )}
     </div>

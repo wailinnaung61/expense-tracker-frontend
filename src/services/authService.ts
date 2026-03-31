@@ -10,8 +10,6 @@ import type {
   UserResetPasswordRequest,
   UserChangePasswordRequest,
   UpdateProfileRequest,
-  MfaVerifyRequest,
-  UserSignInResponse,
   OAuthUrlResponse,
   GoogleSignInRequest,
   DisableMfaWithBackupCodeRequest,

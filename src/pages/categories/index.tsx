@@ -145,7 +145,7 @@ export default function Categories() {
 
   return (
     <div className="space-y-6">
-      <CategoriesHeader onAddClick={handleAddClick} />
+      <CategoriesHeader onAddClick={handleAddClick} onRefresh={handleDialogSuccess} />
       
       <CategoryFilters
         type={type}

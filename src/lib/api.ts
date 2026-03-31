@@ -153,8 +153,7 @@ export const apiClient = {
       if (isRefreshing && refreshPromise) {
         console.log('⏳ Already refreshing, waiting...');
         await refreshPromise;
-        // Retry the original request with the new token
-        console.log('🔁 Retrying request after refresh completed');
+
         return this.request<T>(endpoint, options);
       }
 
@@ -168,11 +167,8 @@ export const apiClient = {
 
       try {
         await refreshPromise;
-        // Retry the original request with the new token
-        console.log('🔁 Retrying original request with new token');
         return this.request<T>(endpoint, options);
       } catch (error) {
-        // Refresh failed, error already handled in refreshToken()
         console.error('❌ Refresh failed, user will be redirected to login');
         throw error;
       }

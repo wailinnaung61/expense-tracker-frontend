@@ -115,10 +115,10 @@ export function CategoriesTable({
         <Table>
           <TableHeader className="bg-accent text-accent-foreground">
             <TableRow>
-              <TableHead className="px-4 py-2 font-medium">Category</TableHead>
-              <TableHead className="hidden sm:table-cell px-4 py-2 font-medium">Type</TableHead>
-              <TableHead className="hidden md:table-cell px-4 py-2 font-medium">Status</TableHead>
-              <TableHead className="hidden lg:table-cell px-4 py-2 font-medium">Created</TableHead>
+              <TableHead className="px-4 py-2 font-medium">{t('categories.title')}</TableHead>
+              <TableHead className="hidden sm:table-cell px-4 py-2 font-medium">{t('categories.categoryType')}</TableHead>
+              <TableHead className="hidden md:table-cell px-4 py-2 font-medium">{t('categories.status')}</TableHead>
+              <TableHead className="hidden lg:table-cell px-4 py-2 font-medium">{t('categories.created')}</TableHead>
               <TableHead className="w-12.5"></TableHead>
             </TableRow>
           </TableHeader>
@@ -153,7 +153,7 @@ export function CategoriesTable({
                         : "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400"
                     }`}
                   >
-                    {category.isActive ? "Active" : "Inactive"}
+                    {category.isActive ? t('categories.active') : t('categories.inactive')}
                   </span>
                 </TableCell>
                 <TableCell className="hidden lg:table-cell text-muted-foreground text-sm">
@@ -169,14 +169,14 @@ export function CategoriesTable({
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => onEdit(category)}>
                         <Edit className="mr-2 h-4 w-4" />
-                        Edit
+                        {t('common.edit')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleDelete(category)}
                         className="text-red-600 focus:text-red-600"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        {t('common.delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -191,7 +191,7 @@ export function CategoriesTable({
       {(hasNextPage || hasPreviousPage) && (
         <div className="flex flex-wrap justify-between items-center">
           <span className="text-sm text-muted-foreground mb-1 md:mb-0">
-            Page {currentPage} · {totalCount} items
+            {t('categories.pagination', { current: currentPage, count: totalCount })}
           </span>
           <div className="flex gap-2">
             {hasPreviousPage && (
@@ -199,10 +199,10 @@ export function CategoriesTable({
                 variant="outline"
                 size="sm"
                 onClick={onPreviousPage}
-                className="px-3 py-2 rtl:rotate-180"
+                className="px-3 py-2"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
+                {t('common.previous')}
               </Button>
             )}
             {hasNextPage && (
@@ -210,9 +210,9 @@ export function CategoriesTable({
                 variant="outline"
                 size="sm"
                 onClick={onNextPage}
-                className="px-3 py-2 rtl:rotate-180"
+                className="px-3 py-2"
               >
-                Next
+                {t('common.next')}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             )}
