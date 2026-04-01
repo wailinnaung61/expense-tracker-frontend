@@ -20,9 +20,9 @@ import { categoryService } from "@/services/categoryService";
 import type { ExpenseCategory, TransactionType } from "@/types/category";
 import { TransactionType as TransactionTypeEnum } from "@/types/category";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -44,18 +44,12 @@ const CATEGORY_COLORS = [
   "#7c3aed", "#9333ea", "#c026d3", "#db2777", "#e11d48"
 ];
 
-const categorySchema = z.object({
-  displayName: z
-    .string()
-    .min(1, "Category name is required")
-    .min(2, "Category name must be at least 2 characters")
-    .max(50, "Category name must not exceed 50 characters"),
-  type: z.string().min(1, "Type is required"),
-  icon: z.string().min(1, "Icon is required"),
-  color: z.string().min(1, "Color is required"),
-});
-
-type CategoryFormData = z.infer<typeof categorySchema>;
+type CategoryFormData = {
+  displayName: string;
+  type: string;
+  icon: string;
+  color: string;
+};
 
 export function AddCategoryDialog({
   open,
@@ -64,6 +58,17 @@ export function AddCategoryDialog({
   category,
 }: AddCategoryDialogProps) {
   const { t } = useTranslation();
+
+  const categorySchema = useMemo(() => z.object({
+    displayName: z
+      .string()
+      .min(1, t("validation.categoryNameRequired"))
+      .min(2, t("validation.categoryNameMin"))
+      .max(50, t("validation.categoryNameMax")),
+    type: z.string().min(1, t("validation.typeRequired")),
+    icon: z.string().min(1, t("validation.iconRequired")),
+    color: z.string().min(1, t("validation.colorRequired")),
+  }), [t]);
   
   const {
     register,
@@ -113,13 +118,7 @@ export function AddCategoryDialog({
           icon: data.icon,
           color: data.color,
         });
-        Swal.fire({
-          icon: "success",
-          title: t('common.success'),
-          text: t('categories.updateSuccessMessage'),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t('categories.updateSuccessMessage'));
       } else {
         // Create new category
         await categoryService.createCategory({
@@ -128,13 +127,7 @@ export function AddCategoryDialog({
           icon: data.icon,
           color: data.color,
         });
-        Swal.fire({
-          icon: "success",
-          title: t('common.success'),
-          text: t('categories.createSuccessMessage'),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t('categories.createSuccessMessage'));
       }
       onSuccess();
       onOpenChange(false);

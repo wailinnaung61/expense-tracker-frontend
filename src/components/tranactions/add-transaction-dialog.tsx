@@ -33,9 +33,8 @@ import type { Transaction } from "@/types/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Upload, X, FileIcon, Loader2 } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -47,23 +46,16 @@ interface AddTransactionDialogProps {
   transaction?: Transaction | null;
 }
 
-const transactionSchema = z.object({
-  type: z.string().min(1, "Type is required"),
-  categoryId: z.string().min(1, "Category is required"),
-  amount: z
-    .string()
-    .min(1, "Amount is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Amount must be greater than 0",
-    }),
-  tranactionDate: z.date(),
-  status: z.string().min(1, "Status is required"),
-  description: z.string().optional(),
-  note: z.string().optional(),
-  imageUrl: z.string().optional(),
-});
-
-type TransactionFormData = z.infer<typeof transactionSchema>;
+type TransactionFormData = {
+  type: string;
+  categoryId: string;
+  amount: string;
+  tranactionDate: Date;
+  status: string;
+  description?: string;
+  note?: string;
+  imageUrl?: string;
+};
 
 export function AddTransactionDialog({
   open,
@@ -78,6 +70,22 @@ export function AddTransactionDialog({
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
+
+  const transactionSchema = useMemo(() => z.object({
+    type: z.string().min(1, t("validation.typeRequired")),
+    categoryId: z.string().min(1, t("validation.categoryRequired")),
+    amount: z
+      .string()
+      .min(1, t("validation.amountRequired"))
+      .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+        message: t("validation.amountPositive"),
+      }),
+    tranactionDate: z.date(),
+    status: z.string().min(1, t("validation.statusRequired")),
+    description: z.string().optional(),
+    note: z.string().optional(),
+    imageUrl: z.string().optional(),
+  }), [t]);
 
   const {
     control,
@@ -271,28 +279,14 @@ export function AddTransactionDialog({
         imageUrl: uploadedImageUrl?.trim() || "",
       };
 
-      console.log('Sending transaction payload:', payload);
-
       if (transaction && transaction.tranactionId) {
         // Update existing transaction (only if it has a valid ID)
         await transactionService.updateTransaction(transaction.tranactionId, payload);
-        Swal.fire({
-          icon: "success",
-          title: t("common.success"),
-          text: t("transactions.addDialog.updateSuccess"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t("transactions.addDialog.updateSuccess"));
       } else {
         // Create new transaction (for new or duplicated transactions)
         await transactionService.createTransaction(payload);
-        Swal.fire({
-          icon: "success",
-          title: t("common.success"),
-          text: t("transactions.addDialog.createSuccess"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t("transactions.addDialog.createSuccess"));
       }
       onSuccess();
       onOpenChange(false);

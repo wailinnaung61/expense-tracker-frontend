@@ -181,11 +181,13 @@ export default function Investments() {
   const handleDialogSuccess = useCallback(() => {
     resetPagination();
     setRefreshKey((prev) => prev + 1);
-  }, []);
+    fetchDashboard();
+  }, [fetchDashboard]);
 
   const handleDeleteSuccess = useCallback(() => {
     setRefreshKey((prev) => prev + 1);
-  }, []);
+    fetchDashboard();
+  }, [fetchDashboard]);
 
   const handlePortfolioRefresh = useCallback(() => {
     fetchPortfolios();

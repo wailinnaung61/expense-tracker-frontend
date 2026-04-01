@@ -31,7 +31,6 @@ import { MfaSetupDialog } from "./mfa-setup-dialog";
 import { authService } from "@/services/authService";
 import { useTranslation } from "@/hooks/useTranslation";
 import { toast } from "react-toastify";
-import Swal from "sweetalert2";
 
 import {
     CheckCircle2,
@@ -86,15 +85,7 @@ export function SecuritySettings() {
         await authService.disableMfa();
         setMfaEnabled(false);
         
-        // Show success with SweetAlert
-        Swal.fire({
-          icon: "success",
-          title: t("settings.security.mfaDisabled"),
-          text: t("settings.security.mfaDisabledMessage"),
-          confirmButtonText: t("common.confirm"),
-          timer: 3000,
-          timerProgressBar: true,
-        });
+        toast.success(t("settings.security.mfaDisabledMessage"));
       } catch (error: any) {
         console.error("Failed to disable MFA:", error);
         toast.error(error.message || t("settings.security.mfaDisableFailed"));

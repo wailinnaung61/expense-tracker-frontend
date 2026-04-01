@@ -21,6 +21,7 @@ import { differenceInDays, format } from "date-fns";
 import { Calendar, Clock, MoreVertical, Plus, Repeat } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { AddRecurringPaymentDialog } from "./add-recurring-payment-dialog";
 import spinnerGif from "@/assets/Spinner.gif";
 import { useAuth } from "@/contexts/AuthContext";
@@ -130,13 +131,8 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
           imageUrl: "",
         });
 
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: t("transactions.upcoming.paySuccess"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        Swal.close();
+        toast.success(t("transactions.upcoming.paySuccess"));
         setLocalRefreshKey((prev) => prev + 1);
         onTransactionCreated?.();
       } catch (error: any) {
@@ -165,13 +161,8 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
     if (result.isConfirmed) {
       try {
         await recurringPaymentService.deleteRecurringPayment(payment.recurringId);
-        Swal.fire({
-          icon: "success",
-          title: t("transactions.upcoming.deleteSuccessTitle"),
-          text: t("transactions.upcoming.deleteSuccessText"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        Swal.close();
+        toast.success(t("transactions.upcoming.deleteSuccessText"));
         setLocalRefreshKey((prev) => prev + 1);
       } catch (error: any) {
         console.error("Failed to delete recurring payment:", error);

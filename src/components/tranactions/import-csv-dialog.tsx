@@ -13,7 +13,6 @@ import type { ExpenseCategory } from "@/types/category";
 import { TransactionType, PaymentStatus } from "@/types/transaction";
 import { Upload, FileText, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
-import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { parse, format } from "date-fns";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -311,13 +310,7 @@ export function ImportCsvDialog({
         })
       );
 
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: t("transactions.importCsv.importSuccess", { count: validRows.length }),
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      toast.success(t("transactions.importCsv.importSuccess", { count: validRows.length }));
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {

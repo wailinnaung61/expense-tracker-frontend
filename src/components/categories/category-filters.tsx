@@ -49,8 +49,6 @@ export function CategoryFilters({
                 <SelectItem value="all">{t("categories.allTypes")}</SelectItem>
                 <SelectItem value={String(TransactionType.Income)}>{t("categories.income")}</SelectItem>
                 <SelectItem value={String(TransactionType.Expense)}>{t("categories.expense")}</SelectItem>
-                <SelectItem value={String(TransactionType.Investment)}>{t("categories.investment")}</SelectItem>
-                <SelectItem value={String(TransactionType.Savings)}>{t("categories.savings")}</SelectItem>
               </SelectContent>
             </Select>
           </div>

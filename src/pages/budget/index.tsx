@@ -162,7 +162,7 @@ export default function Budget() {
       setBudgetMeta(created);
       setDialogOpen(false);
       await loadBudget();
-      await Swal.fire({ icon: "success", title: t("budget.feedback.created"), timer: 2000, showConfirmButton: false });
+      toast.success(t("budget.feedback.created"));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("budget.feedback.createFailed"));
     } finally {
@@ -181,7 +181,7 @@ export default function Budget() {
       setBudgetMeta(updated);
       setDialogOpen(false);
       await loadBudget();
-      await Swal.fire({ icon: "success", title: t("budget.feedback.updated"), timer: 2000, showConfirmButton: false });
+      toast.success(t("budget.feedback.updated"));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("budget.feedback.updateFailed"));
     } finally {
@@ -200,7 +200,7 @@ export default function Budget() {
         alertThreshold: toAlertThresholdRatio(values.alertThresholdPercent),
       });
       await loadBudget();
-      await Swal.fire({ icon: "success", title: t("budget.feedback.categoryUpdated"), timer: 2000, showConfirmButton: false });
+      toast.success(t("budget.feedback.categoryUpdated"));
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : t("budget.feedback.categoryUpdateFailed")
@@ -247,7 +247,7 @@ export default function Budget() {
     try {
       await budgetService.removeBudgetCategory(budgetCategoryId);
       await loadBudget();
-      await Swal.fire({ icon: "success", title: t("budget.feedback.categoryRemoved"), timer: 2000, showConfirmButton: false });
+      toast.success(t("budget.feedback.categoryRemoved"));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("budget.feedback.categoryRemoveFailed"));
     } finally {
@@ -277,7 +277,7 @@ export default function Budget() {
     try {
       await budgetService.resetBudget(budget.budgetId);
       await loadBudget();
-      await Swal.fire({ icon: "success", title: t("budget.feedback.resetSuccess"), timer: 2000, showConfirmButton: false });
+      toast.success(t("budget.feedback.resetSuccess"));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("budget.feedback.resetFailed"));
     } finally {
@@ -309,7 +309,7 @@ export default function Budget() {
       await budgetService.deleteBudget(budget.budgetId);
       setBudget(null);
       setBudgetMeta(null);
-      await Swal.fire({ icon: "success", title: t("budget.feedback.deleteSuccess"), timer: 2000, showConfirmButton: false });
+      toast.success(t("budget.feedback.deleteSuccess"));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("budget.feedback.deleteFailed"));
     } finally {

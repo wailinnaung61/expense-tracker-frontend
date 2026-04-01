@@ -30,10 +30,9 @@ import type { Investment, InvestmentPortfolio } from "@/types/investment";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import Swal from "sweetalert2";
 import { z } from "zod";
 
 interface AddInvestmentDialogProps {
@@ -44,38 +43,18 @@ interface AddInvestmentDialogProps {
   portfolios: InvestmentPortfolio[];
 }
 
-const investmentSchema = z.object({
-  portfolioId: z.string().optional(),
-  assetType: z.string().min(1, "Asset type is required"),
-  assetName: z
-    .string()
-    .min(1, "Asset name is required")
-    .max(200, "Asset name must not exceed 200 characters"),
-  symbol: z.string().optional(),
-  quantity: z
-    .string()
-    .min(1, "Quantity is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Quantity must be greater than 0",
-    }),
-  purchasePrice: z
-    .string()
-    .min(1, "Purchase price is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Purchase price must be greater than 0",
-    }),
-  currentPrice: z
-    .string()
-    .min(1, "Current price is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-      message: "Current price must be 0 or greater",
-    }),
-  purchaseDate: z.date(),
-  status: z.string().optional(),
-  notes: z.string().optional(),
-});
-
-type InvestmentFormData = z.infer<typeof investmentSchema>;
+type InvestmentFormData = {
+  portfolioId?: string;
+  assetType: string;
+  assetName: string;
+  symbol?: string;
+  quantity: string;
+  purchasePrice: string;
+  currentPrice: string;
+  purchaseDate: Date;
+  status?: string;
+  notes?: string;
+};
 
 const ASSET_TYPE_MAP: Record<string, number> = {
   STOCK: AssetType.Stock,
@@ -101,6 +80,37 @@ export function AddInvestmentDialog({
   portfolios,
 }: AddInvestmentDialogProps) {
   const { t } = useTranslation();
+
+  const investmentSchema = useMemo(() => z.object({
+    portfolioId: z.string().optional(),
+    assetType: z.string().min(1, t("validation.assetTypeRequired")),
+    assetName: z
+      .string()
+      .min(1, t("validation.assetNameRequired"))
+      .max(200, t("validation.assetNameMax")),
+    symbol: z.string().optional(),
+    quantity: z
+      .string()
+      .min(1, t("validation.quantityRequired"))
+      .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+        message: t("validation.quantityPositive"),
+      }),
+    purchasePrice: z
+      .string()
+      .min(1, t("validation.purchasePriceRequired"))
+      .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+        message: t("validation.purchasePricePositive"),
+      }),
+    currentPrice: z
+      .string()
+      .min(1, t("validation.currentPriceRequired"))
+      .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+        message: t("validation.currentPriceMin"),
+      }),
+    purchaseDate: z.date(),
+    status: z.string().optional(),
+    notes: z.string().optional(),
+  }), [t]);
   const {
     register,
     handleSubmit,
@@ -169,12 +179,7 @@ export function AddInvestmentDialog({
           notes: data.notes || "",
           imageUrl: investment.imageUrl || "",
         });
-        await Swal.fire({
-          icon: "success",
-          title: t("investments.feedback.updated"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t("investments.feedback.updated"));
       } else {
         await investmentService.createInvestment({
           portfolioId: portfolioValue,
@@ -188,12 +193,7 @@ export function AddInvestmentDialog({
           notes: data.notes || "",
           imageUrl: "",
         });
-        await Swal.fire({
-          icon: "success",
-          title: t("investments.feedback.created"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t("investments.feedback.created"));
       }
       onSuccess();
       onOpenChange(false);

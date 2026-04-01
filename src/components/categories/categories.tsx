@@ -18,6 +18,7 @@ import type { ExpenseCategory, TransactionType } from "@/types/category";
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight, Edit, MoreVertical, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { useTranslation } from "@/hooks/useTranslation";
 
 interface CategoriesTableProps {
@@ -86,13 +87,7 @@ export function CategoriesTable({
     if (result.isConfirmed) {
       try {
         await categoryService.deleteCategory(category.categoryId);
-        Swal.fire({
-          icon: "success",
-          title: t('categories.deleteSuccess'),
-          text: t('categories.deleteSuccessMessage'),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t('categories.deleteSuccessMessage'));
         onDelete();
       } catch (error: any) {
         console.error("Failed to delete category:", error);

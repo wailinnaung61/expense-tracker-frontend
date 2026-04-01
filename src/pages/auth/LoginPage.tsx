@@ -65,7 +65,6 @@ export default function LoginPage() {
       
       // Fetch user data after successful login
       await fetchUser()
-      toast.success(t('auth.loginPage.loginSuccessful'))
       setTimeout(() => {
         navigate('/', { replace: true })
       }, 500)
@@ -95,7 +94,6 @@ export default function LoginPage() {
         return
       }    
       // No MFA - login successful
-      toast.success(t('auth.loginPage.loginSuccessful'))
       setTimeout(() => {
         navigate('/dashboard')
       }, 500)

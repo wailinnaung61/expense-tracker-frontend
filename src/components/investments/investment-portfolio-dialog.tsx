@@ -13,7 +13,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { investmentService } from "@/services/investmentService";
 import type { InvestmentPortfolio } from "@/types/investment";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Edit, Loader2, PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
@@ -27,15 +27,10 @@ interface InvestmentPortfolioDialogProps {
   onRefresh: () => void;
 }
 
-const portfolioSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .max(200, "Name must not exceed 200 characters"),
-  description: z.string().optional(),
-});
-
-type PortfolioFormData = z.infer<typeof portfolioSchema>;
+type PortfolioFormData = {
+  name: string;
+  description?: string;
+};
 
 export function InvestmentPortfolioDialog({
   open,
@@ -46,6 +41,14 @@ export function InvestmentPortfolioDialog({
   const { t } = useTranslation();
   const [editingPortfolio, setEditingPortfolio] = useState<InvestmentPortfolio | null>(null);
   const [showForm, setShowForm] = useState(false);
+
+  const portfolioSchema = useMemo(() => z.object({
+    name: z
+      .string()
+      .min(1, t("validation.nameRequired"))
+      .max(200, t("validation.nameMax", { max: 200 })),
+    description: z.string().optional(),
+  }), [t]);
 
   const {
     register,

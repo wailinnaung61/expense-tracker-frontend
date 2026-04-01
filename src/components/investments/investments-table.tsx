@@ -93,12 +93,7 @@ export function InvestmentsTable({
     if (result.isConfirmed) {
       try {
         await investmentService.deleteInvestment(investmentId);
-        await Swal.fire({
-          icon: "success",
-          title: t("investments.feedback.deleted"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t("investments.feedback.deleted"));
         onDelete();
       } catch (error: unknown) {
         toast.error(error instanceof Error ? error.message : t("investments.feedback.deleteFailed"));

@@ -39,9 +39,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
-import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -53,21 +52,14 @@ interface AddRecurringPaymentDialogProps {
   recurringPayment?: RecurringPayment | null;
 }
 
-const recurringPaymentSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  amount: z
-    .string()
-    .min(1, "Amount is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Amount must be greater than 0",
-    }),
-  categoryId: z.string().min(1, "Category is required"),
-  frequency: z.string().min(1, "Frequency is required"),
-  nextDueDate: z.date(),
-  autoPay: z.boolean(),
-});
-
-type RecurringPaymentFormData = z.infer<typeof recurringPaymentSchema>;
+type RecurringPaymentFormData = {
+  name: string;
+  amount: string;
+  categoryId: string;
+  frequency: string;
+  nextDueDate: Date;
+  autoPay: boolean;
+};
 
 export function AddRecurringPaymentDialog({
   open,
@@ -78,6 +70,20 @@ export function AddRecurringPaymentDialog({
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
+
+  const recurringPaymentSchema = useMemo(() => z.object({
+    name: z.string().min(1, t("validation.nameRequired")),
+    amount: z
+      .string()
+      .min(1, t("validation.amountRequired"))
+      .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+        message: t("validation.amountPositive"),
+      }),
+    categoryId: z.string().min(1, t("validation.categoryRequired")),
+    frequency: z.string().min(1, t("validation.frequencyRequired")),
+    nextDueDate: z.date(),
+    autoPay: z.boolean(),
+  }), [t]);
 
   const {
     register,
@@ -172,13 +178,7 @@ export function AddRecurringPaymentDialog({
           recurringPayment.recurringId,
           updatePayload
         );
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: t("transactions.recurringDialog.updateSuccess"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t("transactions.recurringDialog.updateSuccess"));
       } else {
         const createPayload: CreateRecurringPaymentRequest = {
           name: data.name,
@@ -190,13 +190,7 @@ export function AddRecurringPaymentDialog({
         };
         
         await recurringPaymentService.createRecurringPayment(createPayload);
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: t("transactions.recurringDialog.createSuccess"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t("transactions.recurringDialog.createSuccess"));
       }
 
       onSuccess();

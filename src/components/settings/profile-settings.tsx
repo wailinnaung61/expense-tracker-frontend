@@ -32,7 +32,6 @@ import { z } from "zod";
 import { profileService } from "@/services/profileService";
 import { authService } from "@/services/authService";
 import { useAuth } from "@/contexts/AuthContext";
-import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import type { ProfileResponse, UpdateProfileFormData } from "@/types/profile";
 import { updateProfileSchema, SUPPORTED_CURRENCIES } from "@/types/profile";
@@ -159,13 +158,7 @@ export function ProfileSettings() {
 
       // Show success message only if no email change (email change shows its own message)
       if ((authChanged || profileChanged) && !emailChangedFlag) {
-        Swal.fire({
-          icon: "success",
-          title: t('common.success'),
-          text: t('settings.profile.updateSuccess'),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t('settings.profile.updateSuccess'));
       }
       
       reset(data);
@@ -200,13 +193,7 @@ export function ProfileSettings() {
       setVerificationCode("");
       setPendingEmailVerification(false);
       
-      Swal.fire({
-        icon: "success",
-        title: t('common.success'),
-        text: t('settings.profile.emailVerified'),
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      toast.success(t('settings.profile.emailVerified'));
       
       // Refresh profile data
       const data = await profileService.getProfile();

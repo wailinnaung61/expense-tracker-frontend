@@ -19,6 +19,7 @@ import type { ExpenseCategory } from "@/types/category";
 import { TransactionType, PaymentStatus } from "@/types/transaction";
 import { format } from "date-fns";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { transactionService } from "@/services/tranactionService";
 import { formatCurrency } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -108,13 +109,7 @@ export default function TransactionsTable({
     if (result.isConfirmed) {
       try {
         await transactionService.deleteTransaction(transactionId);
-        Swal.fire({
-          icon: "success",
-          title: t("transactions.table.deleteSuccess"),
-          text: t("transactions.table.deleteSuccessText"),
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        toast.success(t("transactions.table.deleteSuccessText"));
         onDelete();
       } catch (error: any) {
         console.error("Failed to delete transaction:", error);
@@ -134,13 +129,7 @@ export default function TransactionsTable({
         note: transaction.note,
         imageUrl: transaction.imageUrl,
       });
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: t("transactions.table.statusUpdateSuccess"),
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      toast.success(t("transactions.table.statusUpdateSuccess"));
       onDelete(); // Refresh the list
     } catch (error: any) {
       console.error("Failed to update status:", error);

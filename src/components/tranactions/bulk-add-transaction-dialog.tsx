@@ -26,8 +26,7 @@ import type { ExpenseCategory } from "@/types/category";
 import { TransactionType, PaymentStatus } from "@/types/transaction";
 import { format } from "date-fns";
 import { CalendarIcon, Plus, Trash2, Copy, CopyPlus } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
-import Swal from "sweetalert2";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -54,15 +53,6 @@ interface RowErrors {
   amount?: string;
 }
 
-const transactionRowSchema = z.object({
-  categoryId: z.string().min(1, "Category is required"),
-  amount: z.string()
-    .min(1, "Amount is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Enter amount > 0",
-    }),
-});
-
 export function BulkAddTransactionDialog({
   open,
   onOpenChange,
@@ -85,6 +75,15 @@ export function BulkAddTransactionDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const amountInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const { t } = useTranslation();
+
+  const transactionRowSchema = useMemo(() => z.object({
+    categoryId: z.string().min(1, t("validation.categoryRequired")),
+    amount: z.string()
+      .min(1, t("validation.amountRequired"))
+      .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+        message: t("validation.amountPositive"),
+      }),
+  }), [t]);
 
   // Fetch categories
   useEffect(() => {
@@ -286,13 +285,7 @@ export function BulkAddTransactionDialog({
         )
       );
 
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: t("transactions.bulkAdd.createSuccess", { count: rows.length }),
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      toast.success(t("transactions.bulkAdd.createSuccess", { count: rows.length }));
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
