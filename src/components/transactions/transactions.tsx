@@ -20,7 +20,7 @@ import { TransactionType, PaymentStatus } from "@/types/transaction";
 import { format } from "date-fns";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
-import { transactionService } from "@/services/tranactionService";
+import { transactionService } from "@/services/transactionService";
 import { formatCurrency } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
 

@@ -1,4 +1,4 @@
-import TransactionStats from "./tranaction-stats";
+import TransactionStats from "./transaction-stats";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ClientTransactionStatsProps {

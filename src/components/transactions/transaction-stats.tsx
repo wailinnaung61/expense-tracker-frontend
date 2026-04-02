@@ -83,10 +83,15 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
     fetchExpenseBreakdown(currentMonth);
   }, [currentMonth, fetchExpenseBreakdown]);
 
-  // Immediate refresh when transaction changes (materialized view is ready immediately)
+  // Refresh when transaction changes - retry with delay for backend aggregation consistency
   useEffect(() => {
     if (refreshKey === 0) return; // Skip on initial mount
     fetchExpenseBreakdown(currentMonth);
+    // Retry after a short delay to catch backend aggregation updates
+    const timer = setTimeout(() => {
+      fetchExpenseBreakdown(currentMonth);
+    }, 2000);
+    return () => clearTimeout(timer);
   }, [refreshKey, currentMonth, fetchExpenseBreakdown]);
 
   const handlePreviousMonth = useCallback(() => {

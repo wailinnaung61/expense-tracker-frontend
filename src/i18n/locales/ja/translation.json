@@ -156,6 +156,7 @@
     "investment": "投資",
     "savings": "貯金",
     "icon": "アイコン",
+    "iconPlaceholder": "絵文字を入力 例: 🏠",
     "color": "色",
     "active": "有効",
     "inactive": "無効",
@@ -871,6 +872,105 @@
       "portfolioDeleteFailed": "ポートフォリオの削除に失敗しました。",
       "confirmDeletePortfolioTitle": "ポートフォリオを削除しますか？",
       "confirmDeletePortfolioText": "\"{{name}}\"を削除しますか？投資は削除されません。"
+    }
+  },
+  "savings": {
+    "header": {
+      "title": "貯蓄目標",
+      "subtitle": "貯蓄目標を追跡・管理する",
+      "refresh": "更新",
+      "addGoal": "目標追加"
+    },
+    "dashboard": {
+      "title": "貯蓄ダッシュボード",
+      "subtitle": "貯蓄の進捗状況の概要",
+      "totalSaved": "合計貯蓄額",
+      "totalTarget": "合計目標額",
+      "overallProgress": "全体の進捗",
+      "goalCounts": "アクティブ / 完了",
+      "goalOverview": "トップ目標"
+    },
+    "filters": {
+      "searchPlaceholder": "貯蓄目標を検索...",
+      "allStatus": "すべてのステータス",
+      "active": "アクティブ",
+      "completed": "完了",
+      "cancelled": "キャンセル"
+    },
+    "goals": {
+      "noData": "貯蓄目標がありません。最初の目標を作成しましょう！",
+      "contribute": "入金",
+      "edit": "編集",
+      "delete": "削除",
+      "reached": "達成",
+      "remaining": "残り",
+      "targetDate": "目標日",
+      "pagination": "ページ {{current}} · 合計 {{count}} 件"
+    },
+    "dialog": {
+      "addTitle": "貯蓄目標を作成",
+      "addDescription": "新しい貯蓄目標を設定しましょう。",
+      "editTitle": "貯蓄目標を編集",
+      "editDescription": "貯蓄目標の詳細を更新します。",
+      "goalName": "目標名",
+      "goalNamePlaceholder": "例：緊急資金、旅行",
+      "description": "説明",
+      "descriptionPlaceholder": "この目標の簡単な説明",
+      "targetAmount": "目標金額",
+      "targetDate": "目標日",
+      "pickDate": "日付を選択",
+      "status": "ステータス",
+      "selectStatus": "ステータスを選択",
+      "icon": "アイコン",
+      "iconPlaceholder": "絵文字 例：🏠",
+      "color": "色",
+      "notes": "メモ",
+      "notesPlaceholder": "追加メモ...",
+      "cancel": "キャンセル",
+      "create": "目標を作成",
+      "update": "目標を更新",
+      "saving": "保存中...",
+      "preview": "プレビュー"
+    },
+    "contribution": {
+      "title": "入出金",
+      "type": "種類",
+      "deposit": "入金",
+      "withdrawal": "出金",
+      "amount": "金額",
+      "date": "日付",
+      "notes": "メモ",
+      "notesPlaceholder": "メモ（任意）...",
+      "add": "入金を追加",
+      "history": "入出金履歴",
+      "noHistory": "入出金履歴はまだありません。",
+      "loadMore": "もっと見る"
+    },
+    "validation": {
+      "goalNameRequired": "目標名は必須です。",
+      "goalNameMax": "目標名は200文字以内にしてください。",
+      "targetAmountRequired": "目標金額は必須です。",
+      "targetAmountPositive": "目標金額は0より大きくしてください。",
+      "amountRequired": "金額は必須です。",
+      "amountPositive": "金額は0より大きくしてください。"
+    },
+    "feedback": {
+      "loadFailed": "貯蓄データの読み込みに失敗しました。",
+      "created": "貯蓄目標を作成しました！",
+      "createFailed": "貯蓄目標の作成に失敗しました。",
+      "updated": "貯蓄目標を更新しました！",
+      "updateFailed": "貯蓄目標の更新に失敗しました。",
+      "deleted": "貯蓄目標を削除しました。",
+      "deleteFailed": "貯蓄目標の削除に失敗しました。",
+      "confirmDeleteTitle": "貯蓄目標を削除しますか？",
+      "confirmDeleteText": "この操作は取り消せません。",
+      "confirmButton": "削除",
+      "cancelButton": "キャンセル",
+      "contributionAdded": "入金を追加しました！",
+      "contributionFailed": "入金の追加に失敗しました。",
+      "contributionDeleted": "入出金を削除しました。",
+      "contributionDeleteFailed": "入出金の削除に失敗しました。",
+      "confirmDeleteContributionTitle": "入出金を削除しますか？"
     }
   }
 }

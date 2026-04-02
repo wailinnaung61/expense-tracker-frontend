@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { categoryService } from "@/services/categoryService";
-import { transactionService } from "@/services/tranactionService";
+import { transactionService } from "@/services/transactionService";
 import type { ExpenseCategory } from "@/types/category";
 import { TransactionType, PaymentStatus } from "@/types/transaction";
 import { format } from "date-fns";

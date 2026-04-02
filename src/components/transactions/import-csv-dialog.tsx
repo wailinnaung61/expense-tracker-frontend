@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { transactionService } from "@/services/tranactionService";
+import { transactionService } from "@/services/transactionService";
 import { categoryService } from "@/services/categoryService";
 import type { ExpenseCategory } from "@/types/category";
 import { TransactionType, PaymentStatus } from "@/types/transaction";

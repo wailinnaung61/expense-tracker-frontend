@@ -156,6 +156,7 @@
     "investment": "ရင်းနှီးမြှုပ်နှံမှု",
     "savings": "စုဆောင်းငွေ",
     "icon": "အိုင်ကွန်",
+    "iconPlaceholder": "အီမိုဂျီ ရိုက်ပါ ဥပမာ 🏠",
     "color": "အရောင်",
     "active": "လက်ရှိသုံးနေသည်",
     "inactive": "မသုံးတော့ပါ",
@@ -870,6 +871,105 @@
       "portfolioDeleteFailed": "ပေါ့ဖိုလီယို ဖျက်၍မရပါ။",
       "confirmDeletePortfolioTitle": "ပေါ့ဖိုလီယို ဖျက်မလား?",
       "confirmDeletePortfolioText": "\"{{name}}\" ကို ဖျက်မလား? ရင်းနှီးမြှုပ်နှံမှုများ ဖျက်မည်မဟုတ်ပါ။"
+    }
+  },
+  "savings": {
+    "header": {
+      "title": "စုဆောင်းငွေ ပန်းတိုင်များ",
+      "subtitle": "သင့်စုဆောင်းငွေ ပန်းတိုင်များကို ခြေရာခံပြီး စီမံပါ",
+      "refresh": "ပြန်လည်ရယူ",
+      "addGoal": "ပန်းတိုင်ထည့်"
+    },
+    "dashboard": {
+      "title": "စုဆောင်းငွေ ဒက်ရှ်ဘုတ်",
+      "subtitle": "သင့်စုဆောင်းငွေ တိုးတက်မှု အနှစ်ချုပ်",
+      "totalSaved": "စုဆောင်းပြီး စုစုပေါင်း",
+      "totalTarget": "ပစ်မှတ် စုစုပေါင်း",
+      "overallProgress": "အလုံးစုံ တိုးတက်မှု",
+      "goalCounts": "လက်ရှိ / ပြီးစီး",
+      "goalOverview": "ထိပ်တန်း ပန်းတိုင်များ"
+    },
+    "filters": {
+      "searchPlaceholder": "စုဆောင်းငွေ ပန်းတိုင် ရှာပါ...",
+      "allStatus": "အခြေအနေ အားလုံး",
+      "active": "လက်ရှိ",
+      "completed": "ပြီးစီး",
+      "cancelled": "ပယ်ဖျက်"
+    },
+    "goals": {
+      "noData": "စုဆောင်းငွေ ပန်းတိုင် မရှိပါ။ ပထမဆုံး ပန်းတိုင်ကို ဖန်တီးပါ!",
+      "contribute": "ထည့်ငွေ",
+      "edit": "တည်းဖြတ်",
+      "delete": "ဖျက်",
+      "reached": "ရောက်ရှိပြီး",
+      "remaining": "ကျန်ရှိ",
+      "targetDate": "ပစ်မှတ်ရက်",
+      "pagination": "စာမျက်နှာ {{current}} · စုစုပေါင်း {{count}} ခု"
+    },
+    "dialog": {
+      "addTitle": "စုဆောင်းငွေ ပန်းတိုင် ဖန်တီး",
+      "addDescription": "စုဆောင်းရမည့် ပန်းတိုင်အသစ် သတ်မှတ်ပါ။",
+      "editTitle": "စုဆောင်းငွေ ပန်းတိုင် တည်းဖြတ်",
+      "editDescription": "စုဆောင်းငွေ ပန်းတိုင် အသေးစိတ်ကို ပြင်ဆင်ပါ။",
+      "goalName": "ပန်းတိုင်အမည်",
+      "goalNamePlaceholder": "ဥပမာ - အရေးပေါ်ရန်ပုံငွေ၊ ခရီးသွား",
+      "description": "ဖော်ပြချက်",
+      "descriptionPlaceholder": "ဤပန်းတိုင်၏ အကျဉ်းချုပ်",
+      "targetAmount": "ပစ်မှတ်ပမာဏ",
+      "targetDate": "ပစ်မှတ်ရက်",
+      "pickDate": "ရက်စွဲ ရွေးပါ",
+      "status": "အခြေအနေ",
+      "selectStatus": "အခြေအနေ ရွေးပါ",
+      "icon": "အိုင်ကွန်",
+      "iconPlaceholder": "အီမိုဂျီ ဥပမာ 🏠",
+      "color": "အရောင်",
+      "notes": "မှတ်စု",
+      "notesPlaceholder": "ထပ်ဆောင်း မှတ်စု...",
+      "cancel": "ပယ်ဖျက်",
+      "create": "ပန်းတိုင် ဖန်တီး",
+      "update": "ပန်းတိုင် ပြင်ဆင်",
+      "saving": "သိမ်းဆည်းနေသည်...",
+      "preview": "အကြိုကြည့်ရှုမှု"
+    },
+    "contribution": {
+      "title": "ထည့်ငွေ/ထုတ်ငွေ",
+      "type": "အမျိုးအစား",
+      "deposit": "ထည့်ငွေ",
+      "withdrawal": "ထုတ်ငွေ",
+      "amount": "ပမာဏ",
+      "date": "ရက်စွဲ",
+      "notes": "မှတ်စု",
+      "notesPlaceholder": "မှတ်စု (ရွေးချယ်ခွင့်)...",
+      "add": "ထည့်ငွေ ထည့်ပါ",
+      "history": "ထည့်ငွေ/ထုတ်ငွေ မှတ်တမ်း",
+      "noHistory": "ထည့်ငွေ/ထုတ်ငွေ မှတ်တမ်း မရှိသေးပါ။",
+      "loadMore": "ထပ်မံနှိပ်မည်"
+    },
+    "validation": {
+      "goalNameRequired": "ပန်းတိုင်အမည် လိုအပ်ပါသည်။",
+      "goalNameMax": "ပန်းတိုင်အမည် စာလုံး ၂၀၀ အတွင်း ဖြစ်ရပါမည်။",
+      "targetAmountRequired": "ပစ်မှတ်ပမာဏ လိုအပ်ပါသည်။",
+      "targetAmountPositive": "ပစ်မှတ်ပမာဏ ၀ ထက် ကြီးရပါမည်။",
+      "amountRequired": "ပမာဏ လိုအပ်ပါသည်။",
+      "amountPositive": "ပမာဏ ၀ ထက် ကြီးရပါမည်။"
+    },
+    "feedback": {
+      "loadFailed": "စုဆောင်းငွေ အချက်အလက် ရယူ၍မရပါ။",
+      "created": "စုဆောင်းငွေ ပန်းတိုင် ဖန်တီးပြီးပါပြီ!",
+      "createFailed": "စုဆောင်းငွေ ပန်းတိုင် ဖန်တီး၍မရပါ။",
+      "updated": "စုဆောင်းငွေ ပန်းတိုင် ပြင်ဆင်ပြီးပါပြီ!",
+      "updateFailed": "စုဆောင်းငွေ ပန်းတိုင် ပြင်ဆင်၍မရပါ။",
+      "deleted": "စုဆောင်းငွေ ပန်းတိုင် ဖျက်ပြီးပါပြီ။",
+      "deleteFailed": "စုဆောင်းငွေ ပန်းတိုင် ဖျက်၍မရပါ။",
+      "confirmDeleteTitle": "စုဆောင်းငွေ ပန်းတိုင် ဖျက်မလား?",
+      "confirmDeleteText": "ဤလုပ်ဆောင်ချက် ပြန်ဖျက်၍မရပါ။",
+      "confirmButton": "ဖျက်",
+      "cancelButton": "ပယ်ဖျက်",
+      "contributionAdded": "ထည့်ငွေ ထည့်ပြီးပါပြီ!",
+      "contributionFailed": "ထည့်ငွေ ထည့်၍မရပါ။",
+      "contributionDeleted": "ထည့်ငွေ/ထုတ်ငွေ ဖျက်ပြီးပါပြီ။",
+      "contributionDeleteFailed": "ထည့်ငွေ/ထုတ်ငွေ ဖျက်၍မရပါ။",
+      "confirmDeleteContributionTitle": "ထည့်ငွေ/ထုတ်ငွေ ဖျက်မလား?"
     }
   }
 }

@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { recurringPaymentService } from "@/services/recurringPaymentService";
-import { transactionService } from "@/services/tranactionService";
+import { transactionService } from "@/services/transactionService";
 import type { RecurringPayment } from "@/types/recurringPayment";
 import { PaymentStatus, TransactionType } from "@/types/transaction";
 import { differenceInDays, format } from "date-fns";

@@ -2,14 +2,14 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, ListPlus, FileUp, RefreshCcw } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
-interface TranactionsHeaderProps {
+interface TransactionsHeaderProps {
   onRefresh: () => void;
   onAddClick: () => void;
   onBulkAddClick: () => void;
   onImportCsvClick: () => void;
 }
 
-export function ExpensesHeader({ onRefresh, onAddClick, onBulkAddClick, onImportCsvClick }: TranactionsHeaderProps) {
+export function ExpensesHeader({ onRefresh, onAddClick, onBulkAddClick, onImportCsvClick }: TransactionsHeaderProps) {
   const { t } = useTranslation();
   return (
     <div className="flex justify-between items-start md:items-center gap-3">

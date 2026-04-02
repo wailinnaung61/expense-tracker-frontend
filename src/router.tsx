@@ -16,7 +16,7 @@ import ConfirmSignUpPage from "./pages/auth/ConfirmSignUpPage"
 
 // Dashboard Pages
 import Home from "@/pages/home"
-import Tranactions from "@/pages/tranactions"
+import Transactions from "@/pages/transactions"
 import Budget from "@/pages/budget"
 import Savings from "@/pages/savings"
 import Accounts from "@/pages/accounts"
@@ -55,7 +55,7 @@ export default function Router() {
             <Route path="/dashboard" element={<Home />} />
             <Route path="/expenseCategory" element={<Categories />} />
             <Route path="/budget" element={<Budget />} />
-            <Route path="/tranaction" element={<Tranactions />} />
+            <Route path="/tranaction" element={<Transactions />} />
             <Route path="/saving" element={<Savings />} />
             <Route path="/investment" element={<Investments />} />
             <Route path="/report" element={<Reports />} />

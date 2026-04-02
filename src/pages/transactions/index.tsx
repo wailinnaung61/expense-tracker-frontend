@@ -1,8 +1,8 @@
-import { UpcomingPayments } from "@/components/tranactions/upcoming-payments";
-import { ExpensesHeader } from "@/components/tranactions/tranactions-header";
-import { TransactionFilters } from "@/components/tranactions/tranaction-filters";
-import TransactionsTable from "@/components/tranactions/tranactions";
-import ClientTransactionStats from "@/components/tranactions/client-transaction-stats";
+import { UpcomingPayments } from "@/components/transactions/upcoming-payments";
+import { ExpensesHeader } from "@/components/transactions/transactions-header";
+import { TransactionFilters } from "@/components/transactions/transaction-filters";
+import TransactionsTable from "@/components/transactions/transactions";
+import ClientTransactionStats from "@/components/transactions/client-transaction-stats";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { Transaction, TransactionListParams } from "@/types/transaction";
@@ -10,12 +10,12 @@ import type { ExpenseCategory } from "@/types/category";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import spinnerGif from "@/assets/Spinner.gif";
-import { transactionService } from "@/services/tranactionService";
+import { transactionService } from "@/services/transactionService";
 import { categoryService } from "@/services/categoryService";
 import { budgetService } from "@/services/budgetService";
-import { AddTransactionDialog } from "@/components/tranactions/add-transaction-dialog";
-import { BulkAddTransactionDialog } from "@/components/tranactions/bulk-add-transaction-dialog";
-import { ImportCsvDialog } from "@/components/tranactions/import-csv-dialog";
+import { AddTransactionDialog } from "@/components/transactions/add-transaction-dialog";
+import { BulkAddTransactionDialog } from "@/components/transactions/bulk-add-transaction-dialog";
+import { ImportCsvDialog } from "@/components/transactions/import-csv-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { CHATBOT_REFRESH_EVENT, type ChatbotRefreshEventDetail } from "@/lib/chatbot-refresh";
@@ -31,7 +31,7 @@ type BudgetInsight = {
   usagePercent: number;
 };
 
-export default function Tranactions() {
+export default function Transactions() {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);

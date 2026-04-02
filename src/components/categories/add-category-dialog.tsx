@@ -198,21 +198,30 @@ export function AddCategoryDialog({
               name="icon"
               control={control}
               render={({ field }) => (
-                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-1.5 sm:gap-2">
-                  {CATEGORY_ICONS.map((iconOption) => (
-                    <button
-                      key={iconOption}
-                      type="button"
-                      onClick={() => field.onChange(iconOption)}
-                      className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-lg sm:text-xl rounded-lg border-2 hover:border-primary hover:bg-accent transition-all ${
-                        selectedIcon === iconOption
-                          ? "border-primary bg-primary/10 scale-105"
-                          : "border-border"
-                      }`}
-                    >
-                      {iconOption}
-                    </button>
-                  ))}
+                <div className="space-y-2">
+                  <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-1.5 sm:gap-2">
+                    {CATEGORY_ICONS.map((iconOption) => (
+                      <button
+                        key={iconOption}
+                        type="button"
+                        onClick={() => field.onChange(iconOption)}
+                        className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-lg sm:text-xl rounded-lg border-2 hover:border-primary hover:bg-accent transition-all ${
+                          selectedIcon === iconOption
+                            ? "border-primary bg-primary/10 scale-105"
+                            : "border-border"
+                        }`}
+                      >
+                        {iconOption}
+                      </button>
+                    ))}
+                  </div>
+                  <Input
+                    placeholder={t('categories.iconPlaceholder')}
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    maxLength={2}
+                    className="w-full"
+                  />
                 </div>
               )}
             />

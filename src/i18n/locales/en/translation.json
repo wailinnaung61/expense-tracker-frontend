@@ -156,6 +156,7 @@
     "investment": "Investment",
     "savings": "Savings",
     "icon": "Icon",
+    "iconPlaceholder": "Type custom emoji e.g. 🏠",
     "color": "Color",
     "active": "Active",
     "inactive": "Inactive",
@@ -868,6 +869,105 @@
       "portfolioDeleteFailed": "Failed to delete portfolio.",
       "confirmDeletePortfolioTitle": "Delete Portfolio?",
       "confirmDeletePortfolioText": "Delete \"{{name}}\"? Investments won't be deleted."
+    }
+  },
+  "savings": {
+    "header": {
+      "title": "Savings Goals",
+      "subtitle": "Track and manage your savings goals",
+      "refresh": "Refresh",
+      "addGoal": "Add Goal"
+    },
+    "dashboard": {
+      "title": "Savings Dashboard",
+      "subtitle": "Overview of your savings progress",
+      "totalSaved": "Total Saved",
+      "totalTarget": "Total Target",
+      "overallProgress": "Overall Progress",
+      "goalCounts": "Active / Completed",
+      "goalOverview": "Top Goals"
+    },
+    "filters": {
+      "searchPlaceholder": "Search savings goals...",
+      "allStatus": "All Status",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "goals": {
+      "noData": "No savings goals found. Create your first goal!",
+      "contribute": "Contribute",
+      "edit": "Edit",
+      "delete": "Delete",
+      "reached": "reached",
+      "remaining": "remaining",
+      "targetDate": "Target",
+      "pagination": "Page {{current}} · {{count}} total goals"
+    },
+    "dialog": {
+      "addTitle": "Create Saving Goal",
+      "addDescription": "Set a new savings target to work towards.",
+      "editTitle": "Edit Saving Goal",
+      "editDescription": "Update your savings goal details.",
+      "goalName": "Goal Name",
+      "goalNamePlaceholder": "e.g. Emergency Fund, Vacation",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description of this goal",
+      "targetAmount": "Target Amount",
+      "targetDate": "Target Date",
+      "pickDate": "Pick a date",
+      "status": "Status",
+      "selectStatus": "Select status",
+      "icon": "Icon",
+      "iconPlaceholder": "Emoji e.g. 🏠",
+      "color": "Color",
+      "notes": "Notes",
+      "notesPlaceholder": "Additional notes...",
+      "cancel": "Cancel",
+      "create": "Create Goal",
+      "update": "Update Goal",
+      "saving": "Saving...",
+      "preview": "Preview"
+    },
+    "contribution": {
+      "title": "Contributions",
+      "type": "Type",
+      "deposit": "Deposit",
+      "withdrawal": "Withdrawal",
+      "amount": "Amount",
+      "date": "Date",
+      "notes": "Notes",
+      "notesPlaceholder": "Optional note...",
+      "add": "Add Contribution",
+      "history": "Contribution History",
+      "noHistory": "No contributions yet.",
+      "loadMore": "Load more"
+    },
+    "validation": {
+      "goalNameRequired": "Goal name is required.",
+      "goalNameMax": "Goal name must be 200 characters or less.",
+      "targetAmountRequired": "Target amount is required.",
+      "targetAmountPositive": "Target amount must be greater than 0.",
+      "amountRequired": "Amount is required.",
+      "amountPositive": "Amount must be greater than 0."
+    },
+    "feedback": {
+      "loadFailed": "Failed to load savings data.",
+      "created": "Saving goal created!",
+      "createFailed": "Failed to create saving goal.",
+      "updated": "Saving goal updated!",
+      "updateFailed": "Failed to update saving goal.",
+      "deleted": "Saving goal deleted.",
+      "deleteFailed": "Failed to delete saving goal.",
+      "confirmDeleteTitle": "Delete Saving Goal?",
+      "confirmDeleteText": "This action cannot be undone.",
+      "confirmButton": "Delete",
+      "cancelButton": "Cancel",
+      "contributionAdded": "Contribution added!",
+      "contributionFailed": "Failed to add contribution.",
+      "contributionDeleted": "Contribution deleted.",
+      "contributionDeleteFailed": "Failed to delete contribution.",
+      "confirmDeleteContributionTitle": "Delete Contribution?"
     }
   }
 }
