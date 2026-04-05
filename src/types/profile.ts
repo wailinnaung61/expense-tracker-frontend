@@ -16,6 +16,7 @@ export interface ProfileResponse {
   email: string
   phoneNumber: string | null
   currency: string
+  locale: string
   dailyLimit: number
   roleId: string
   status: string
@@ -30,6 +31,7 @@ export interface ProfileResponse {
 export interface UpdateProfileRequest {
   phoneNumber?: string | null
   currency?: string
+  locale?: string
   dailyLimit?: number
   notificationPreferences?: NotificationPreferences
 }
@@ -47,10 +49,20 @@ export const SUPPORTED_CURRENCIES = [
 
 export type CurrencyCode = typeof SUPPORTED_CURRENCIES[number]['code']
 
+// Supported locales for notifications
+export const SUPPORTED_LOCALES = [
+  { code: 'en', name: 'English' },
+  { code: 'ja', name: '日本語 (Japanese)' },
+  { code: 'my', name: 'မြန်မာ (Myanmar)' },
+] as const
+
+export type LocaleCode = typeof SUPPORTED_LOCALES[number]['code']
+
 // Validation schema for profile update form
 export const updateProfileSchema = z.object({
   phoneNumber: z.string().optional().nullable(),
   currency: z.enum(['JPY', 'USD', 'EUR', 'GBP', 'SGD', 'THB', 'MMK']),
+  locale: z.enum(['en', 'ja', 'my']),
   dailyLimit: z.number().min(0, 'Daily limit cannot be negative'),
 })
 

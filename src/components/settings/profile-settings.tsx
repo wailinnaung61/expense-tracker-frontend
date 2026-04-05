@@ -34,8 +34,9 @@ import { authService } from "@/services/authService";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "react-toastify";
 import type { ProfileResponse, UpdateProfileFormData } from "@/types/profile";
-import { updateProfileSchema, SUPPORTED_CURRENCIES } from "@/types/profile";
+import { updateProfileSchema, SUPPORTED_CURRENCIES, SUPPORTED_LOCALES } from "@/types/profile";
 import { useTranslation } from "@/hooks/useTranslation";
+import i18n from "@/i18n/config";
 
 // Auth profile validation schema (userName as displayName, email)
 const authProfileSchema = z.object({
@@ -73,11 +74,13 @@ export function ProfileSettings() {
       userName: "",
       email: "",
       currency: "USD",
+      locale: "en",
       dailyLimit: 0,
     },
   });
 
   const selectedCurrency = watch("currency");
+  const selectedLocale = watch("locale");
 
   // Fetch profile data on mount
   useEffect(() => {
@@ -86,12 +89,16 @@ export function ProfileSettings() {
         const data = await profileService.getProfile();
         setProfile(data);
         
+        // DO NOT sync locale with i18n - locale is ONLY for notification language
+        // UI language is controlled separately by the language switcher
+        
         // Reset all form values
         reset({
           userName: data.userName,
           email: data.email,
           phoneNumber: data.phoneNumber || "",
           currency: data.currency as any,
+          locale: data.locale as any,
           dailyLimit: data.dailyLimit,
         });
       } catch (error: any) {
@@ -111,10 +118,11 @@ export function ProfileSettings() {
       // Check if auth fields changed (userName, email)
       const authChanged = data.userName !== profile?.userName || data.email !== profile?.email;
       
-      // Check if profile fields changed (phoneNumber, currency, dailyLimit)
+      // Check if profile fields changed (phoneNumber, currency, locale, dailyLimit)
       const profileChanged = 
         data.phoneNumber !== profile?.phoneNumber ||
         data.currency !== profile?.currency ||
+        data.locale !== profile?.locale ||
         data.dailyLimit !== profile?.dailyLimit;
 
       let emailChangedFlag = false;
@@ -148,9 +156,13 @@ export function ProfileSettings() {
         const updatedProfile = await profileService.updateProfile({
           phoneNumber: data.phoneNumber || null,
           currency: data.currency,
+          locale: data.locale,
           dailyLimit: data.dailyLimit,
         });
         setProfile(updatedProfile);
+        
+        // DO NOT sync locale with i18n - locale is ONLY for notification language
+        // UI language is controlled separately by the language switcher
         
         // Refresh user context to update currency across the app
         await fetchUser();
@@ -203,6 +215,7 @@ export function ProfileSettings() {
         email: data.email,
         phoneNumber: data.phoneNumber || "",
         currency: data.currency as any,
+        locale: data.locale as any,
         dailyLimit: data.dailyLimit,
       });
       await fetchUser();
@@ -357,6 +370,34 @@ export function ProfileSettings() {
                           {errors.currency.message}
                         </p>
                       )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="locale">{t('settings.profile.notificationLanguage')}</Label>
+                      <Select
+                        value={selectedLocale}
+                        onValueChange={(value) => setValue("locale", value as any, { shouldDirty: true })}
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger id="locale">
+                          <SelectValue placeholder={t('settings.profile.selectLocale')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SUPPORTED_LOCALES.map((locale) => (
+                            <SelectItem key={locale.code} value={locale.code}>
+                              {locale.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.locale && (
+                        <p className="text-sm text-destructive">
+                          {errors.locale.message}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        {t('settings.profile.localeHint')}
+                      </p>
                     </div>
 
                     <div className="space-y-2">
