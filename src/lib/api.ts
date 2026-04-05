@@ -35,8 +35,6 @@ export const apiClient = {
       throw new Error('No refresh token or username available');
     }
 
-    console.log('🔄 Attempting to refresh access token for user:', username);
-
     const language = localStorage.getItem("i18nextLng") || "en";
 
     const response = await fetch(`${API_BASE_URL}/api/Auth/refresh`, {
@@ -96,7 +94,6 @@ export const apiClient = {
     const tokens = data.tokens || data;
     
     if (tokens.accessToken && tokens.idToken && tokens.refreshToken) {
-      console.log('✅ Access token refreshed successfully');
       localStorage.setItem('accessToken', tokens.accessToken);
       localStorage.setItem('idToken', tokens.idToken);
       localStorage.setItem('refreshToken', tokens.refreshToken);
@@ -147,11 +144,8 @@ export const apiClient = {
       !authEndpointsToExclude.includes(endpoint);
 
     if (shouldRefresh) {
-      console.log('⚠️ 401 Unauthorized detected, attempting token refresh for:', endpoint);
-      
       // If already refreshing, wait for it to complete
       if (isRefreshing && refreshPromise) {
-        console.log('⏳ Already refreshing, waiting...');
         await refreshPromise;
 
         return this.request<T>(endpoint, options);

@@ -15,9 +15,7 @@ export function NavigationLinks() {
 
   return (
     <nav className="hidden md:flex md:items-center md:gap-5 md:text-sm md:font-medium md:ms-6 overflow-x-auto">
-      cons
       {user?.menus.map((item) => {
-        console.log("Rendering nav item:", item);
         const Icon = getIconByKey(item.key);
         return (
           <Link

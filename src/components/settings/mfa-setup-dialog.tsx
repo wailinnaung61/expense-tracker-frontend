@@ -64,9 +64,7 @@ export function MfaSetupDialog({ open, onOpenChange, onSuccess }: MfaSetupDialog
     setStep("loading");
     setError(null);
     try {
-      console.log("🔐 Starting MFA setup...");
       const response = await authService.setupMfa();
-      console.log("✅ MFA setup response:", response);
       setSecretCode(response.secretCode);
       setQrCodeUri(response.qrCodeUri);
       setSession(response.session);
@@ -301,7 +299,7 @@ export function MfaSetupDialog({ open, onOpenChange, onSuccess }: MfaSetupDialog
                 </AlertDescription>
               </Alert>
 
-              <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto p-2 border rounded-md bg-muted/30">
+              <div className="grid grid-cols-2 gap-2 max-h-50 overflow-y-auto p-2 border rounded-md bg-muted/30">
                 {backupCodes.map((code, index) => (
                   <div
                     key={index}

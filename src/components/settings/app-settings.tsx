@@ -36,7 +36,7 @@ export function AppSettings() {
           </p>
         </div>
         <Select defaultValue="system">
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-50">
             <SelectValue placeholder="Select theme" />
           </SelectTrigger>
           <SelectContent>
