@@ -6,6 +6,18 @@ export const SavingGoalStatus = {
 
 export type SavingGoalStatus = (typeof SavingGoalStatus)[keyof typeof SavingGoalStatus];
 
+export const SavingGoalType = {
+  EmergencyFund: "EmergencyFund",
+  Vacation: "Vacation",
+  Vehicle: "Vehicle",
+  Home: "Home",
+  Education: "Education",
+  Retirement: "Retirement",
+  Other: "Other",
+} as const;
+
+export type SavingGoalType = (typeof SavingGoalType)[keyof typeof SavingGoalType];
+
 export const SavingTransactionType = {
   Deposit: 0,
   Withdrawal: 1,
@@ -24,6 +36,7 @@ export interface SavingGoal {
   remainingAmount: number;
   targetDate: string;
   status: string;
+  SavingGoalType?: string;
   notes: string;
   icon: string;
   color: string;
@@ -47,14 +60,24 @@ export interface SavingDashboard {
   overallProgressPercentage: number;
   activeGoalsCount: number;
   completedGoalsCount: number;
+  goalTypeAllocation?: GoalTypeAllocation[];
   goals: SavingGoal[];
   top5Goals: SavingGoal[];
+}
+
+export interface GoalTypeAllocation {
+  goalType: string;
+  totalSaved: number;
+  totalTarget: number;
+  progressPercentage: number;
+  goalCount: number;
 }
 
 export interface CreateSavingGoalRequest {
   goalName: string;
   targetAmount: number;
   targetDate: string;
+  savingGoalType?: string;
   description?: string;
   notes?: string;
   icon?: string;
@@ -66,6 +89,7 @@ export interface UpdateSavingGoalRequest {
   targetAmount: number;
   targetDate: string;
   status?: SavingGoalStatus;
+  savingGoalType?: string;
   description?: string;
   notes?: string;
   icon?: string;

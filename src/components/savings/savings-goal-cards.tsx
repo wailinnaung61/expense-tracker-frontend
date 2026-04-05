@@ -47,6 +47,17 @@ const getStatusBadgeClass = (status: string): string => {
   return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400";
 };
 
+const formatGoalTypeLabel = (goalType?: string) => {
+  if (!goalType) return "";
+  return goalType.replace(/([A-Z])/g, " $1").trim();
+};
+
+const getGoalTypeValue = (goal: any) => {
+  return (
+    goal.savingGoalType ?? goal.SavingGoalType ?? goal.goalType ?? goal.GoalType ?? ""
+  );
+};
+
 export function SavingsGoalCards({
   goals,
   currentPage,
@@ -134,6 +145,11 @@ export function SavingsGoalCards({
                     </div>
                     <div className="min-w-0">
                       <h3 className="text-sm font-semibold truncate">{goal.goalName}</h3>
+                      {getGoalTypeValue(goal) && (
+                        <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-1">
+                          {formatGoalTypeLabel(getGoalTypeValue(goal))}
+                        </p>
+                      )}
                       {goal.description && (
                         <p className="text-xs text-muted-foreground truncate max-w-45">
                           {goal.description}

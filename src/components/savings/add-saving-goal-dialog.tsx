@@ -25,7 +25,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/useTranslation";
 import { savingsService } from "@/services/savingsService";
-import { SavingGoalStatus } from "@/types/savings";
+import { SavingGoalStatus, SavingGoalType } from "@/types/savings";
 import type { SavingGoal } from "@/types/savings";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -53,10 +53,21 @@ const GOAL_COLORS = [
   "#7c3aed", "#9333ea", "#c026d3", "#db2777", "#e11d48",
 ];
 
+const GOAL_TYPES = [
+  { value: String(SavingGoalType.EmergencyFund), label: "Emergency Fund" },
+  { value: String(SavingGoalType.Vacation), label: "Vacation" },
+  { value: String(SavingGoalType.Vehicle), label: "Vehicle" },
+  { value: String(SavingGoalType.Home), label: "Home" },
+  { value: String(SavingGoalType.Education), label: "Education" },
+  { value: String(SavingGoalType.Retirement), label: "Retirement" },
+  { value: String(SavingGoalType.Other), label: "Other" },
+];
+
 type SavingGoalFormData = {
   goalName: string;
   targetAmount: string;
   targetDate: Date;
+  savingGoalType: string;
   status?: string;
   description?: string;
   notes?: string;
@@ -92,6 +103,7 @@ export function AddSavingGoalDialog({
             message: t("savings.validation.targetAmountPositive"),
           }),
         targetDate: z.date(),
+        savingGoalType: z.string().min(1),
         status: z.string().optional(),
         description: z.string().optional(),
         notes: z.string().optional(),
@@ -114,6 +126,7 @@ export function AddSavingGoalDialog({
       goalName: "",
       targetAmount: "",
       targetDate: new Date(),
+      savingGoalType: String(SavingGoalType.EmergencyFund),
       status: String(SavingGoalStatus.Active),
       description: "",
       notes: "",
@@ -126,12 +139,26 @@ export function AddSavingGoalDialog({
   const selectedColor = watch("color");
   const goalName = watch("goalName");
 
+  const normalizeGoalType = (value?: string) => {
+    if (!value) return String(SavingGoalType.Other);
+    const normalized = value.trim();
+    const match = GOAL_TYPES.find(
+      (type) => type.value.toLowerCase() === normalized.toLowerCase()
+    );
+    return match?.value ?? String(SavingGoalType.Other);
+  };
+
   useEffect(() => {
+    const existingGoalType = normalizeGoalType(
+      (goal as any)?.savingGoalType ?? (goal as any)?.SavingGoalType ?? (goal as any)?.goalType ?? (goal as any)?.GoalType
+    );
+
     if (goal) {
       reset({
         goalName: goal.goalName,
         targetAmount: String(goal.targetAmount),
         targetDate: new Date(goal.targetDate),
+        savingGoalType: existingGoalType,
         status: String(STATUS_MAP[goal.status.toUpperCase()] ?? SavingGoalStatus.Active),
         description: goal.description || "",
         notes: goal.notes || "",
@@ -143,6 +170,7 @@ export function AddSavingGoalDialog({
         goalName: "",
         targetAmount: "",
         targetDate: new Date(),
+        savingGoalType: String(SavingGoalType.EmergencyFund),
         status: String(SavingGoalStatus.Active),
         description: "",
         notes: "",
@@ -159,6 +187,7 @@ export function AddSavingGoalDialog({
           goalName: data.goalName.trim(),
           targetAmount: Number(data.targetAmount),
           targetDate: format(data.targetDate, "yyyy-MM-dd"),
+          savingGoalType: data.savingGoalType || String(SavingGoalType.Other),
           status: Number(data.status) as SavingGoalStatus,
           description: data.description || "",
           notes: data.notes || "",
@@ -171,6 +200,7 @@ export function AddSavingGoalDialog({
           goalName: data.goalName.trim(),
           targetAmount: Number(data.targetAmount),
           targetDate: format(data.targetDate, "yyyy-MM-dd"),
+          savingGoalType: data.savingGoalType || String(SavingGoalType.Other),
           description: data.description || "",
           notes: data.notes || "",
           icon: data.icon || "",
@@ -219,6 +249,32 @@ export function AddSavingGoalDialog({
               placeholder={t("savings.dialog.descriptionPlaceholder")}
               {...register("description")}
             />
+          </div>
+
+          {/* Goal Type */}
+          <div className="space-y-2">
+            <Label>Goal Type</Label>
+            <Controller
+              name="savingGoalType"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select goal type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GOAL_TYPES.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.savingGoalType && (
+              <p className="text-sm text-red-600">Please select a goal type.</p>
+            )}
           </div>
 
           {/* Target Amount */}
