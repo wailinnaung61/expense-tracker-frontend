@@ -129,13 +129,13 @@ export default function LandingPage() {
               <Button 
                 variant="ghost" 
                 onClick={() => navigate("/login")} 
-                className="hover:text-sky-600 hover:bg-sky-50 transition-all"
+                className="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition-all"
               >
                 {t('auth.signIn')}
               </Button>
               <Button 
                 onClick={() => navigate("/signup")} 
-                className="relative overflow-hidden bg-linear-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg shadow-sky-500/30 hover:shadow-xl hover:shadow-sky-500/40 transition-all hover:scale-110 group animate-pulse-glow"
+                className="relative overflow-hidden bg-linear-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg shadow-sky-500/30 hover:shadow-xl hover:shadow-sky-500/40 transition-all hover:scale-110 group animate-pulse-glow text-white"
               >
                 <span className="relative z-10 font-semibold">{t('auth.getStarted')}</span>
                 <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
@@ -264,15 +264,17 @@ export default function LandingPage() {
               </Button>
               <Button 
                 size="lg" 
-                variant="outline"
                 onClick={() => navigate("/login")}
-                className="text-lg px-10 h-14 border-2 border-sky-200 hover:border-sky-400 hover:bg-linear-to-r hover:from-sky-50 hover:to-cyan-50 hover:scale-110 transition-all font-semibold group shadow-lg hover:shadow-xl relative overflow-hidden"
+                className="relative overflow-hidden bg-white hover:bg-white text-lg px-10 h-14 shadow-xl shadow-sky-500/20 hover:shadow-2xl hover:shadow-sky-500/40 hover:scale-110 transition-all text-gray-900 font-semibold group border-2 border-sky-200 hover:border-sky-400"
               >
-                <span className="relative z-10 flex items-center gap-2">
+                <span className="relative z-10 flex items-center gap-2 group-hover:text-sky-600 transition-colors">
                   {t('landing.hero.ctaDemo')}
-                  <div className="w-2 h-2 rounded-full bg-sky-500 animate-pulse group-hover:scale-150 transition-transform"></div>
+                  <div className="w-2 h-2 rounded-full bg-sky-500 animate-pulse group-hover:scale-150 group-hover:bg-sky-600 transition-all shadow-md shadow-sky-500/50"></div>
                 </span>
-                <div className="absolute inset-0 bg-linear-to-r from-sky-100/0 via-sky-100/50 to-sky-100/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-sky-50/0 via-sky-100/80 to-sky-50/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-sky-100/40 via-cyan-100/40 to-teal-100/40 animate-shimmer"></div>
+                </div>
               </Button>
             </div>
 
