@@ -685,6 +685,12 @@
     "closeChat": "チャットを閉じる"
   },
   "settings": {
+    "tabs": {
+      "profile": "プロフィール",
+      "appearance": "外観",
+      "notifications": "通知",
+      "security": "セキュリティ"
+    },
     "profile": {
       "title": "プロフィール設定",
       "description": "アカウント情報と環境設定を管理します",
@@ -755,6 +761,45 @@
       "backupCodesDownloaded": "バックアップコードをダウンロードしました",
       "secretCopied": "シークレットコードをクリップボードにコピーしました",
       "codeCopied": "コードをクリップボードにコピーしました"
+    },
+    "appearance": {
+      "themeTitle": "テーマ",
+      "themeDescription": "アプリの外観と雰囲気をカスタマイズします",
+      "colorScheme": "カラースキーム",
+      "colorSchemeHint": "お好みのテーマを選択してください",
+      "light": "ライト",
+      "dark": "ダーク",
+      "system": "システム",
+      "displayTitle": "表示",
+      "displayDescription": "より良い体験のために表示設定を調整します",
+      "animations": "アニメーション",
+      "animationsHint": "アニメーションを有効または無効にします",
+      "compactMode": "コンパクトモード",
+      "compactModeHint": "画面により多くのコンテンツを表示するために間隔を減らします"
+    },
+    "notifications": {
+      "alertsTitle": "金融アラート",
+      "alertsDescription": "重要な金融イベントについて通知を受け取ります",
+      "budgetAlerts": "予算アラート",
+      "budgetAlertsHint": "予算が80%に達したとき、または上限を超えたときに通知します",
+      "savingGoals": "貯蓄目標",
+      "savingGoalsHint": "目標達成と期限間近について通知します",
+      "largeTransactions": "大きな取引",
+      "largeTransactionsHint": "取引が1日の支出上限を超えたときに通知します",
+      "recurringTitle": "定期支払い",
+      "recurringDescription": "定期的な請求とサブスクリプションの通知を管理します",
+      "recurringPayments": "支払いリマインダー",
+      "recurringPaymentsHint": "支払期限の3日前に通知します",
+      "autoPayments": "自動支払い確認",
+      "autoPaymentsHint": "自動支払いが処理されたときに通知します",
+      "paymentFailures": "支払い失敗",
+      "paymentFailuresHint": "支払いが失敗したとき、または取引が失敗したときに通知します",
+      "systemTitle": "システム通知",
+      "systemDescription": "システムイベントとデータエクスポートに関する通知",
+      "exports": "エクスポート通知",
+      "exportsHint": "データエクスポートがダウンロード可能になったときに通知します",
+      "updateSuccess": "通知設定が正常に更新されました",
+      "updateError": "通知設定の更新に失敗しました"
     }
   },
   "investments": {
@@ -1044,5 +1089,42 @@
     "quarter": "四半期",
     "today": "今日",
     "done": "完了"
+  },
+  "notifications": {
+    "title": "通知",
+    "loading": "読み込み中...",
+    "noNotifications": "通知はまだありません",
+    "allCaughtUp": "すべて確認済みです！",
+    "noReadNotifications": "既読の通知はありません",
+    "noNotificationsDesc": "まだ通知がありません",
+    "markAllRead": "すべて既読にする",
+    "clearRead": "既読をクリア",
+    "viewAll": "すべての通知を表示",
+    "markAsRead": "既読にする",
+    "delete": "削除",
+    "new": "新規",
+    "total": "合計",
+    "unread": "未読",
+    "filter": {
+      "all": "すべての通知",
+      "unread": "未読のみ",
+      "read": "既読のみ",
+      "placeholder": "通知をフィルター"
+    },
+    "loadMore": "さらに読み込む",
+    "success": {
+      "markedAsRead": "通知を既読にしました",
+      "allMarkedAsRead": "すべての通知を既読にしました",
+      "deleted": "通知を削除しました",
+      "clearedRead": "既読の通知をクリアしました"
+    },
+    "error": {
+      "loadFailed": "通知の読み込みに失敗しました",
+      "updateFailed": "通知の更新に失敗しました",
+      "markAsReadFailed": "既読に失敗しました",
+      "markAllReadFailed": "すべて既読に失敗しました",
+      "deleteFailed": "削除に失敗しました",
+      "clearReadFailed": "既読のクリアに失敗しました"
+    }
   }
 }

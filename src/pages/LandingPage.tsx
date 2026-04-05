@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import {
@@ -299,7 +299,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-24 sm:py-32 bg-white relative">
+      <section id="features" className="py-24 sm:py-32 bg-white relative">
         {/* Decorative background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(14,165,233,0.05),transparent_70%)]"></div>
         
@@ -752,7 +752,10 @@ export default function LandingPage() {
           </div>
           
           <p className="mt-8 text-sm text-gray-500 animate-fade-in-up-soft animation-delay-500">
-            {t('landing.cta.terms')}
+            {t('landing.cta.terms')}{' '}
+            <Link to="/terms" className="underline hover:text-sky-600 transition-colors">{t('landing.footer.terms')}</Link>
+            {' & '}
+            <Link to="/privacy" className="underline hover:text-sky-600 transition-colors">{t('landing.footer.privacy')}</Link>
           </p>
         </div>
       </section>
@@ -761,7 +764,7 @@ export default function LandingPage() {
       <footer className="border-t border-gray-200 bg-linear-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div className="md:col-span-1 animate-in fade-in slide-in-from-bottom duration-500">
+            <div className="md:col-span-2 animate-in fade-in slide-in-from-bottom duration-500">
               <div className="flex items-center gap-3 mb-4 group">
                 <div className="relative animate-bounce-subtle">
                   <div className="absolute inset-0 bg-linear-to-br from-sky-400 to-cyan-500 rounded-xl blur-md opacity-60 group-hover:opacity-100 transition-opacity animate-pulse"></div>
@@ -784,30 +787,17 @@ export default function LandingPage() {
             <div className="animate-in fade-in slide-in-from-bottom duration-500 delay-100">
               <h3 className="font-bold text-gray-900 mb-4 text-lg">{t('landing.footer.product')}</h3>
               <ul className="space-y-3">
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.features')}</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.pricing')}</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.security')}</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.updates')}</li>
+                <li><a href="#features" className="text-gray-600 hover:text-sky-600 transition-all hover:translate-x-1 hover:scale-105 duration-200 inline-block">{t('landing.footer.features')}</a></li>
+                <li><a href="#features" className="text-gray-600 hover:text-sky-600 transition-all hover:translate-x-1 hover:scale-105 duration-200 inline-block">{t('landing.footer.security')}</a></li>
               </ul>
             </div>
             
             <div className="animate-in fade-in slide-in-from-bottom duration-500 delay-200">
-              <h3 className="font-bold text-gray-900 mb-4 text-lg">{t('landing.footer.company')}</h3>
-              <ul className="space-y-3">
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.about')}</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.blog')}</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.careers')}</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.contact')}</li>
-              </ul>
-            </div>
-            
-            <div className="animate-in fade-in slide-in-from-bottom duration-500 delay-300">
               <h3 className="font-bold text-gray-900 mb-4 text-lg">{t('landing.footer.legal')}</h3>
               <ul className="space-y-3">
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.privacy')}</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.terms')}</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.cookiePolicy')}</li>
-                <li className="text-gray-600 hover:text-sky-600 cursor-pointer transition-all hover:translate-x-1 hover:scale-105 duration-200">{t('landing.footer.licenses')}</li>
+                <li><Link to="/privacy" className="text-gray-600 hover:text-sky-600 transition-all hover:translate-x-1 hover:scale-105 duration-200 inline-block">{t('landing.footer.privacy')}</Link></li>
+                <li><Link to="/terms" className="text-gray-600 hover:text-sky-600 transition-all hover:translate-x-1 hover:scale-105 duration-200 inline-block">{t('landing.footer.terms')}</Link></li>
+                <li><Link to="/cookie-policy" className="text-gray-600 hover:text-sky-600 transition-all hover:translate-x-1 hover:scale-105 duration-200 inline-block">{t('landing.footer.cookiePolicy')}</Link></li>
               </ul>
             </div>
           </div>

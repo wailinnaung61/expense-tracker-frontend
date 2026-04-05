@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { aggregationService } from "@/services/aggregationService";
 import { Link } from "react-router-dom";
 import type { ExpenseBreakdown, MonthlyAggregation } from "@/types/aggregation";
@@ -399,9 +399,16 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
+                  <Tooltip
+                    contentStyle={{ borderRadius: 12, fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }}
+                    formatter={(value: number, name: string, props: any) => [
+                      `${formatCurrency(value, currency)} (${Math.round(props.payload.percentage)}%)`,
+                      name,
+                    ]}
+                  />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-4 pointer-events-none">
                 <div className={`font-bold dark:text-slate-50 ${
                   formatCurrency(data.totalExpenses, currency).length > 15 
                     ? 'text-xs' 

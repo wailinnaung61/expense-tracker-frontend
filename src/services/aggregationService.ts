@@ -66,4 +66,11 @@ export const aggregationService = {
   async getExpenseBreakdown(month: string): Promise<ExpenseBreakdown> {
     return apiClient.get<ExpenseBreakdown>(`/api/Aggregation/expense-breakdown/${month}`);
   },
+
+  async getExpenseBreakdownByRange(startDate: string, endDate: string): Promise<ExpenseBreakdown> {
+    return apiClient.get<ExpenseBreakdown>('/api/Aggregation/expense-breakdown', {
+      startDate,
+      endDate,
+    });
+  },
 };

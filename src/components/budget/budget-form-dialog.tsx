@@ -261,6 +261,21 @@ export function BudgetFormDialog({
               }
             });
             setCategoryDrafts(drafts);
+          } else {
+            // Previous budget exists but has no categories - initialize empty
+            setTotalAmount("");
+            setSelectedCategoryIds([]);
+            setCategoryDrafts(
+              Object.fromEntries(
+                availableCategories.map((category) => [
+                  category.categoryId,
+                  {
+                    allocatedAmount: "",
+                    alertThresholdPercent: "80",
+                  },
+                ])
+              )
+            );
           }
         })
         .catch(() => {

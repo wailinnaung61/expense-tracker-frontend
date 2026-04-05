@@ -13,7 +13,7 @@ import { categoryService } from "@/services/categoryService";
 import type { DashboardResponse } from "@/types/dashboard";
 import type { ProfileResponse } from "@/types/profile";
 import type { ExpenseCategory } from "@/types/category";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
 
@@ -24,37 +24,46 @@ export default function Home() {
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Refs to avoid stale closures & double-fetch from deps changing
+  const profileRef = useRef(profile);
+  profileRef.current = profile;
+  const categoriesRef = useRef(categories);
+  categoriesRef.current = categories;
+
   const currency = profile?.currency || "USD";
 
   const fetchData = useCallback(async (m: string) => {
     setLoading(true);
     try {
+      const cachedProfile = profileRef.current;
+      const cachedCategories = categoriesRef.current;
+
       const [dashRes, profRes, catRes] = await Promise.all([
         dashboardService.getDashboard(m),
-        profile ? Promise.resolve(profile) : profileService.getProfile(),
-        categories.length > 0 ? Promise.resolve({ items: categories }) : categoryService.getCategories({ pageSize: 100 }),
+        cachedProfile ? Promise.resolve(cachedProfile) : profileService.getProfile(),
+        cachedCategories.length > 0 ? Promise.resolve({ items: cachedCategories }) : categoryService.getCategories({ pageSize: 100 }),
       ]);
       setData(dashRes);
-      if (!profile) setProfile(profRes);
-      if (categories.length === 0) setCategories(catRes.items);
+      if (!cachedProfile) setProfile(profRes);
+      if (cachedCategories.length === 0) setCategories(catRes.items);
     } catch {
       // silent
     } finally {
       setLoading(false);
     }
-  }, [profile, categories]);
+  }, []);
 
   useEffect(() => {
     fetchData(month);
   }, [month, fetchData]);
 
-  const handleMonthChange = (m: string) => setMonth(m);
-  const handleRefresh = () => fetchData(month);
+  const handleMonthChange = useCallback((m: string) => setMonth(m), []);
+  const handleRefresh = useCallback(() => fetchData(month), [fetchData, month]);
 
   // Find previous month from trend data for comparison
-  const previousMonth = data?.monthlyTrend
+  const previousMonth = useMemo(() => data?.monthlyTrend
     .filter((m) => m.period < (data.currentMonth?.period ?? ""))
-    .sort((a, b) => b.period.localeCompare(a.period))[0] ?? null;
+    .sort((a, b) => b.period.localeCompare(a.period))[0] ?? null, [data]);
 
   if (loading && !data) {
     return (

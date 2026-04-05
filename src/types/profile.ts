@@ -1,5 +1,15 @@
 import { z } from 'zod'
 
+export interface NotificationPreferences {
+  budgetAlerts: boolean
+  recurringPayments: boolean
+  autoPayments: boolean
+  savingGoals: boolean
+  largeTransactions: boolean
+  paymentFailures: boolean
+  exports: boolean
+}
+
 export interface ProfileResponse {
   userId: string
   userName: string
@@ -11,6 +21,7 @@ export interface ProfileResponse {
   status: string
   mfaEnabled: boolean
   mfaMethod: string | null
+  notificationPreferences: NotificationPreferences
   createdAt: string
   updatedAt: string | null
   lastLoginAt: string | null
@@ -20,6 +31,7 @@ export interface UpdateProfileRequest {
   phoneNumber?: string | null
   currency?: string
   dailyLimit?: number
+  notificationPreferences?: NotificationPreferences
 }
 
 // Supported currencies from backend

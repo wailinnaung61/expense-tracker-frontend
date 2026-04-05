@@ -409,6 +409,55 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Appearance Settings: Reduce Motion */
+.reduce-motion,
+.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Appearance Settings: Compact Mode */
+.compact-mode {
+  /* Reduce spacing in cards */
+  --spacing-scale: 0.75;
+}
+
+.compact-mode .space-y-6 > * + * {
+  margin-top: calc(1.5rem * var(--spacing-scale)) !important;
+}
+
+.compact-mode .space-y-4 > * + * {
+  margin-top: calc(1rem * var(--spacing-scale)) !important;
+}
+
+.compact-mode .p-6 {
+  padding: calc(1.5rem * var(--spacing-scale)) !important;
+}
+
+.compact-mode .p-4 {
+  padding: calc(1rem * var(--spacing-scale)) !important;
+}
+
+.compact-mode .py-6 {
+  padding-top: calc(1.5rem * var(--spacing-scale)) !important;
+  padding-bottom: calc(1.5rem * var(--spacing-scale)) !important;
+}
+
+.compact-mode .py-4 {
+  padding-top: calc(1rem * var(--spacing-scale)) !important;
+  padding-bottom: calc(1rem * var(--spacing-scale)) !important;
+}
+
+.compact-mode .gap-6 {
+  gap: calc(1.5rem * var(--spacing-scale)) !important;
+}
+
+.compact-mode .gap-4 {
+  gap: calc(1rem * var(--spacing-scale)) !important;
+}
+
 :root {
   --radius: 0.5rem;
   --background: oklch(1 0 0);

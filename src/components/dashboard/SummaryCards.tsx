@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatCurrency } from "@/lib/utils";
@@ -9,6 +10,7 @@ import {
   TrendingUp,
   ArrowUpRight,
   ArrowDownRight,
+  Scale,
 } from "lucide-react";
 
 interface SummaryCardsProps {
@@ -22,10 +24,22 @@ function pctChange(curr: number, prev: number): number | null {
   return ((curr - prev) / prev) * 100;
 }
 
-export function SummaryCards({ current, previous, currency }: SummaryCardsProps) {
+export const SummaryCards = memo(function SummaryCards({ current, previous, currency }: SummaryCardsProps) {
   const { t } = useTranslation();
 
-  const cards = [
+  const incomeVal = current?.income ?? 0;
+  const expenseVal = current?.expense ?? 0;
+  const savingVal = current?.saving ?? 0;
+  const investmentVal = current?.investment ?? 0;
+  const netBalance = incomeVal - expenseVal - savingVal - investmentVal;
+
+  const prevIncomeVal = previous?.income ?? 0;
+  const prevExpenseVal = previous?.expense ?? 0;
+  const prevSavingVal = previous?.saving ?? 0;
+  const prevInvestmentVal = previous?.investment ?? 0;
+  const prevNetBalance = prevIncomeVal - prevExpenseVal - prevSavingVal - prevInvestmentVal;
+
+  const cards = useMemo(() => [
     {
       key: "income",
       label: t("dashboard.income"),
@@ -96,10 +110,38 @@ export function SummaryCards({ current, previous, currency }: SummaryCardsProps)
         iconShadow: "shadow-purple-500/30",
       },
     },
-  ];
+    {
+      key: "netBalance",
+      label: t("dashboard.netBalance" as any),
+      value: netBalance,
+      prev: prevNetBalance,
+      icon: Scale,
+      colors: netBalance >= 0
+        ? {
+            from: "from-teal-500/10",
+            via: "via-cyan-500/5",
+            orb: "from-teal-400/20",
+            iconFrom: "from-teal-500",
+            iconTo: "to-cyan-600",
+            text: "text-teal-600 dark:text-teal-400",
+            labelColor: "text-teal-700 dark:text-teal-300",
+            iconShadow: "shadow-teal-500/30",
+          }
+        : {
+            from: "from-rose-500/10",
+            via: "via-red-500/5",
+            orb: "from-rose-400/20",
+            iconFrom: "from-rose-500",
+            iconTo: "to-red-600",
+            text: "text-rose-600 dark:text-rose-400",
+            labelColor: "text-rose-700 dark:text-rose-300",
+            iconShadow: "shadow-rose-500/30",
+          },
+    },
+  ], [t, current, previous, netBalance, prevNetBalance]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
       {cards.map((card) => {
         const change = pctChange(card.value, card.prev);
         const isUp = change !== null && change >= 0;
@@ -126,7 +168,7 @@ export function SummaryCards({ current, previous, currency }: SummaryCardsProps)
                 {card.label}
               </div>
               <div className={`text-xl font-bold ${card.colors.text}`}>
-                {card.key === "income" ? "+" : card.key === "expense" ? "-" : ""}{formatCurrency(card.value, currency)}
+                {card.key === "income" ? "+" : card.key === "expense" ? "-" : card.key === "netBalance" ? (card.value >= 0 ? "+" : "") : ""}{formatCurrency(card.key === "netBalance" ? card.value : Math.abs(card.value), currency)}
               </div>
               {card.tagline && (
                 <div className={`text-[10px] ${card.colors.labelColor} opacity-70 mt-1`}>
@@ -160,4 +202,4 @@ export function SummaryCards({ current, previous, currency }: SummaryCardsProps)
       })}
     </div>
   );
-}
+});

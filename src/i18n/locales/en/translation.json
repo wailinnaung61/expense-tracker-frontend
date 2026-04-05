@@ -337,8 +337,70 @@
       "terms": "Terms",
       "cookiePolicy": "Cookie Policy",
       "licenses": "Licenses",
-      "copyright": "© 2026 ExpenseTracker. All rights reserved.",
-      "madeWith": "Built with ❤�E�Efor better financial futures"
+      "copyright": "© 2026 Wai Linn Aung. All rights reserved.",
+      "madeWith": "Built with ❤️ for better financial futures"
+    }
+  },
+  "legal": {
+    "backToHome": "Back to Home",
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: April 1, 2026",
+      "intro": "At ExpenseTracker, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our application.",
+      "infoCollect": "Information We Collect",
+      "infoCollectDesc": "We collect information you provide directly to us, including your name, email address, and financial data you enter into the application such as transactions, budgets, savings goals, and investment records.\n\nWe also automatically collect certain technical information when you use our service, including your IP address, browser type, device information, and usage patterns.",
+      "howWeUse": "How We Use Your Information",
+      "howWeUseDesc": "We use the information we collect to provide, maintain, and improve our services, including processing your transactions, generating financial reports, and personalizing your experience.\n\nWe may also use your information to communicate with you about updates, security alerts, and support messages.",
+      "dataStorage": "Data Storage & Security",
+      "dataStorageDesc": "Your data is stored securely using industry-standard encryption (AES-256) both in transit and at rest. We use AWS infrastructure with regular security audits and penetration testing.\n\nWe retain your data for as long as your account is active. You may request deletion of your data at any time through your account settings.",
+      "cookies": "Cookies & Local Storage",
+      "cookiesDesc": "We use essential cookies and local storage to maintain your session, remember your preferences (such as language and theme), and ensure the security of your account.\n\nFor more details, please see our Cookie Policy.",
+      "thirdParty": "Third-Party Services",
+      "thirdPartyDesc": "We do not sell, trade, or rent your personal information to third parties. We may share anonymized, aggregated data for analytics purposes.\n\nOur service may integrate with third-party authentication providers (e.g., for multi-factor authentication) which have their own privacy policies.",
+      "yourRights": "Your Rights",
+      "yourRightsDesc": "You have the right to access, correct, or delete your personal data at any time. You may export your data in standard formats through the application.\n\nYou may also opt out of non-essential communications at any time through your account settings.",
+      "changes": "Changes to This Policy",
+      "changesDesc": "We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the \"Last updated\" date.",
+      "contact": "Contact Us",
+      "contactDesc": "If you have any questions about this Privacy Policy, please contact us through the support section in the application settings."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: April 1, 2026",
+      "intro": "Welcome to ExpenseTracker. By accessing or using our application, you agree to be bound by these Terms of Service. Please read them carefully before using our service.",
+      "acceptance": "Acceptance of Terms",
+      "acceptanceDesc": "By creating an account or using ExpenseTracker, you agree to these Terms of Service and our Privacy Policy. If you do not agree with any part of these terms, you may not use our service.",
+      "accounts": "User Accounts",
+      "accountsDesc": "You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.\n\nYou must provide accurate and complete information when creating your account. You agree to notify us immediately of any unauthorized use of your account.",
+      "useOfService": "Acceptable Use",
+      "useOfServiceDesc": "You agree to use ExpenseTracker only for its intended purpose of personal financial management. You may not use the service to store or transmit malicious code, violate any applicable laws, or infringe on the rights of others.\n\nYou are solely responsible for the accuracy of the financial data you enter into the application.",
+      "intellectualProperty": "Intellectual Property",
+      "intellectualPropertyDesc": "ExpenseTracker and its original content, features, and functionality are owned by us and are protected by international copyright, trademark, and other intellectual property laws.\n\nYour financial data remains your property. We do not claim ownership of the data you enter into the application.",
+      "limitation": "Limitation of Liability",
+      "limitationDesc": "ExpenseTracker is provided as a financial tracking tool and does not constitute financial advice. We are not responsible for any financial decisions you make based on information displayed in the application.\n\nTo the maximum extent permitted by law, we shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service.",
+      "termination": "Termination",
+      "terminationDesc": "We may terminate or suspend your account at any time for violation of these terms, without prior notice. Upon termination, your right to use the service will immediately cease.\n\nYou may delete your account at any time through the application settings. Upon deletion, your data will be permanently removed in accordance with our Privacy Policy.",
+      "changes": "Changes to Terms",
+      "changesDesc": "We reserve the right to modify these terms at any time. We will provide notice of significant changes through the application or via email. Your continued use of the service after changes constitutes acceptance of the new terms.",
+      "governingLaw": "Governing Law",
+      "governingLawDesc": "These Terms of Service shall be governed by and construed in accordance with applicable laws, without regard to conflict of law principles."
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "lastUpdated": "Last updated: April 1, 2026",
+      "intro": "This Cookie Policy explains how ExpenseTracker uses cookies and similar technologies to recognize you when you visit our application. It explains what these technologies are, why we use them, and your rights to control our use of them.",
+      "whatAreCookies": "What Are Cookies",
+      "whatAreCookiesDesc": "Cookies are small data files placed on your device when you visit a website or use an application. They are widely used to make services work more efficiently and to provide reporting information.\n\nCookies set by the service owner are called \"first-party cookies.\" Cookies set by parties other than the service owner are called \"third-party cookies.\"",
+      "howWeUse": "How We Use Cookies",
+      "howWeUseDesc": "We use cookies for the following purposes:\n\n• Authentication: To keep you signed in and maintain your session securely.\n• Preferences: To remember your settings such as language, theme, and currency preferences.\n• Security: To support security features and detect malicious activity.",
+      "types": "Types of Cookies We Use",
+      "typesDesc": "Essential Cookies: Required for the application to function. These include session tokens and security cookies. These cannot be disabled.\n\nPreference Cookies: Used to remember your settings (language, theme, currency). Stored in your browser's local storage.\n\nWe do not use advertising or tracking cookies.",
+      "managing": "Managing Cookies",
+      "managingDesc": "You can control cookies through your browser settings. Most browsers allow you to refuse or delete cookies. However, disabling essential cookies may prevent you from using certain features of our application.\n\nYour language and theme preferences are stored in local storage and can be changed at any time through the application settings.",
+      "thirdParty": "Third-Party Cookies",
+      "thirdPartyDesc": "We do not use third-party advertising or analytics cookies. Any third-party services we integrate with (such as authentication providers) may set their own cookies according to their own policies.",
+      "changes": "Changes to This Policy",
+      "changesDesc": "We may update this Cookie Policy from time to time to reflect changes in technology, regulation, or our business practices. Any changes will be posted on this page with an updated date."
     }
   },
   "budget": {
@@ -683,6 +745,12 @@
     "openChat": "Open chat",
     "closeChat": "Close chat"  },
   "settings": {
+    "tabs": {
+      "profile": "Profile",
+      "appearance": "Appearance",
+      "notifications": "Notifications",
+      "security": "Security"
+    },
     "profile": {
       "title": "Profile Settings",
       "description": "Manage your account information and preferences",
@@ -753,6 +821,45 @@
       "backupCodesDownloaded": "Backup codes downloaded",
       "secretCopied": "Secret code copied to clipboard",
       "codeCopied": "Code copied to clipboard"
+    },
+    "appearance": {
+      "themeTitle": "Theme",
+      "themeDescription": "Customize how the app looks and feels",
+      "colorScheme": "Color Scheme",
+      "colorSchemeHint": "Select your preferred theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "displayTitle": "Display",
+      "displayDescription": "Adjust display preferences for better experience",
+      "animations": "Animations",
+      "animationsHint": "Enable or disable animations",
+      "compactMode": "Compact Mode",
+      "compactModeHint": "Reduce spacing for more content on screen"
+    },
+    "notifications": {
+      "alertsTitle": "Financial Alerts",
+      "alertsDescription": "Get notified about important financial events",
+      "budgetAlerts": "Budget Alerts",
+      "budgetAlertsHint": "Notify when budget reaches 80% or exceeds limit",
+      "savingGoals": "Saving Goals",
+      "savingGoalsHint": "Notify about goal achievements and upcoming deadlines",
+      "largeTransactions": "Large Transactions",
+      "largeTransactionsHint": "Notify when transactions exceed your daily spending limit",
+      "recurringTitle": "Recurring Payments",
+      "recurringDescription": "Manage notifications for recurring bills and subscriptions",
+      "recurringPayments": "Payment Reminders",
+      "recurringPaymentsHint": "Notify about upcoming payments (3 days before due)",
+      "autoPayments": "Auto-Payment Confirmations",
+      "autoPaymentsHint": "Notify when automatic payments are processed",
+      "paymentFailures": "Payment Failures",
+      "paymentFailuresHint": "Notify when payments fail or transactions are unsuccessful",
+      "systemTitle": "System Notifications",
+      "systemDescription": "Notifications about system events and data exports",
+      "exports": "Export Notifications",
+      "exportsHint": "Notify when data exports are ready for download",
+      "updateSuccess": "Notification preferences updated successfully",
+      "updateError": "Failed to update notification preferences"
     }
   },
   "investments": {
@@ -1019,7 +1126,8 @@
     "qSavings": "Savings",
     "qReports": "Reports",
     "savingTagline": "Track your savings goals",
-    "investmentTagline": "View your investments"
+    "investmentTagline": "View your investments",
+    "netBalance": "Net Balance"
   },
   "reports": {
     "title": "Reports",
@@ -1040,6 +1148,71 @@
     "year": "Year",
     "quarter": "Quarter",
     "today": "Today",
-    "done": "Done"
+    "done": "Done",
+    "startMonth": "Start",
+    "endMonth": "End",
+    "thisYear": "This Year",
+    "export": "Export",
+    "netBalance": "Net Balance",
+    "monthlyBreakdown": "Monthly Breakdown",
+    "monthlyBreakdownDesc": "Income, expense, saving & investment by month",
+    "categoryBreakdown": "Category Breakdown",
+    "categoryBreakdownDesc": "Expense distribution by category",
+    "transactionList": "Transaction List",
+    "transactionListDesc": "Recent transactions in this period",
+    "date": "Date",
+    "category": "Category",
+    "type": "Type",
+    "descriptionCol": "Description",
+    "amount": "Amount",
+    "total": "Total",
+    "transactions": "Txns",
+    "incomeVsExpenseDesc": "Monthly income & expense flow comparison",
+    "savingsRate": "Savings Rate",
+    "savingsRateDesc": "Percentage of income retained after expenses",
+    "savingsRateFormula": "(Income − Expense) ÷ Income",
+    "rateExcellent": "Excellent! Keep it up 🎉",
+    "rateGood": "Good, but room to improve",
+    "rateNeedsWork": "Needs attention ⚠️",
+    "top5Expenses": "Top 5 Expenses",
+    "top5ExpensesDesc": "Your biggest spending this period",
+    "trend": "Trend"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "loading": "Loading...",
+    "noNotifications": "No notifications yet",
+    "allCaughtUp": "You're all caught up!",
+    "noReadNotifications": "No read notifications",
+    "noNotificationsDesc": "You don't have any notifications yet",
+    "markAllRead": "Mark all read",
+    "clearRead": "Clear read",
+    "viewAll": "View all notifications",
+    "markAsRead": "Mark as read",
+    "delete": "Delete",
+    "new": "New",
+    "total": "total",
+    "unread": "unread",
+    "filter": {
+      "all": "All notifications",
+      "unread": "Unread only",
+      "read": "Read only",
+      "placeholder": "Filter notifications"
+    },
+    "loadMore": "Load more",
+    "success": {
+      "markedAsRead": "Notification marked as read",
+      "allMarkedAsRead": "All notifications marked as read",
+      "deleted": "Notification deleted",
+      "clearedRead": "All read notifications cleared"
+    },
+    "error": {
+      "loadFailed": "Failed to load notifications",
+      "updateFailed": "Failed to update notification",
+      "markAsReadFailed": "Failed to mark as read",
+      "markAllReadFailed": "Failed to mark all as read",
+      "deleteFailed": "Failed to delete notification",
+      "clearReadFailed": "Failed to clear read notifications"
+    }
   }
 }

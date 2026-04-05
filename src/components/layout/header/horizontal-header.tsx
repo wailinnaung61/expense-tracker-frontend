@@ -6,6 +6,7 @@ import { NavigationLinks } from "./navigation-links";
 import { ProfileMenu } from "./profile-menu";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageSwitcher } from "../language-switcher";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 // Only need mobile menu for horizontal header
 interface HorizontalHeaderProps {
@@ -27,6 +28,7 @@ export function HorizontalHeader({ setMobileOpen }: HorizontalHeaderProps) {
           <LanguageSwitcher />
           <ThemeToggle />
           <ThemeConfig />
+          <NotificationBell />
 
           <ProfileMenu />
 

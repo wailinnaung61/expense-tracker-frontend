@@ -4,6 +4,9 @@ import AuthLayout from "./components/layout/AuthLayout"
 
 // Public Pages
 import LandingPage from "@/pages/LandingPage"
+import PrivacyPolicy from "@/pages/legal/PrivacyPolicy"
+import TermsOfService from "@/pages/legal/TermsOfService"
+import CookiePolicy from "@/pages/legal/CookiePolicy"
 
 // Auth Pages
 import LoginPage from "@/pages/auth/LoginPage"
@@ -24,6 +27,7 @@ import Reports from "@/pages/reports"
 import Settings from "@/pages/settings"
 import Investments from "@/pages/investments"
 import Categories from "@/pages/categories"
+import NotificationsPage from "@/pages/notifications/NotificationsPage"
 
 // Route Components
 import { ProtectedRoute } from "@/components/ProtectedRoute"
@@ -37,6 +41,11 @@ export default function Router() {
         <Route element={<PublicRoute />}>
           <Route path="/" element={<LandingPage />} />
         </Route>
+
+        {/* Legal Pages (public, no auth wrapper) */}
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/cookie-policy" element={<CookiePolicy />} />
 
         {/* Public Auth Routes */}
         <Route element={<AuthLayout />}>
@@ -61,6 +70,7 @@ export default function Router() {
             <Route path="/report" element={<Reports />} />
             <Route path="/user" element={<Accounts />} />
             <Route path="/setting" element={<Settings />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
           </Route>
         </Route>
 

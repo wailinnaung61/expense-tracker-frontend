@@ -170,6 +170,7 @@ export function ContributionDialog({
 
   const handleDeleteContribution = async (contributionId: string) => {
     if (!goal) return;
+    onOpenChange(false);
     const result = await Swal.fire({
       title: t("savings.feedback.confirmDeleteContributionTitle"),
       text: t("savings.feedback.confirmDeleteText"),
@@ -185,7 +186,6 @@ export function ContributionDialog({
       try {
         await savingsService.deleteContribution(goal.savingGoalId, contributionId);
         toast.success(t("savings.feedback.contributionDeleted"));
-        fetchContributions();
         onSuccess();
       } catch (error: unknown) {
         toast.error(
@@ -193,8 +193,11 @@ export function ContributionDialog({
             ? error.message
             : t("savings.feedback.contributionDeleteFailed")
         );
+        onOpenChange(true);
       }
+      return;
     }
+    onOpenChange(true);
   };
 
   if (!goal) return null;

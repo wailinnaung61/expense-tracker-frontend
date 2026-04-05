@@ -4,6 +4,7 @@ import { Menu, PanelLeft } from "lucide-react";
 import { ProfileMenu } from "./profile-menu";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageSwitcher } from "../language-switcher";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 interface VerticalHeaderProps {
   toggleSidebar: () => void;
@@ -47,6 +48,7 @@ export function VerticalHeader({
           <LanguageSwitcher />
           <ThemeToggle />
           <ThemeConfig />
+          <NotificationBell />
 
           <ProfileMenu />
         </div>
