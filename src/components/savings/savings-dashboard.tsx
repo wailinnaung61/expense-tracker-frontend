@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatCurrency } from "@/lib/utils";
 import type { SavingGoal, SavingDashboard } from "@/types/savings";
-import { PiggyBank, Target, TrendingUp, CheckCircle2, CircleDot, CircleDollarSign, BarChart3 } from "lucide-react";
+import { PiggyBank, Target, TrendingUp, CheckCircle2, CircleDot, CircleDollarSign } from "lucide-react";
 
 interface SavingsDashboardProps {
   dashboard: SavingDashboard;
@@ -119,54 +119,8 @@ export function SavingsDashboardView({ dashboard, currency, onContribute }: Savi
             <span className="text-muted-foreground">{t("savings.dashboard.overallProgress")}</span>
             <span className="font-medium">{dashboard.overallProgressPercentage.toFixed(1)}%</span>
           </div>
-          <Progress value={Math.min(dashboard.overallProgressPercentage, 100)} className="h-3" />
+          <Progress value={Math.min(dashboard.overallProgressPercentage, 100)} className="h-2" />
         </div>
-
-        {/* Goal Type Allocation Breakdown */}
-        {dashboard.goalTypeAllocation && dashboard.goalTypeAllocation.length > 0 && (
-          <div className="mt-6 pt-5 border-t">
-            <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="h-5 w-5 text-foreground" />
-              <h3 className="text-sm font-semibold text-foreground">Savings by Goal Type</h3>
-            </div>
-            <div className="grid grid-cols-1 gap-3">
-              {dashboard.goalTypeAllocation.map((allocation) => (
-                <div
-                  key={allocation.goalType}
-                  className="rounded-xl bg-muted/50 p-4 hover:bg-muted/80 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-sm font-medium text-foreground truncate">
-                        {allocation.goalType.replace(/([A-Z])/g, ' $1').trim()}
-                      </span>
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                        {allocation.goalCount} {allocation.goalCount === 1 ? 'goal' : 'goals'}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-foreground">
-                        {formatCurrency(allocation.totalSaved, currency)}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        of {formatCurrency(allocation.totalTarget, currency)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Progress value={Math.min(allocation.progressPercentage, 100)} className="h-2" />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>{allocation.progressPercentage.toFixed(1)}% progress</span>
-                      <span>
-                        {formatCurrency(allocation.totalTarget - allocation.totalSaved, currency)} remaining
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Goal Quick List */}
         {dashboard.top5Goals.length > 0 && (

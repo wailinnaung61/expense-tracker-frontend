@@ -33,7 +33,19 @@
     "september": "9月",
     "october": "10月",
     "november": "11月",
-    "december": "12月"
+    "december": "12月",
+    "januaryShort": "1月",
+    "februaryShort": "2月",
+    "marchShort": "3月",
+    "aprilShort": "4月",
+    "mayShort": "5月",
+    "juneShort": "6月",
+    "julyShort": "7月",
+    "augustShort": "8月",
+    "septemberShort": "9月",
+    "octoberShort": "10月",
+    "novemberShort": "11月",
+    "decemberShort": "12月"
   },
   "auth": {
     "login": "ログイン",
@@ -485,7 +497,9 @@
     },
     "type": {
       "income": "収入",
-      "expense": "支出"
+      "expense": "支出",
+      "investment": "投資",
+      "savings": "貯蓄"
     },
     "filters": {
       "searchPlaceholder": "取引を検索...",
@@ -685,6 +699,8 @@
     "closeChat": "チャットを閉じる"
   },
   "settings": {
+    "title": "設定",
+    "description": "アカウント設定と環境設定を管理します",
     "tabs": {
       "profile": "プロフィール",
       "appearance": "外観",
@@ -941,6 +957,21 @@
     "filters": {
       "searchPlaceholder": "貯蓄目標を検索...",
       "allStatus": "すべてのステータス",
+      "allTypes": "すべてのタイプ",
+      "active": "アクティブ",
+      "completed": "完了",
+      "cancelled": "キャンセル"
+    },
+    "goalTypes": {
+      "emergencyFund": "緊急資金",
+      "vacation": "休暇",
+      "vehicle": "車両",
+      "home": "住宅",
+      "education": "教育",
+      "retirement": "退職金",
+      "other": "その他"
+    },
+    "status": {
       "active": "アクティブ",
       "completed": "完了",
       "cancelled": "キャンセル"
@@ -962,6 +993,8 @@
       "editDescription": "貯蓄目標の詳細を更新します。",
       "goalName": "目標名",
       "goalNamePlaceholder": "例：緊急資金、旅行",
+      "goalType": "目標タイプ",
+      "selectGoalType": "目標タイプを選択",
       "description": "説明",
       "descriptionPlaceholder": "この目標の簡単な説明",
       "targetAmount": "目標金額",
@@ -997,6 +1030,7 @@
     "validation": {
       "goalNameRequired": "目標名は必須です。",
       "goalNameMax": "目標名は200文字以内にしてください。",
+      "goalTypeRequired": "目標タイプを選択してください。",
       "targetAmountRequired": "目標金額は必須です。",
       "targetAmountPositive": "目標金額は0より大きくしてください。",
       "amountRequired": "金額は必須です。",
@@ -1070,7 +1104,8 @@
     "qSavings": "目標",
     "qReports": "レポート",
     "savingTagline": "貯蓄目標を追跡",
-    "investmentTagline": "投資状況を確認"
+    "investmentTagline": "投資状況を確認",
+    "netBalance": "純残高"
   },
   "reports": {
     "title": "レポート",
@@ -1091,7 +1126,35 @@
     "year": "年",
     "quarter": "四半期",
     "today": "今日",
-    "done": "完了"
+    "done": "完了",
+    "startMonth": "開始",
+    "endMonth": "終了",
+    "thisYear": "今年",
+    "export": "エクスポート",
+    "netBalance": "純残高",
+    "monthlyBreakdown": "月別内訳",
+    "monthlyBreakdownDesc": "月別の収入、支出、貯蓄、投資",
+    "categoryBreakdown": "カテゴリ別内訳",
+    "categoryBreakdownDesc": "カテゴリ別支出分布",
+    "transactionList": "取引一覧",
+    "transactionListDesc": "この期間の最近の取引",
+    "date": "日付",
+    "category": "カテゴリ",
+    "type": "種類",
+    "descriptionCol": "説明",
+    "amount": "金額",
+    "total": "合計",
+    "transactions": "取引数",
+    "incomeVsExpenseDesc": "月別の収入と支出の比較",
+    "savingsRate": "貯蓄率",
+    "savingsRateDesc": "支出後に保持される収入の割合",
+    "savingsRateFormula": "(収入 − 支出) ÷ 収入",
+    "rateExcellent": "素晴らしい！続けてください 🎉",
+    "rateGood": "良いですが、改善の余地があります",
+    "rateNeedsWork": "注意が必要です ⚠️",
+    "top5Expenses": "トップ5支出",
+    "top5ExpensesDesc": "この期間の最大の支出",
+    "trend": "トレンド"
   },
   "notifications": {
     "title": "通知",

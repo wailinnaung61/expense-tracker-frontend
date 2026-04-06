@@ -24,6 +24,7 @@ export default function Savings() {
 
   // Filters
   const [status, setStatus] = useState<string>("all");
+  const [goalType, setGoalType] = useState<string>("all");
   const [keyword, setKeyword] = useState<string>("");
 
   // Pagination
@@ -52,6 +53,7 @@ export default function Savings() {
         const params: SavingGoalFilterParams = { pageSize };
 
         if (status !== "all") params.status = status;
+        if (goalType !== "all") params.goalType = goalType;
         if (keyword.trim()) params.keyword = keyword.trim();
         if (cursor) params.cursor = cursor;
         if (cursorId) params.cursorId = cursorId;
@@ -68,7 +70,7 @@ export default function Savings() {
         setLoading(false);
       }
     },
-    [status, keyword, t]
+    [status, goalType, keyword, t]
   );
 
   const fetchDashboard = useCallback(async () => {
@@ -207,8 +209,10 @@ export default function Savings() {
       {/* Filters */}
       <SavingsFilters
         status={status}
+        goalType={goalType}
         keyword={keyword}
         onStatusChange={handleFilterChange(setStatus)}
+        onGoalTypeChange={handleFilterChange(setGoalType)}
         onKeywordChange={handleFilterChange(setKeyword)}
       />
 

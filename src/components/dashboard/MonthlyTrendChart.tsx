@@ -116,14 +116,14 @@ export function MonthlyTrendChart({ currency, month }: TrendChartProps) {
             `${year}-01`,
             `${year}-12`
           );
-          const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+          const monthKeys = ["common.januaryShort","common.februaryShort","common.marchShort","common.aprilShort","common.mayShort","common.juneShort","common.julyShort","common.augustShort","common.septemberShort","common.octoberShort","common.novemberShort","common.decemberShort"] as const;
           const monthMap = new Map(monthly.map((m) => {
             const mm = parseInt(m.period.split("-")[1], 10);
             return [mm, m];
           }));
           result = Array.from({ length: 12 }, (_, i) => {
             const m = monthMap.get(i + 1);
-            return { label: monthNames[i], ...(m ? { income: m.income, expense: m.expense, saving: m.saving, investment: m.investment } : empty) };
+            return { label: t(monthKeys[i]), ...(m ? { income: m.income, expense: m.expense, saving: m.saving, investment: m.investment } : empty) };
           });
           break;
         }
@@ -149,7 +149,7 @@ export function MonthlyTrendChart({ currency, month }: TrendChartProps) {
     } finally {
       setLoading(false);
     }
-  }, [viewMode, currentDate]);
+  }, [viewMode, currentDate, t]);
 
   useEffect(() => {
     fetchData();

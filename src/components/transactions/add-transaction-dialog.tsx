@@ -352,6 +352,32 @@ export function AddTransactionDialog({
                       <span>{t("transactions.type.income")}</span>
                     </Label>
                   </div>
+                  <div>
+                    <RadioGroupItem
+                      value={String(TransactionType.Investment)}
+                      id="investment"
+                      className="peer sr-only"
+                    />
+                    <Label
+                      htmlFor="investment"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                    >
+                      <span>{t("transactions.type.investment")}</span>
+                    </Label>
+                  </div>
+                  <div>
+                    <RadioGroupItem
+                      value={String(TransactionType.Savings)}
+                      id="savings"
+                      className="peer sr-only"
+                    />
+                    <Label
+                      htmlFor="savings"
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                    >
+                      <span>{t("transactions.type.savings")}</span>
+                    </Label>
+                  </div>
                 </RadioGroup>
               )}
             />

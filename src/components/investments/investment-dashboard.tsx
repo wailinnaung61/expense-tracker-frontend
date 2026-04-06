@@ -5,6 +5,20 @@ import { formatCurrency } from "@/lib/utils";
 import type { InvestmentDashboard } from "@/types/investment";
 import { TrendingUp, TrendingDown, Wallet, BarChart3, PieChart } from "lucide-react";
 
+const translateAssetType = (type: string, t: any): string => {
+  const typeMap: Record<string, string> = {
+    'STOCK': 'investments.filters.stock',
+    'CRYPTO': 'investments.filters.crypto',
+    'BOND': 'investments.filters.bond',
+    'MUTUALFUND': 'investments.filters.mutualFund',
+    'REALESTATE': 'investments.filters.realEstate',
+    'REAL_ESTATE': 'investments.filters.realEstate',
+    'GOLD': 'investments.filters.gold',
+    'OTHER': 'investments.filters.other',
+  };
+  return t(typeMap[type.toUpperCase()] || type);
+};
+
 interface InvestmentDashboardProps {
   dashboard: InvestmentDashboard;
   currency: string;
@@ -144,7 +158,7 @@ export function InvestmentDashboardView({ dashboard, currency }: InvestmentDashb
               {dashboard.assetAllocation.map((asset) => (
                 <div key={asset.assetType} className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{asset.assetType}</span>
+                    <span className="text-muted-foreground">{translateAssetType(asset.assetType, t)}</span>
                     <span className="font-medium">
                       {formatCurrency(asset.currentValue, currency)} ({asset.percentage.toFixed(1)}%)
                     </span>

@@ -60,17 +60,8 @@ export interface SavingDashboard {
   overallProgressPercentage: number;
   activeGoalsCount: number;
   completedGoalsCount: number;
-  goalTypeAllocation?: GoalTypeAllocation[];
   goals: SavingGoal[];
   top5Goals: SavingGoal[];
-}
-
-export interface GoalTypeAllocation {
-  goalType: string;
-  totalSaved: number;
-  totalTarget: number;
-  progressPercentage: number;
-  goalCount: number;
 }
 
 export interface CreateSavingGoalRequest {
@@ -105,6 +96,7 @@ export interface AddSavingContributionRequest {
 
 export interface SavingGoalFilterParams {
   status?: SavingGoalStatus | string;
+  goalType?: SavingGoalType | string;
   keyword?: string;
   pageSize?: number;
   cursor?: string;

@@ -11,15 +11,19 @@ import { Search } from "lucide-react";
 
 interface SavingsFiltersProps {
   status: string;
+  goalType: string;
   keyword: string;
   onStatusChange: (status: string) => void;
+  onGoalTypeChange: (goalType: string) => void;
   onKeywordChange: (keyword: string) => void;
 }
 
 export function SavingsFilters({
   status,
+  goalType,
   keyword,
   onStatusChange,
+  onGoalTypeChange,
   onKeywordChange,
 }: SavingsFiltersProps) {
   const { t } = useTranslation();
@@ -49,6 +53,22 @@ export function SavingsFilters({
                 <SelectItem value="0">{t("savings.filters.active")}</SelectItem>
                 <SelectItem value="1">{t("savings.filters.completed")}</SelectItem>
                 <SelectItem value="2">{t("savings.filters.cancelled")}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={goalType} onValueChange={onGoalTypeChange}>
+              <SelectTrigger className="w-full sm:w-44 h-11 border-muted-foreground/20">
+                <SelectValue placeholder={t("savings.filters.allTypes")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("savings.filters.allTypes")}</SelectItem>
+                <SelectItem value="EmergencyFund">{t("savings.goalTypes.emergencyFund")}</SelectItem>
+                <SelectItem value="Vacation">{t("savings.goalTypes.vacation")}</SelectItem>
+                <SelectItem value="Vehicle">{t("savings.goalTypes.vehicle")}</SelectItem>
+                <SelectItem value="Home">{t("savings.goalTypes.home")}</SelectItem>
+                <SelectItem value="Education">{t("savings.goalTypes.education")}</SelectItem>
+                <SelectItem value="Retirement">{t("savings.goalTypes.retirement")}</SelectItem>
+                <SelectItem value="Other">{t("savings.goalTypes.other")}</SelectItem>
               </SelectContent>
             </Select>
           </div>

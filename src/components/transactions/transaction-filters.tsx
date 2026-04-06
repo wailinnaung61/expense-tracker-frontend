@@ -151,6 +151,8 @@ export function TransactionFilters({
                 <SelectItem value="all">{t("transactions.filters.allTypes")}</SelectItem>
                 <SelectItem value="0">{t("transactions.type.income")}</SelectItem>
                 <SelectItem value="1">{t("transactions.type.expense")}</SelectItem>
+                <SelectItem value="2">{t("transactions.type.investment")}</SelectItem>
+                <SelectItem value="3">{t("transactions.type.savings")}</SelectItem>
               </SelectContent>
             </Select>
             

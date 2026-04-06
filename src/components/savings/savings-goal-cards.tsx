@@ -47,9 +47,26 @@ const getStatusBadgeClass = (status: string): string => {
   return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400";
 };
 
-const formatGoalTypeLabel = (goalType?: string) => {
-  if (!goalType) return "";
-  return goalType.replace(/([A-Z])/g, " $1").trim();
+const translateGoalType = (goalType: string, t: any): string => {
+  const typeMap: Record<string, string> = {
+    'EmergencyFund': 'savings.goalTypes.emergencyFund',
+    'Vacation': 'savings.goalTypes.vacation',
+    'Vehicle': 'savings.goalTypes.vehicle',
+    'Home': 'savings.goalTypes.home',
+    'Education': 'savings.goalTypes.education',
+    'Retirement': 'savings.goalTypes.retirement',
+    'Other': 'savings.goalTypes.other',
+  };
+  return t(typeMap[goalType] || 'savings.goalTypes.other');
+};
+
+const translateStatus = (status: string, t: any): string => {
+  const statusMap: Record<string, string> = {
+    'ACTIVE': 'savings.status.active',
+    'COMPLETED': 'savings.status.completed',
+    'CANCELLED': 'savings.status.cancelled',
+  };
+  return t(statusMap[status.toUpperCase()] || status);
 };
 
 const getGoalTypeValue = (goal: any) => {
@@ -143,15 +160,17 @@ export function SavingsGoalCards({
                         <CircleDot className="h-5 w-5" style={{ color: goalColor }} />
                       )}
                     </div>
-                    <div className="min-w-0">
-                      <h3 className="text-sm font-semibold truncate">{goal.goalName}</h3>
-                      {getGoalTypeValue(goal) && (
-                        <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-1">
-                          {formatGoalTypeLabel(getGoalTypeValue(goal))}
-                        </p>
-                      )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-semibold truncate">{goal.goalName}</h3>
+                        {getGoalTypeValue(goal) && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-muted text-muted-foreground shrink-0">
+                            {translateGoalType(getGoalTypeValue(goal), t)}
+                          </span>
+                        )}
+                      </div>
                       {goal.description && (
-                        <p className="text-xs text-muted-foreground truncate max-w-45">
+                        <p className="text-xs text-muted-foreground line-clamp-1">
                           {goal.description}
                         </p>
                       )}
@@ -161,7 +180,7 @@ export function SavingsGoalCards({
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${getStatusBadgeClass(goal.status)}`}
                     >
-                      {goal.status}
+                      {translateStatus(goal.status, t)}
                     </span>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

@@ -33,7 +33,19 @@
     "september": "September",
     "october": "October",
     "november": "November",
-    "december": "December"
+    "december": "December",
+    "januaryShort": "Jan",
+    "februaryShort": "Feb",
+    "marchShort": "Mar",
+    "aprilShort": "Apr",
+    "mayShort": "May",
+    "juneShort": "Jun",
+    "julyShort": "Jul",
+    "augustShort": "Aug",
+    "septemberShort": "Sep",
+    "octoberShort": "Oct",
+    "novemberShort": "Nov",
+    "decemberShort": "Dec"
   },
   "auth": {
     "login": "Login",
@@ -546,7 +558,9 @@
     },
     "type": {
       "income": "Income",
-      "expense": "Expense"
+      "expense": "Expense",
+      "investment": "Investment",
+      "savings": "Savings"
     },
     "filters": {
       "searchPlaceholder": "Search transactions...",
@@ -745,6 +759,8 @@
     "openChat": "Open chat",
     "closeChat": "Close chat"  },
   "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and preferences",
     "tabs": {
       "profile": "Profile",
       "appearance": "Appearance",
@@ -1000,6 +1016,21 @@
     "filters": {
       "searchPlaceholder": "Search savings goals...",
       "allStatus": "All Status",
+      "allTypes": "All Types",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "goalTypes": {
+      "emergencyFund": "Emergency Fund",
+      "vacation": "Vacation",
+      "vehicle": "Vehicle",
+      "home": "Home",
+      "education": "Education",
+      "retirement": "Retirement",
+      "other": "Other"
+    },
+    "status": {
       "active": "Active",
       "completed": "Completed",
       "cancelled": "Cancelled"
@@ -1021,6 +1052,8 @@
       "editDescription": "Update your savings goal details.",
       "goalName": "Goal Name",
       "goalNamePlaceholder": "e.g. Emergency Fund, Vacation",
+      "goalType": "Goal Type",
+      "selectGoalType": "Select goal type",
       "description": "Description",
       "descriptionPlaceholder": "Brief description of this goal",
       "targetAmount": "Target Amount",
@@ -1056,6 +1089,7 @@
     "validation": {
       "goalNameRequired": "Goal name is required.",
       "goalNameMax": "Goal name must be 200 characters or less.",
+      "goalTypeRequired": "Please select a goal type.",
       "targetAmountRequired": "Target amount is required.",
       "targetAmountPositive": "Target amount must be greater than 0.",
       "amountRequired": "Amount is required.",

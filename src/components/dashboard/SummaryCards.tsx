@@ -112,7 +112,7 @@ export const SummaryCards = memo(function SummaryCards({ current, previous, curr
     },
     {
       key: "netBalance",
-      label: t("dashboard.netBalance" as any),
+      label: t("dashboard.netBalance"),
       value: netBalance,
       prev: prevNetBalance,
       icon: Scale,

@@ -63,6 +63,30 @@ const getAssetTypeBadgeClass = (type: string): string => {
   return "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400";
 };
 
+const translateAssetType = (type: string, t: any): string => {
+  const typeMap: Record<string, string> = {
+    'STOCK': 'investments.filters.stock',
+    'CRYPTO': 'investments.filters.crypto',
+    'BOND': 'investments.filters.bond',
+    'MUTUALFUND': 'investments.filters.mutualFund',
+    'REALESTATE': 'investments.filters.realEstate',
+    'REAL_ESTATE': 'investments.filters.realEstate',
+    'GOLD': 'investments.filters.gold',
+    'OTHER': 'investments.filters.other',
+  };
+  return t(typeMap[type.toUpperCase()] || type);
+};
+
+const translateStatus = (status: string, t: any): string => {
+  const statusMap: Record<string, string> = {
+    'HOLDING': 'investments.filters.holding',
+    'SOLD': 'investments.filters.sold',
+    'PARTIALSOLD': 'investments.filters.partialSold',
+    'PARTIAL_SOLD': 'investments.filters.partialSold',
+  };
+  return t(statusMap[status.toUpperCase()] || status);
+};
+
 export function InvestmentsTable({
   investments,
   portfolios,
@@ -147,7 +171,7 @@ export function InvestmentsTable({
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${getAssetTypeBadgeClass(inv.assetType)}`}
                       >
-                        {inv.assetType}
+                        {translateAssetType(inv.assetType, t)}
                       </span>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm">{inv.quantity}</TableCell>
@@ -197,7 +221,7 @@ export function InvestmentsTable({
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${getStatusBadgeClass(inv.status)}`}
                       >
-                        {inv.status}
+                        {translateStatus(inv.status, t)}
                       </span>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right">

@@ -33,7 +33,19 @@
     "september": "စက်တင်ဘာ",
     "october": "အောက်တိုဘာ",
     "november": "နိုဝင်ဘာ",
-    "december": "ဒီဇင်ဘာ"
+    "december": "ဒီဇင်ဘာ",
+    "januaryShort": "ဇန်",
+    "februaryShort": "ဖေ",
+    "marchShort": "မတ်",
+    "aprilShort": "ဧပြီ",
+    "mayShort": "မေ",
+    "juneShort": "ဇွန်",
+    "julyShort": "ဇူ",
+    "augustShort": "သြ",
+    "septemberShort": "စက်",
+    "octoberShort": "အောက်",
+    "novemberShort": "နို",
+    "decemberShort": "ဒီ"
   },
   "auth": {
     "login": "ဝင်မည်",
@@ -485,7 +497,9 @@
     },
     "type": {
       "income": "ဝင်ငွေ",
-      "expense": "ကုန်ကျစရိတ်"
+      "expense": "ကုန်ကျစရိတ်",
+      "investment": "ရင်းနှီးမြှုပ်နှံမှု",
+      "savings": "စုငွေ"
     },
     "filters": {
       "searchPlaceholder": "ငွေသွင်းထုတ်များ ရှာမည်...",
@@ -684,6 +698,8 @@
     "openChat": "ချတ် အဖွင့်",
     "closeChat": "ချတ် အပိတ်"  },
   "settings": {
+    "title": "ချိန်ညှိချက်များ",
+    "description": "သင့်အကောင့် ချိန်ညှိချက်များနှင့် နှစ်သက်မှုများကို စီမံပါ",
     "tabs": {
       "profile": "ပရိုဖိုင်",
       "appearance": "အသွင်အပြင်",
@@ -940,6 +956,21 @@
     "filters": {
       "searchPlaceholder": "စုဆောင်းငွေ ပန်းတိုင် ရှာပါ...",
       "allStatus": "အခြေအနေ အားလုံး",
+      "allTypes": "အမျိုးအစား အားလုံး",
+      "active": "လက်ရှိ",
+      "completed": "ပြီးစီး",
+      "cancelled": "ပယ်ဖျက်"
+    },
+    "goalTypes": {
+      "emergencyFund": "အရေးပေါ်ရန်ပုံငွေ",
+      "vacation": "အားလပ်ရက်",
+      "vehicle": "မော်တော်ယာဉ်",
+      "home": "အိမ်",
+      "education": "ပညာရေး",
+      "retirement": "အငြိမ်းစား",
+      "other": "အခြား"
+    },
+    "status": {
       "active": "လက်ရှိ",
       "completed": "ပြီးစီး",
       "cancelled": "ပယ်ဖျက်"
@@ -961,6 +992,8 @@
       "editDescription": "စုဆောင်းငွေ ပန်းတိုင် အသေးစိတ်ကို ပြင်ဆင်ပါ။",
       "goalName": "ပန်းတိုင်အမည်",
       "goalNamePlaceholder": "ဥပမာ - အရေးပေါ်ရန်ပုံငွေ၊ ခရီးသွား",
+      "goalType": "ပန်းတိုင် အမျိုးအစား",
+      "selectGoalType": "ပန်းတိုင် အမျိုးအစား ရွေးပါ",
       "description": "ဖော်ပြချက်",
       "descriptionPlaceholder": "ဤပန်းတိုင်၏ အကျဉ်းချုပ်",
       "targetAmount": "ပစ်မှတ်ပမာဏ",
@@ -996,6 +1029,7 @@
     "validation": {
       "goalNameRequired": "ပန်းတိုင်အမည် လိုအပ်ပါသည်။",
       "goalNameMax": "ပန်းတိုင်အမည် စာလုံး ၂၀၀ အတွင်း ဖြစ်ရပါမည်။",
+      "goalTypeRequired": "ပန်းတိုင် အမျိုးအစား ရွေးပါ။",
       "targetAmountRequired": "ပစ်မှတ်ပမာဏ လိုအပ်ပါသည်။",
       "targetAmountPositive": "ပစ်မှတ်ပမာဏ ၀ ထက် ကြီးရပါမည်။",
       "amountRequired": "ပမာဏ လိုအပ်ပါသည်။",
@@ -1069,7 +1103,8 @@
     "qSavings": "ရည်မှန်းချက်",
     "qReports": "အစီရင်ခံ",
     "savingTagline": "စုဆောင်းငွေ ပန်းတိုင်းများ ခြေရာခံမည်",
-    "investmentTagline": "ရင်းနှီးမြှုပ်နှံမှု ကြည့်ရှုမည်"
+    "investmentTagline": "ရင်းနှီးမြှုပ်နှံမှု ကြည့်ရှုမည်",
+    "netBalance": "စုစုပေါင်း လက်ကျန်ငွေ"
   },
   "reports": {
     "title": "အစီရင်ခံစာ",
@@ -1090,7 +1125,35 @@
     "year": "နှစ်",
     "quarter": "သုံးလပတ်",
     "today": "ယနေ့",
-    "done": "ပြီးပါပြီ"
+    "done": "ပြီးပါပြီ",
+    "startMonth": "စတင်",
+    "endMonth": "ပြီးစီး",
+    "thisYear": "ယခုနှစ်",
+    "export": "ထုတ်ယူပါ",
+    "netBalance": "စုစုပေါင်း လက်ကျန်ငွေ",
+    "monthlyBreakdown": "လစဉ် ခွဲခြမ်းစိတ်ဖြာမှု",
+    "monthlyBreakdownDesc": "လစဉ်အတွက် ဝင်ငွေ၊ အသုံးစရိတ်၊ စုဆောင်းငွေ နှင့် ရင်းနှီးမြှုပ်နှံမှု",
+    "categoryBreakdown": "အမျိုးအစား ခွဲခြမ်းစိတ်ဖြာမှု",
+    "categoryBreakdownDesc": "အမျိုးအစား အလိုက် အသုံးစရိတ် ခွဲဝေမှု",
+    "transactionList": "ငွေသွင်းထုတ် စာရင်း",
+    "transactionListDesc": "ဤကာလအတွင်း မကြာသေးမီ ငွေသွင်းထုတ်များ",
+    "date": "ရက်စွဲ",
+    "category": "အမျိုးအစား",
+    "type": "အမျိုးအစား",
+    "descriptionCol": "ဖော်ပြချက်",
+    "amount": "ပမာဏ",
+    "total": "စုစုပေါင်း",
+    "transactions": "ငွေသွင်းထုတ်စရွယ်",
+    "incomeVsExpenseDesc": "လစဉ် ဝင်ငွေ နှင့် အသုံးစရိတ် ပမာဏ နှိုင်းယှဉ်မှု",
+    "savingsRate": "စုဆောင်းငွေ အရှိအသား",
+    "savingsRateDesc": "အသုံးစရိတ် ဖြစ်ပြီး ကျန်ရှိသော ဝင်ငွေရှိန်မှန်း အချိုးအစား",
+    "savingsRateFormula": "(ဝင်ငွေ − အသုံးစရိတ်) ÷ ဝင်ငွေ",
+    "rateExcellent": "သိပ်သန်သန်သာသာ! ဆက်လုပ်ပါ 🎉",
+    "rateGood": "ကောင်းပါသည်၊ မြှင့်တင်ရန် ရှိပါသေးသည်",
+    "rateNeedsWork": "အာရုံစိုက်ပါ ⚠️",
+    "top5Expenses": "အကြီးဆက်ဆုံး အသုံးစရိတ် 5 ခု",
+    "top5ExpensesDesc": "ဤကာလတွင်း အကြီးဆက်ဆုံး အသုံးစရိတ်များ",
+    "trend": "ရေတိုးပြေင်းလဲ"
   },
   "notifications": {
     "title": "သတင်းအချက်အလက်များ",

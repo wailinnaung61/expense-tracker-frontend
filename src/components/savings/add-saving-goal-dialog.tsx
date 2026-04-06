@@ -53,16 +53,6 @@ const GOAL_COLORS = [
   "#7c3aed", "#9333ea", "#c026d3", "#db2777", "#e11d48",
 ];
 
-const GOAL_TYPES = [
-  { value: String(SavingGoalType.EmergencyFund), label: "Emergency Fund" },
-  { value: String(SavingGoalType.Vacation), label: "Vacation" },
-  { value: String(SavingGoalType.Vehicle), label: "Vehicle" },
-  { value: String(SavingGoalType.Home), label: "Home" },
-  { value: String(SavingGoalType.Education), label: "Education" },
-  { value: String(SavingGoalType.Retirement), label: "Retirement" },
-  { value: String(SavingGoalType.Other), label: "Other" },
-];
-
 type SavingGoalFormData = {
   goalName: string;
   targetAmount: string;
@@ -88,6 +78,16 @@ export function AddSavingGoalDialog({
   goal,
 }: AddSavingGoalDialogProps) {
   const { t } = useTranslation();
+
+  const GOAL_TYPES = useMemo(() => [
+    { value: String(SavingGoalType.EmergencyFund), label: t("savings.goalTypes.emergencyFund") },
+    { value: String(SavingGoalType.Vacation), label: t("savings.goalTypes.vacation") },
+    { value: String(SavingGoalType.Vehicle), label: t("savings.goalTypes.vehicle") },
+    { value: String(SavingGoalType.Home), label: t("savings.goalTypes.home") },
+    { value: String(SavingGoalType.Education), label: t("savings.goalTypes.education") },
+    { value: String(SavingGoalType.Retirement), label: t("savings.goalTypes.retirement") },
+    { value: String(SavingGoalType.Other), label: t("savings.goalTypes.other") },
+  ], [t]);
 
   const goalSchema = useMemo(
     () =>
@@ -253,14 +253,14 @@ export function AddSavingGoalDialog({
 
           {/* Goal Type */}
           <div className="space-y-2">
-            <Label>Goal Type</Label>
+            <Label>{t("savings.dialog.goalType")}</Label>
             <Controller
               name="savingGoalType"
               control={control}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select goal type" />
+                    <SelectValue placeholder={t("savings.dialog.selectGoalType")} />
                   </SelectTrigger>
                   <SelectContent>
                     {GOAL_TYPES.map((type) => (
@@ -273,7 +273,7 @@ export function AddSavingGoalDialog({
               )}
             />
             {errors.savingGoalType && (
-              <p className="text-sm text-red-600">Please select a goal type.</p>
+              <p className="text-sm text-red-600">{t("savings.validation.goalTypeRequired")}</p>
             )}
           </div>
 
