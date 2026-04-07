@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { authService } from '@/services/authService'
+import { apiClient } from '@/lib/api'
 import type { User, LoginResponse } from '@/types/auth'
 
 interface AuthContextType {
@@ -19,8 +20,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   // Fetch user data from /api/auth/me
-const fetchUser = async () => {
+const fetchUser = async (silent: boolean = false) => {
   try {
+    // Note: The apiClient will automatically attempt token refresh if needed
+    // The silent parameter affects whether refresh errors show alerts
     const userData = await authService.getMe()
     setUser(userData)
     // Store username for refresh token requests (needed for Google OAuth and page reload)
@@ -31,6 +34,10 @@ const fetchUser = async () => {
     if (error?.status === 401 || error?.status === 403) {
       authService.clearTokens()
     }
+    // Re-throw if not silent to let caller handle
+    if (!silent) {
+      throw error
+    }
   }
 }
 
@@ -39,12 +46,16 @@ const fetchUser = async () => {
     const initAuth = async () => {
       try {
         if (authService.isAuthenticated()) {
-          await fetchUser()
+          // Silent mode: don't show error alerts on initial page load
+          await fetchUser(true)
         }
       } catch (error) {
+        // Silently fail - user will be redirected to login without alert
         console.error('Auth init failed:', error)
       } finally {
         setIsLoading(false)
+        // Mark initial load as complete - future token refresh errors will show alerts
+        apiClient.setInitialLoadComplete()
       }
     }
     initAuth()

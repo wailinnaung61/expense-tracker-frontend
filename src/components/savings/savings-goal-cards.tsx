@@ -49,15 +49,15 @@ const getStatusBadgeClass = (status: string): string => {
 
 const translateGoalType = (goalType: string, t: any): string => {
   const typeMap: Record<string, string> = {
-    'EmergencyFund': 'savings.goalTypes.emergencyFund',
-    'Vacation': 'savings.goalTypes.vacation',
-    'Vehicle': 'savings.goalTypes.vehicle',
-    'Home': 'savings.goalTypes.home',
-    'Education': 'savings.goalTypes.education',
-    'Retirement': 'savings.goalTypes.retirement',
-    'Other': 'savings.goalTypes.other',
+    'EMERGENCYFUND': 'savings.goalTypes.emergencyFund',
+    'VACATION': 'savings.goalTypes.vacation',
+    'VEHICLE': 'savings.goalTypes.vehicle',
+    'HOME': 'savings.goalTypes.home',
+    'EDUCATION': 'savings.goalTypes.education',
+    'RETIREMENT': 'savings.goalTypes.retirement',
+    'OTHER': 'savings.goalTypes.other',
   };
-  return t(typeMap[goalType] || 'savings.goalTypes.other');
+  return t(typeMap[goalType.toUpperCase()] || 'savings.goalTypes.other');
 };
 
 const translateStatus = (status: string, t: any): string => {

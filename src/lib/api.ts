@@ -15,9 +15,14 @@ export class ApiError extends Error {
 // Token refresh state
 let isRefreshing = false;
 let refreshPromise: Promise<void> | null = null;
+let isInitialLoad = true; // Track if we're in initial page load
 
 export const apiClient = {
-  async refreshToken(): Promise<void> {
+  setInitialLoadComplete(): void {
+    isInitialLoad = false;
+  },
+
+  async refreshToken(silent: boolean = false): Promise<void> {
     const refreshToken = localStorage.getItem('refreshToken');
     const username = localStorage.getItem('username');
     
@@ -69,21 +74,24 @@ export const apiClient = {
         console.error('Failed to parse error response:', e);
       }
       
-      // Refresh failed, clear tokens and show error message
+      // Refresh failed, clear tokens
       localStorage.removeItem('accessToken');
       localStorage.removeItem('idToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('username');
       
-      // Show error alert with actual message from server
-      await Swal.fire({
-        icon: 'warning',
-        title: errorTitle,
-        text: errorMessage,
-        confirmButtonText: 'Login',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-      });
+      // Only show error alert if not silent (e.g., not during initial page load)
+      const shouldShowAlert = !silent && !isInitialLoad;
+      if (shouldShowAlert) {
+        await Swal.fire({
+          icon: 'warning',
+          title: errorTitle,
+          text: errorMessage,
+          confirmButtonText: 'Login',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        });
+      }
       
       window.location.href = '/auth/login';
       throw new Error(`Token refresh failed: ${response.status} ${response.statusText}`);
