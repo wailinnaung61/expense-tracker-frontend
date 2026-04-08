@@ -247,12 +247,6 @@
       "today": "Today",
       "ctaDemo": "Watch Demo"
     },
-    "stats": {
-      "users": "Active Users",
-      "tracked": "Tracked",
-      "saved": "Saved",
-      "rating": "Rating"
-    },
     "features": {
       "title": "Powerful Features",
       "subtitle1": "Everything You Need to",
@@ -285,7 +279,7 @@
     },
     "benefits": {
       "title": "Why Choose Spendio?",
-      "subtitle": "Join thousands of satisfied users who trust us with their financial future",
+      "subtitle": "Smart financial tools designed for real results",
       "easy": {
         "title": "Easy to Use",
         "description": "Intuitive interface that anyone can master in minutes"

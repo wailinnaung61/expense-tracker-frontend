@@ -65,13 +65,6 @@ export default function LandingPage() {
     },
   ];
 
-  const stats = [
-    { value: "10K+", label: t('landing.stats.users') },
-    { value: "$50M+", label: t('landing.stats.tracked') },
-    { value: "99.9%", label: t('landing.stats.saved') },
-    { value: "4.9★", label: t('landing.stats.rating') },
-  ];
-
   const benefits = [
     { icon: <Zap className="h-5 w-5" />, text: t('landing.benefits.easy.title') },
     { icon: <Smartphone className="h-5 w-5" />, text: t('landing.benefits.powerful.title') },
@@ -276,25 +269,6 @@ export default function LandingPage() {
                   <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-sky-100/40 via-cyan-100/40 to-teal-100/40 animate-shimmer"></div>
                 </div>
               </Button>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto pt-8 border-t border-sky-100">
-              {stats.map((stat, index) => (
-                <div 
-                  key={index} 
-                  className="text-center group cursor-default animate-in fade-in zoom-in duration-700"
-                  style={{ animationDelay: `${700 + index * 100}ms` }}
-                >
-                  <div className="relative inline-block mb-2">
-                    <div className="absolute inset-0 bg-linear-to-r from-sky-600 to-cyan-600 blur-xl opacity-0 group-hover:opacity-40 transition-opacity animate-pulse"></div>
-                    <div className="relative text-4xl sm:text-5xl font-black bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent group-hover:scale-125 transition-all duration-300 animate-float">
-                      {stat.value}
-                    </div>
-                  </div>
-                  <div className="text-sm font-medium text-gray-600 uppercase tracking-wider">{stat.label}</div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
