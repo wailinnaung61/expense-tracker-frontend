@@ -104,31 +104,32 @@ export default function LandingPage() {
 
       {/* Navigation */}
       <nav className="border-b border-sky-100/50 bg-white/70 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3 group animate-in fade-in slide-in-from-left duration-700">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center gap-2 sm:gap-3 group animate-in fade-in slide-in-from-left duration-700">
               <div className="relative animate-bounce-subtle">
                 <div className="absolute inset-0 bg-linear-to-br from-sky-400 to-cyan-500 rounded-xl blur-md opacity-60 group-hover:opacity-100 transition-opacity animate-pulse-glow"></div>
-                <div className="relative h-10 w-10 rounded-xl bg-linear-to-br from-sky-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-sky-500/40 group-hover:shadow-sky-500/60 transition-all group-hover:scale-110 group-hover:rotate-12">
-                  <Wallet className="h-5 w-5 text-white animate-float" />
+                <div className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-linear-to-br from-sky-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-sky-500/40 group-hover:shadow-sky-500/60 transition-all group-hover:scale-110 group-hover:rotate-12">
+                  <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-white animate-float" />
                 </div>
               </div>
-              <span className="text-xl font-bold bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="text-lg sm:text-xl font-bold bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
                 Spendio
               </span>
             </div>
-            <div className="flex gap-3 animate-in fade-in slide-in-from-right duration-700">
+            <div className="flex gap-1.5 sm:gap-3 animate-in fade-in slide-in-from-right duration-700">
               <LanguageSwitcher />
               <Button 
                 variant="ghost" 
                 onClick={() => navigate("/login")} 
-                className="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition-all"
+                className="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition-all text-sm sm:text-base px-2 sm:px-4"
               >
-                {t('auth.signIn')}
+                <span className="hidden xs:inline">{t('auth.signIn')}</span>
+                <span className="xs:hidden">{t('auth.login')}</span>
               </Button>
               <Button 
                 onClick={() => navigate("/signup")} 
-                className="relative overflow-hidden bg-linear-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg shadow-sky-500/30 hover:shadow-xl hover:shadow-sky-500/40 transition-all hover:scale-110 group animate-pulse-glow text-white"
+                className="relative overflow-hidden bg-linear-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg shadow-sky-500/30 hover:shadow-xl hover:shadow-sky-500/40 transition-all hover:scale-110 group animate-pulse-glow text-white text-sm sm:text-base px-3 sm:px-4"
               >
                 <span className="relative z-10 font-semibold">{t('auth.getStarted')}</span>
                 <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
