@@ -284,7 +284,7 @@
       }
     },
     "benefits": {
-      "title": "ExpenseTrackerが選ばれる理由",
+      "title": "Spendioが選ばれる理由",
       "subtitle": "数千人のユーザーが、将来の資産形成を私たちに託しています",
       "easy": {
         "title": "圧倒的な使いやすさ",
@@ -313,7 +313,7 @@
     },
     "testimonials": {
       "title": "多くのユーザーに愛されています",
-      "subtitle": "ExpenseTrackerをご利用中の方々の声をご紹介します"
+      "subtitle": "Spendioをご利用中の方々の声をご紹介します"
     },
     "screenshots": {
       "badge": "マルチデバイス対応",
@@ -349,7 +349,7 @@
       "terms": "利用規約",
       "cookiePolicy": "Cookieポリシー",
       "licenses": "ライセンス",
-      "copyright": "© 2026 ExpenseTracker. All rights reserved.",
+      "copyright": "© 2026 Spendio. All rights reserved.",
       "madeWith": "あなたの豊かな未来のために ❤️ を込めて"
     }
   }

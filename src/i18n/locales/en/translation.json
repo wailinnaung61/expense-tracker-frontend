@@ -284,7 +284,7 @@
       }
     },
     "benefits": {
-      "title": "Why Choose ExpenseTracker?",
+      "title": "Why Choose Spendio?",
       "subtitle": "Join thousands of satisfied users who trust us with their financial future",
       "easy": {
         "title": "Easy to Use",
@@ -313,7 +313,7 @@
     },
     "testimonials": {
       "title": "Loved by Thousands",
-      "subtitle": "See what our users are saying about ExpenseTracker"
+      "subtitle": "See what our users are saying about Spendio"
     },
     "screenshots": {
       "badge": "Cross-Platform",
@@ -358,7 +358,7 @@
     "privacy": {
       "title": "Privacy Policy",
       "lastUpdated": "Last updated: April 1, 2026",
-      "intro": "At ExpenseTracker, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our application.",
+      "intro": "At Spendio, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our application.",
       "infoCollect": "Information We Collect",
       "infoCollectDesc": "We collect information you provide directly to us, including your name, email address, and financial data you enter into the application such as transactions, budgets, savings goals, and investment records.\n\nWe also automatically collect certain technical information when you use our service, including your IP address, browser type, device information, and usage patterns.",
       "howWeUse": "How We Use Your Information",
@@ -379,17 +379,17 @@
     "terms": {
       "title": "Terms of Service",
       "lastUpdated": "Last updated: April 1, 2026",
-      "intro": "Welcome to ExpenseTracker. By accessing or using our application, you agree to be bound by these Terms of Service. Please read them carefully before using our service.",
+      "intro": "Welcome to Spendio. By accessing or using our application, you agree to be bound by these Terms of Service. Please read them carefully before using our service.",
       "acceptance": "Acceptance of Terms",
-      "acceptanceDesc": "By creating an account or using ExpenseTracker, you agree to these Terms of Service and our Privacy Policy. If you do not agree with any part of these terms, you may not use our service.",
+      "acceptanceDesc": "By creating an account or using Spendio, you agree to these Terms of Service and our Privacy Policy. If you do not agree with any part of these terms, you may not use our service.",
       "accounts": "User Accounts",
       "accountsDesc": "You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.\n\nYou must provide accurate and complete information when creating your account. You agree to notify us immediately of any unauthorized use of your account.",
       "useOfService": "Acceptable Use",
-      "useOfServiceDesc": "You agree to use ExpenseTracker only for its intended purpose of personal financial management. You may not use the service to store or transmit malicious code, violate any applicable laws, or infringe on the rights of others.\n\nYou are solely responsible for the accuracy of the financial data you enter into the application.",
+      "useOfServiceDesc": "You agree to use Spendio only for its intended purpose of personal financial management. You may not use the service to store or transmit malicious code, violate any applicable laws, or infringe on the rights of others.\n\nYou are solely responsible for the accuracy of the financial data you enter into the application.",
       "intellectualProperty": "Intellectual Property",
-      "intellectualPropertyDesc": "ExpenseTracker and its original content, features, and functionality are owned by us and are protected by international copyright, trademark, and other intellectual property laws.\n\nYour financial data remains your property. We do not claim ownership of the data you enter into the application.",
+      "intellectualPropertyDesc": "Spendio and its original content, features, and functionality are owned by us and are protected by international copyright, trademark, and other intellectual property laws.\n\nYour financial data remains your property. We do not claim ownership of the data you enter into the application.",
       "limitation": "Limitation of Liability",
-      "limitationDesc": "ExpenseTracker is provided as a financial tracking tool and does not constitute financial advice. We are not responsible for any financial decisions you make based on information displayed in the application.\n\nTo the maximum extent permitted by law, we shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service.",
+      "limitationDesc": "Spendio is provided as a financial tracking tool and does not constitute financial advice. We are not responsible for any financial decisions you make based on information displayed in the application.\n\nTo the maximum extent permitted by law, we shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service.",
       "termination": "Termination",
       "terminationDesc": "We may terminate or suspend your account at any time for violation of these terms, without prior notice. Upon termination, your right to use the service will immediately cease.\n\nYou may delete your account at any time through the application settings. Upon deletion, your data will be permanently removed in accordance with our Privacy Policy.",
       "changes": "Changes to Terms",
@@ -400,7 +400,7 @@
     "cookies": {
       "title": "Cookie Policy",
       "lastUpdated": "Last updated: April 1, 2026",
-      "intro": "This Cookie Policy explains how ExpenseTracker uses cookies and similar technologies to recognize you when you visit our application. It explains what these technologies are, why we use them, and your rights to control our use of them.",
+      "intro": "This Cookie Policy explains how Spendio uses cookies and similar technologies to recognize you when you visit our application. It explains what these technologies are, why we use them, and your rights to control our use of them.",
       "whatAreCookies": "What Are Cookies",
       "whatAreCookiesDesc": "Cookies are small data files placed on your device when you visit a website or use an application. They are widely used to make services work more efficiently and to provide reporting information.\n\nCookies set by the service owner are called \"first-party cookies.\" Cookies set by parties other than the service owner are called \"third-party cookies.\"",
       "howWeUse": "How We Use Cookies",

@@ -121,7 +121,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <span className="text-xl font-bold bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
-                ExpenseTracker
+                Spendio
               </span>
             </div>
             <div className="flex gap-3 animate-in fade-in slide-in-from-right duration-700">
@@ -774,7 +774,7 @@ export default function LandingPage() {
                     <Wallet className="h-5 w-5 text-white animate-float" />
                   </div>
                 </div>
-                <span className="text-xl font-bold bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">ExpenseTracker</span>
+                <span className="text-xl font-bold bg-linear-to-r from-sky-600 to-cyan-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform">Spendio</span>
               </div>
               <p className="text-gray-600 leading-relaxed mb-6">
                 {t('landing.footer.tagline')}
