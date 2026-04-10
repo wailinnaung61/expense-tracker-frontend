@@ -693,7 +693,9 @@
       "formatTitle": "CSV Format:",
       "importing": "Importing...",
       "importButton": "Import {{count}} Transaction(s)",
-      "importSuccess": "{{count}} transaction(s) imported successfully"
+      "importSuccess": "{{count}} transaction(s) imported successfully",
+      "noValidRows": "No rows to import after removing duplicates.",
+      "duplicatesSkipped": "Skipped {{count}} duplicate row(s) in the CSV."
     },
     "bulkAdd": {
       "title": "Bulk Add Transactions",
