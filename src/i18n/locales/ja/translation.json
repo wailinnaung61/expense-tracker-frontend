@@ -693,7 +693,9 @@
       "formatTitle": "CSVフォーマット:",
       "importing": "インポート中...",
       "importButton": "{{count}}件の取引をインポート",
-      "importSuccess": "{{count}}件の取引を正常にインポートしました"
+      "importSuccess": "{{count}}件の取引を正常にインポートしました",
+      "noValidRows": "重複を除いた後、インポートできる行がありません。",
+      "duplicatesSkipped": "CSV内の重複行 {{count}} 件をスキップしました。"
     },
     "bulkAdd": {
       "title": "取引を一括追加",
