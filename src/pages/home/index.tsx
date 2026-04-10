@@ -16,6 +16,10 @@ import type { ExpenseCategory } from "@/types/category";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
+import {
+  CHATBOT_REFRESH_EVENT,
+  type ChatbotRefreshEventDetail,
+} from "@/lib/chatbot-refresh";
 
 export default function Home() {
   const [month, setMonth] = useState(() => format(new Date(), "yyyy-MM"));
@@ -53,9 +57,34 @@ export default function Home() {
     }
   }, []);
 
+  const monthRef = useRef(month);
+  monthRef.current = month;
+
   useEffect(() => {
     fetchData(month);
   }, [month, fetchData]);
+
+  useEffect(() => {
+    const onChatbotRefresh = (event: Event) => {
+      const { target } = (event as CustomEvent<ChatbotRefreshEventDetail>).detail;
+      if (
+        target === "transactions" ||
+        target === "summary" ||
+        target === "budget" ||
+        target === "savings" ||
+        target === "investments" ||
+        target === "categories" ||
+        target === "recurring_payments"
+      ) {
+        fetchData(monthRef.current);
+      }
+    };
+
+    window.addEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    return () => {
+      window.removeEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    };
+  }, [fetchData]);
 
   const handleMonthChange = useCallback((m: string) => setMonth(m), []);
   const handleRefresh = useCallback(() => fetchData(month), [fetchData, month]);

@@ -7,7 +7,7 @@ import type { ChatMessage } from "@/types/chat";
 import {
   dispatchChatRefreshTarget,
   isChatRefreshTarget,
-  resolveRefreshTargetFromFunctions,
+  resolveRefreshTargetsFromFunctions,
 } from "@/lib/chatbot-refresh";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -36,9 +36,15 @@ export function ChatBot() {
     scrollToBottom();
   }, [messages]);
 
+  const initCalledRef = useRef(false);
+
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (isOpen) {
+      inputRef.current?.focus();
+      if (!initCalledRef.current) {
+        initCalledRef.current = true;
+        chatService.init().catch(() => {});
+      }
     }
   }, [isOpen]);
 
@@ -68,14 +74,18 @@ export function ChatBot() {
 
       setMessages((prev) => [...prev, aiMessage]);
 
-      // Prefer explicit refreshTarget from backend; fallback to function mapping.
-      const resolvedRefreshTarget = isChatRefreshTarget(response.refreshTarget)
-        ? response.refreshTarget
-        : resolveRefreshTargetFromFunctions(response.functionsCalled);
+      const targets = new Set(
+        resolveRefreshTargetsFromFunctions(response.functionsCalled)
+      );
+      if (isChatRefreshTarget(response.refreshTarget)) {
+        targets.add(response.refreshTarget);
+      }
 
-      if (resolvedRefreshTarget) {
+      if (targets.size > 0) {
         setTimeout(() => {
-          dispatchChatRefreshTarget(resolvedRefreshTarget);
+          for (const target of targets) {
+            dispatchChatRefreshTarget(target);
+          }
         }, 250);
       }
     } catch (error) {

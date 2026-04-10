@@ -18,6 +18,10 @@ import { AlertTriangle, Loader2, WalletCards } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import {
+  CHATBOT_REFRESH_EVENT,
+  type ChatbotRefreshEventDetail,
+} from "@/lib/chatbot-refresh";
 
 function createFallbackBudgetMeta(
   budget: BudgetMonthlyResponse | null,
@@ -153,6 +157,20 @@ export default function Budget() {
 
   useEffect(() => {
     void loadBudget();
+  }, [loadBudget]);
+
+  useEffect(() => {
+    const onChatbotRefresh = (event: Event) => {
+      const { target } = (event as CustomEvent<ChatbotRefreshEventDetail>).detail;
+      if (target === "budget") {
+        void loadBudget();
+      }
+    };
+
+    window.addEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    return () => {
+      window.removeEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    };
   }, [loadBudget]);
 
   const handleCreate = async (request: Parameters<typeof budgetService.createBudget>[0]) => {
