@@ -47,6 +47,7 @@ export function ImportCsvDialog({
   const [isImporting, setIsImporting] = useState(false);
   const [validCount, setValidCount] = useState(0);
   const [invalidCount, setInvalidCount] = useState(0);
+  const importInFlightRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
@@ -187,6 +188,28 @@ export function ImportCsvDialog({
     return null;
   };
 
+  const buildRowFingerprint = (row: ParsedRow): string | null => {
+    const category = findCategoryByName(row.category);
+    const type = parseTransactionType(row.type);
+    const status = parsePaymentStatus(row.status);
+    const date = parseDate(row.date);
+    const amount = parseFloat(row.amount);
+
+    if (!category || type === null || status === null || !date || isNaN(amount) || amount <= 0) {
+      return null;
+    }
+
+    return [
+      type,
+      category.categoryId,
+      amount.toFixed(2),
+      format(date, "yyyy-MM-dd"),
+      status,
+      row.description.trim().toLowerCase(),
+      row.note.trim().toLowerCase(),
+    ].join("|");
+  };
+
   const validateAndParseRow = (row: string[], rowNumber: number): ParsedRow => {
     const errors: string[] = [];
     const parsedRow: ParsedRow = {
@@ -280,6 +303,8 @@ export function ImportCsvDialog({
   };
 
   const handleImport = async () => {
+    if (importInFlightRef.current || isImporting) return;
+
     const validRows = parsedData.filter((r) => r.valid);
 
     if (validRows.length === 0) {
@@ -287,11 +312,30 @@ export function ImportCsvDialog({
       return;
     }
 
+    importInFlightRef.current = true;
     setIsImporting(true);
     try {
+      // Deduplicate valid rows before import to prevent accidental doubles in CSV files.
+      const seenFingerprints = new Set<string>();
+      const rowsToImport: ParsedRow[] = [];
+
+      for (const row of validRows) {
+        const fingerprint = buildRowFingerprint(row);
+        if (!fingerprint || seenFingerprints.has(fingerprint)) {
+          continue;
+        }
+        seenFingerprints.add(fingerprint);
+        rowsToImport.push(row);
+      }
+
+      if (rowsToImport.length === 0) {
+        toast.error(t("transactions.importCsv.noValidRows"));
+        return;
+      }
+
       // Import all valid transactions
       await Promise.all(
-        validRows.map((row) => {
+        rowsToImport.map((row) => {
           const category = findCategoryByName(row.category)!;
           const type = parseTransactionType(row.type)!;
           const status = parsePaymentStatus(row.status)!;
@@ -310,7 +354,14 @@ export function ImportCsvDialog({
         })
       );
 
-      toast.success(t("transactions.importCsv.importSuccess", { count: validRows.length }));
+      if (rowsToImport.length < validRows.length) {
+        toast.info(
+          t("transactions.importCsv.duplicatesSkipped", {
+            count: validRows.length - rowsToImport.length,
+          })
+        );
+      }
+      toast.success(t("transactions.importCsv.importSuccess", { count: rowsToImport.length }));
       onSuccess();
       onOpenChange(false);
     } catch (error: any) {
@@ -318,6 +369,7 @@ export function ImportCsvDialog({
       toast.error(error.message || 'Failed to import transactions. Please try again.');
     } finally {
       setIsImporting(false);
+      importInFlightRef.current = false;
     }
   };
 

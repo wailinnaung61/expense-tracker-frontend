@@ -245,6 +245,10 @@ export default function Transactions() {
       if (target === "recurring_payments") {
         setRecurringPaymentsRefreshKey((prev) => prev + 1);
       }
+
+      if (target === "budget") {
+        setBudgetRefreshKey((prev) => prev + 1);
+      }
     };
 
     window.addEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);

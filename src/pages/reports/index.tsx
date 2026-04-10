@@ -2,6 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { format, endOfMonth } from "date-fns";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatCurrency } from "@/lib/utils";
+import {
+  CHATBOT_REFRESH_EVENT,
+  type ChatbotRefreshEventDetail,
+} from "@/lib/chatbot-refresh";
 import { aggregationService } from "@/services/aggregationService";
 import { transactionService } from "@/services/transactionService";
 import { categoryService } from "@/services/categoryService";
@@ -177,6 +181,28 @@ export default function Reports() {
 
   useEffect(() => {
     fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    const onChatbotRefresh = (event: Event) => {
+      const { target } = (event as CustomEvent<ChatbotRefreshEventDetail>).detail;
+      if (
+        target === "transactions" ||
+        target === "summary" ||
+        target === "budget" ||
+        target === "savings" ||
+        target === "investments" ||
+        target === "categories" ||
+        target === "recurring_payments"
+      ) {
+        fetchData();
+      }
+    };
+
+    window.addEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    return () => {
+      window.removeEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
+    };
   }, [fetchData]);
 
   const totals = useMemo(() => {

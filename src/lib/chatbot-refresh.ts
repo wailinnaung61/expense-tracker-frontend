@@ -5,6 +5,7 @@ export type ChatRefreshTarget =
   | "summary"
   | "categories"
   | "recurring_payments"
+  | "budget"
   | "investments"
   | "savings";
 
@@ -17,7 +18,9 @@ export const isChatRefreshTarget = (value: unknown): value is ChatRefreshTarget 
     value === "transactions" ||
     value === "summary" ||
     value === "categories" ||
+    
     value === "recurring_payments" ||
+    value === "budget" ||
     value === "investments" ||
     value === "savings"
   );
@@ -31,26 +34,62 @@ export const dispatchChatRefreshTarget = (target: ChatRefreshTarget) => {
   );
 };
 
-export const resolveRefreshTargetFromFunctions = (
-  functionsCalled: string[] | null | undefined
-): ChatRefreshTarget | null => {
-  const functionName = functionsCalled?.[0];
+const FUNCTION_REFRESH_MAP: Record<string, ChatRefreshTarget> = {
+  add_expense: "transactions",
+  add_income: "transactions",
+  add_investment: "transactions",
+  add_savings: "transactions",
+  update_transaction: "transactions",
+  delete_transaction: "transactions",
+  list_transactions: "transactions",
+  find_transaction: "transactions",
 
-  switch (functionName) {
-    case "add_expense":
-    case "add_income":
-    case "list_transactions":
-    case "delete_transaction":
-      return "transactions";
-    case "get_monthly_summary":
-    case "get_yearly_summary":
-    case "get_expense_breakdown":
-      return "summary";
-    case "list_categories":
-      return "categories";
-    case "list_recurring_payments":
-      return "recurring_payments";
-    default:
-      return null;
+  get_monthly_summary: "summary",
+  get_yearly_summary: "summary",
+  get_expense_breakdown: "summary",
+  get_dashboard: "summary",
+  get_saving_dashboard: "summary",
+
+  list_categories: "categories",
+  create_category: "categories",
+  update_category: "categories",
+  delete_category: "categories",
+
+  get_budget: "budget",
+  create_budget: "budget",
+  update_budget: "budget",
+  delete_budget: "budget",
+  add_budget_category: "budget",
+  remove_budget_category: "budget",
+
+  list_recurring_payments: "recurring_payments",
+  create_recurring_payment: "recurring_payments",
+  update_recurring_payment: "recurring_payments",
+  delete_recurring_payment: "recurring_payments",
+  mark_recurring_paid: "recurring_payments",
+
+  list_saving_goals: "savings",
+  create_saving_goal: "savings",
+  update_saving_goal: "savings",
+  delete_saving_goal: "savings",
+  add_saving_contribution: "savings",
+
+  list_investments: "investments",
+  create_investment_record: "investments",
+  create_portfolio: "investments",
+  update_investment: "investments",
+  delete_investment: "investments",
+  get_investment_dashboard: "investments",
+};
+
+export const resolveRefreshTargetsFromFunctions = (
+  functionsCalled: string[] | null | undefined
+): ChatRefreshTarget[] => {
+  if (!functionsCalled?.length) return [];
+  const targets = new Set<ChatRefreshTarget>();
+  for (const fn of functionsCalled) {
+    const target = FUNCTION_REFRESH_MAP[fn];
+    if (target) targets.add(target);
   }
+  return [...targets];
 };
