@@ -36,7 +36,6 @@ import { toast } from "react-toastify";
 import type { ProfileResponse, UpdateProfileFormData } from "@/types/profile";
 import { updateProfileSchema, SUPPORTED_CURRENCIES, SUPPORTED_LOCALES } from "@/types/profile";
 import { useTranslation } from "@/hooks/useTranslation";
-import i18n from "@/i18n/config";
 
 // Auth profile validation schema (userName as displayName, email)
 const authProfileSchema = z.object({

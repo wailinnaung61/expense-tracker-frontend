@@ -753,7 +753,8 @@
     "welcomeMessage": "こんにちは！私はあなたのAIファイナンシャルアシスタントです。今日はどのようにお手伝いできますか？",
     "errorMessage": "申し訳ありませんが、現在接続に問題があります。しばらくしてからもう一度お試しください。",
     "openChat": "チャットを開く",
-    "closeChat": "チャットを閉じる"
+    "closeChat": "チャットを閉じる",
+    "downloadExcel": "Excelをダウンロード"
   },
   "settings": {
     "title": "設定",

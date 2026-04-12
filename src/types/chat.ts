@@ -1,5 +1,14 @@
 import type { ChatRefreshTarget } from "@/lib/chatbot-refresh";
 
+/** Mirrors server `AppConstants.ChatClientActionType.ShowReportsDownload`. */
+export const CHAT_CLIENT_ACTION_SHOW_REPORTS_DOWNLOAD = "show_reports_download" as const;
+
+export interface ChatClientAction {
+  type: string;
+  startMonth?: string | null;
+  endMonth?: string | null;
+}
+
 export interface ChatRequest {
   message: string;
 }
@@ -10,6 +19,7 @@ export interface ChatResponse {
   refreshTarget?: ChatRefreshTarget | null;
   functionsCalled?: string[] | null;
   functionResult?: any;
+  clientAction?: ChatClientAction | null;
 }
 
 export interface ChatMessage {
@@ -18,6 +28,7 @@ export interface ChatMessage {
   isUser: boolean;
   timestamp: Date;
   translationKey?: string;
+  clientAction?: ChatClientAction | null;
 }
 
 export interface ChatCategoryInfo {
