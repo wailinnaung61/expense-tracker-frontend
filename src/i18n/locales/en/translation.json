@@ -753,7 +753,9 @@
     "welcomeMessage": "Hi! I'm your AI financial assistant. How can I help you today?",
     "errorMessage": "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
     "openChat": "Open chat",
-    "closeChat": "Close chat"  },
+    "closeChat": "Close chat",
+    "downloadExcel": "Download Excel"
+  },
   "settings": {
     "title": "Settings",
     "description": "Manage your account settings and preferences",

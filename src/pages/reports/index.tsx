@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { format, endOfMonth } from "date-fns";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatCurrency } from "@/lib/utils";
@@ -93,8 +94,19 @@ const RADIAL_COLORS = [
   "#f43f5e", "#6366f1",
 ];
 
+function parseYyyyMmParam(value: string | null): { y: number; m: number } | null {
+  if (!value || !/^\d{4}-\d{2}$/.test(value)) return null;
+  const [ys, ms] = value.split("-");
+  const y = Number(ys);
+  const m = Number(ms) - 1;
+  if (!Number.isFinite(y) || m < 0 || m > 11) return null;
+  return { y, m };
+}
+
 export default function Reports() {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const appliedUrlPrefillRef = useRef(false);
   const [year, setYear] = useState(new Date().getFullYear());
   const [startMonth, setStartMonth] = useState(0);
   const [endMonth, setEndMonth] = useState(new Date().getMonth());
@@ -182,6 +194,40 @@ export default function Reports() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    if (appliedUrlPrefillRef.current) return;
+    const sm = searchParams.get("startMonth");
+    const em = searchParams.get("endMonth");
+    if (!sm && !em) return;
+    const a = parseYyyyMmParam(sm);
+    const b = parseYyyyMmParam(em);
+    if (!a && !b) return;
+    appliedUrlPrefillRef.current = true;
+
+    const monthKey = (x: { y: number; m: number }) => x.y * 12 + x.m;
+
+    if (a && b) {
+      const [first, second] = monthKey(a) <= monthKey(b) ? [a, b] : [b, a];
+      if (first.y === second.y) {
+        setYear(first.y);
+        setStartMonth(first.m);
+        setEndMonth(second.m);
+      } else {
+        setYear(first.y);
+        setStartMonth(first.m);
+        setEndMonth(11);
+      }
+    } else if (a) {
+      setYear(a.y);
+      setStartMonth(a.m);
+      setEndMonth(a.m);
+    } else if (b) {
+      setYear(b.y);
+      setStartMonth(0);
+      setEndMonth(b.m);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const onChatbotRefresh = (event: Event) => {

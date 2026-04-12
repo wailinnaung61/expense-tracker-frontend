@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessageCircle, X, Send, Sparkles, Bot, User } from "lucide-react";
 import { chatService } from "@/services/chatService";
-import type { ChatMessage } from "@/types/chat";
+import {
+  CHAT_CLIENT_ACTION_SHOW_REPORTS_DOWNLOAD,
+  type ChatMessage,
+} from "@/types/chat";
 import {
   dispatchChatRefreshTarget,
   isChatRefreshTarget,
@@ -13,6 +17,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 export function ChatBot() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -70,6 +75,7 @@ export function ChatBot() {
         text: response.message,
         isUser: false,
         timestamp: new Date(response.createdAt),
+        clientAction: response.clientAction ?? null,
       };
 
       setMessages((prev) => [...prev, aiMessage]);
@@ -108,6 +114,16 @@ export function ChatBot() {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const openReportsDownload = (action: ChatMessage["clientAction"]) => {
+    if (!action || action.type !== CHAT_CLIENT_ACTION_SHOW_REPORTS_DOWNLOAD) return;
+    const params = new URLSearchParams();
+    if (action.startMonth) params.set("startMonth", action.startMonth);
+    if (action.endMonth) params.set("endMonth", action.endMonth);
+    const qs = params.toString();
+    navigate(qs ? `/report?${qs}` : "/report");
+    setIsOpen(false);
   };
 
   return (
@@ -191,6 +207,18 @@ export function ChatBot() {
                   <p className="whitespace-pre-wrap wrap-break-word">
                     {message.translationKey ? t(message.translationKey as any) : message.text}
                   </p>
+                  {!message.isUser &&
+                    message.clientAction?.type === CHAT_CLIENT_ACTION_SHOW_REPORTS_DOWNLOAD && (
+                      <Button
+                        type="button"
+                        variant="link"
+                        size="sm"
+                        className="mt-2 h-auto min-h-0 p-0 text-left text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300"
+                        onClick={() => openReportsDownload(message.clientAction)}
+                      >
+                        {t("chatbot.downloadExcel" as any)}
+                      </Button>
+                    )}
                 </div>
                 <p
                   className={`mt-1 px-1 text-[11px] text-slate-400 ${
