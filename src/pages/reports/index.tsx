@@ -852,15 +852,26 @@ export default function Reports() {
                       {transactions.map((tx) => {
                         const cat = catMap.get(tx.categoryId);
                         const isIncome = tx.type === 0;
+                        const categoryLabel =
+                          tx.categoryName?.trim() ||
+                          cat?.displayName?.trim() ||
+                          t("transactions.table.unknownCategory");
                         return (
                           <TableRow key={tx.tranactionId}>
                             <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                               {format(new Date(tx.tranactionDate), "MMM dd")}
                             </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-sm">{cat?.icon || "\uD83D\uDCC1"}</span>
-                                <span className="text-xs truncate max-w-[100px]">{tx.categoryName}</span>
+                            <TableCell className="min-w-0 max-w-[220px]">
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span
+                                  className="text-sm shrink-0"
+                                  style={cat?.color ? { color: cat.color } : undefined}
+                                >
+                                  {cat?.icon || "📁"}
+                                </span>
+                                <span className="truncate text-xs font-medium text-foreground">
+                                  {categoryLabel}
+                                </span>
                               </div>
                             </TableCell>
                             <TableCell>

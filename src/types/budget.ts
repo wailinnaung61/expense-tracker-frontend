@@ -3,6 +3,10 @@ export interface BudgetMonthlyResponse {
   categories: BudgetCategoryDto[];
   topSpending: TopSpendingDto[];
   budgetId: string | null;
+  /** Inclusive period (yyyy-MM-dd) from GET-by-month when a budget exists. */
+  startDate: string;
+  endDate: string;
+  periodType?: string | null;
 }
 
 export interface BudgetSummaryDto {
@@ -54,6 +58,9 @@ export interface CreateBudgetRequest {
   year: number;
   month: number;
   totalAmount: number;
+  /** ISO yyyy-MM-dd; optional custom range (backend may set PeriodType Custom). */
+  startDate?: string;
+  endDate?: string;
   categories?: CreateBudgetCategoryRequest[];
 }
 
@@ -68,6 +75,13 @@ export interface UpdateBudgetCategoryRequest {
 
 export interface MessageResponse {
   message: string;
+}
+
+/** Response from POST /api/budgets/{budgetId}/reports/excel (camelCase or PascalCase from API). */
+export interface BudgetExcelExportJobResponse {
+  jobId: string;
+  status?: string;
+  fileName?: string | null;
 }
 
 export function normalizeAlertThresholdPercent(

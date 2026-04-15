@@ -19,8 +19,16 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { monthBoundsFromYyyyMm } from "@/lib/budget-period";
 import { formatCurrency } from "@/lib/utils";
 import { budgetService } from "@/services/budgetService";
+import { format, parseISO } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import type { DragEndEvent } from "@dnd-kit/core";
 import {
@@ -39,7 +47,13 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlertTriangle, GripVertical, Maximize2, Minimize2, Target } from "lucide-react";
+import { AlertTriangle, CalendarIcon, GripVertical, Maximize2, Minimize2, Target } from "lucide-react";
+
+function dateFromYyyyMmDd(value: string): Date | undefined {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  const d = parseISO(value);
+  return Number.isNaN(d.getTime()) ? undefined : d;
+}
 
 type CategoryDraft = {
   allocatedAmount: string;
@@ -199,6 +213,9 @@ export function BudgetFormDialog({
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [categoryDrafts, setCategoryDrafts] = useState<Record<string, CategoryDraft>>({});
   const [isMaximized, setIsMaximized] = useState(false);
+  const [useCustomPeriod, setUseCustomPeriod] = useState(false);
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -220,8 +237,19 @@ export function BudgetFormDialog({
   };
 
   useEffect(() => {
+    if (!open || mode !== "create") {
+      return;
+    }
+    const { start, end } = monthBoundsFromYyyyMm(selectedMonth);
+    setCustomStart(start);
+    setCustomEnd(end);
+    setUseCustomPeriod(false);
+  }, [open, mode, selectedMonth]);
+
+  useEffect(() => {
     if (!open) {
       setIsMaximized(false);
+      setUseCustomPeriod(false);
       return;
     }
 
@@ -300,7 +328,8 @@ export function BudgetFormDialog({
     setTotalAmount(String(budget?.totalAmount ?? ""));
     setSelectedCategoryIds([]);
     setCategoryDrafts({});
-  }, [availableCategories, budget, mode, open]);
+    setUseCustomPeriod(false);
+  }, [availableCategories, budget, mode, open, selectedMonth]);
 
   const totalAmountValue = Number(totalAmount);
   const allocatedTotal = useMemo(() => {
@@ -310,11 +339,19 @@ export function BudgetFormDialog({
     }, 0);
   }, [categoryDrafts, selectedCategoryIds]);
 
-  const allocationOverflow =
+  const allocatedExceedsTotal =
     mode === "create" &&
     Number.isFinite(totalAmountValue) &&
     totalAmountValue > 0 &&
     allocatedTotal > totalAmountValue;
+
+  const dateRangeInvalid =
+    mode === "create" &&
+    useCustomPeriod &&
+    (!customStart || !customEnd || customEnd < customStart);
+
+  const customStartDate = useMemo(() => dateFromYyyyMmDd(customStart), [customStart]);
+  const customEndDate = useMemo(() => dateFromYyyyMmDd(customEnd), [customEnd]);
 
   const hasInvalidCategoryDraft = selectedCategoryIds.some((categoryId) => {
     const draft = categoryDrafts[categoryId];
@@ -333,8 +370,8 @@ export function BudgetFormDialog({
   const canSubmit =
     Number.isFinite(totalAmountValue) &&
     totalAmountValue > 0 &&
-    !allocationOverflow &&
-    !hasInvalidCategoryDraft;
+    !hasInvalidCategoryDraft &&
+    !dateRangeInvalid;
 
   const handleToggleCategory = (categoryId: string, checked: boolean) => {
     setSelectedCategoryIds((current) => {
@@ -378,7 +415,7 @@ export function BudgetFormDialog({
 
     if (mode === "create") {
       const [year, month] = selectedMonth.split("-").map(Number);
-      await onCreate({
+      const payload: Parameters<typeof onCreate>[0] = {
         year,
         month,
         totalAmount: totalAmountValue,
@@ -392,7 +429,12 @@ export function BudgetFormDialog({
           ),
           sortOrder: index + 1,
         })),
-      });
+      };
+      if (useCustomPeriod && customStart && customEnd && customEnd >= customStart) {
+        payload.startDate = customStart;
+        payload.endDate = customEnd;
+      }
+      await onCreate(payload);
       return;
     }
 
@@ -446,9 +488,103 @@ export function BudgetFormDialog({
                 placeholder="0.00"
               />
             </div>
+
+            {mode === "create" && (
+              <div className="space-y-3 rounded-xl border border-sky-200/60 bg-sky-50/40 p-4 dark:border-sky-800/50 dark:bg-sky-950/20">
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="budget-custom-period"
+                    checked={useCustomPeriod}
+                    onCheckedChange={(checked) => setUseCustomPeriod(checked === true)}
+                    className="mt-0.5"
+                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="budget-custom-period" className="cursor-pointer font-medium">
+                      {t("budget.dialog.customPeriod" as any)}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      {t("budget.dialog.customPeriodHint" as any)}
+                    </p>
+                  </div>
+                </div>
+                {useCustomPeriod && (
+                  <div className="grid gap-3 sm:grid-cols-2 pt-1">
+                    <div className="space-y-2">
+                      <Label>{t("budget.dialog.periodStart" as any)}</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            id="budget-period-start"
+                            className="h-11 w-full justify-start text-left font-normal border-muted-foreground/20 hover:bg-accent/50"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                            {customStartDate ? (
+                              <span className="font-medium">{format(customStartDate, "PPP")}</span>
+                            ) : (
+                              <span className="text-muted-foreground">{t("budget.dialog.pickStartDate" as any)}</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={customStartDate}
+                            onSelect={(d) => setCustomStart(d ? format(d, "yyyy-MM-dd") : "")}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>{t("budget.dialog.periodEnd" as any)}</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            id="budget-period-end"
+                            className="h-11 w-full justify-start text-left font-normal border-muted-foreground/20 hover:bg-accent/50"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                            {customEndDate ? (
+                              <span className="font-medium">{format(customEndDate, "PPP")}</span>
+                            ) : (
+                              <span className="text-muted-foreground">{t("budget.dialog.pickEndDate" as any)}</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={customEndDate}
+                            onSelect={(d) => setCustomEnd(d ? format(d, "yyyy-MM-dd") : "")}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+                )}
+                {dateRangeInvalid && (
+                  <Alert className="border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    <AlertTitle>{t("budget.dialog.dateRangeInvalidTitle" as any)}</AlertTitle>
+                    <AlertDescription>{t("budget.dialog.dateRangeInvalid" as any)}</AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
           </div>
 
-          <div className={`rounded-xl border p-4 ${allocationOverflow ? 'border-red-300 dark:border-red-700 bg-red-50/80 dark:bg-red-950/50' : 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/30 dark:bg-emerald-950/30'}`}>
+          <div
+            className={`rounded-xl border p-4 ${
+              allocatedExceedsTotal
+                ? "border-amber-200 dark:border-amber-800 bg-amber-50/40 dark:bg-amber-950/25"
+                : "border-emerald-300 dark:border-emerald-700 bg-emerald-50/30 dark:bg-emerald-950/30"
+            }`}
+          >
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -465,38 +601,40 @@ export function BudgetFormDialog({
                   {formatCurrency(allocatedTotal, currency)} / {formatCurrency(Number.isFinite(totalAmountValue) ? totalAmountValue : 0, currency)}
                 </div>
               </div>
-              
-              {/* Unassigned Amount Display */}
-              <div className={`flex items-center justify-between rounded-lg p-3 ${allocationOverflow ? 'bg-red-100 dark:bg-red-900/50' : 'bg-emerald-100 dark:bg-emerald-900/50'}`}>
+
+              <div
+                className={`flex items-center justify-between rounded-lg p-3 ${
+                  allocatedExceedsTotal
+                    ? "bg-amber-100/80 dark:bg-amber-900/35"
+                    : "bg-emerald-100 dark:bg-emerald-900/50"
+                }`}
+              >
                 <div className="flex items-center gap-2">
-                  <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${allocationOverflow ? 'bg-red-500' : 'bg-emerald-500'}`}>
+                  <div
+                    className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+                      allocatedExceedsTotal ? "bg-amber-600" : "bg-emerald-500"
+                    }`}
+                  >
                     <Target className="h-4 w-4 text-white" />
                   </div>
                   <div>
                     <div className="text-xs font-medium text-muted-foreground">
-                      {allocationOverflow ? t("budget.dialog.overAllocated") : t("budget.dialog.unassigned")}
+                      {allocatedExceedsTotal
+                        ? t("budget.dialog.overAllocated")
+                        : t("budget.dialog.unassigned")}
                     </div>
-                    <div className={`text-lg font-bold ${allocationOverflow ? 'text-red-700 dark:text-red-300' : 'text-emerald-700 dark:text-emerald-300'}`}>
+                    <div
+                      className={`text-lg font-bold ${
+                        allocatedExceedsTotal
+                          ? "text-amber-900 dark:text-amber-100"
+                          : "text-emerald-700 dark:text-emerald-300"
+                      }`}
+                    >
                       {formatCurrency(Math.abs(totalAmountValue - allocatedTotal), currency)}
                     </div>
                   </div>
                 </div>
-                {allocationOverflow && (
-                  <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                )}
               </div>
-              
-              {allocationOverflow && (
-                <Alert className="border-red-300 dark:border-red-700 bg-red-100 dark:bg-red-900/50">
-                  <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                  <AlertTitle className="text-red-900 dark:text-red-100">
-                    {t("budget.dialog.cannotExceedTitle")}
-                  </AlertTitle>
-                  <AlertDescription className="text-red-800 dark:text-red-200">
-                    {t("budget.dialog.allocationOver")}
-                  </AlertDescription>
-                </Alert>
-              )}
             </div>
           </div>
 

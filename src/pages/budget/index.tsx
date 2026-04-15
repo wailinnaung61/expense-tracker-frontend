@@ -7,13 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ApiError } from "@/lib/api";
+import {
+  calendarMonthOverlapsBudgetRange,
+  dateFnsLocaleForLanguage,
+  formatBudgetRangeLabel,
+  formatSelectedCalendarMonth,
+  isSameCalendarMonthRange,
+  monthBoundsFromYyyyMm,
+  spansMultipleCalendarMonths,
+} from "@/lib/budget-period";
 import { budgetService } from "@/services/budgetService";
 import { categoryService } from "@/services/categoryService";
 import { profileService } from "@/services/profileService";
 import { toAlertThresholdRatio, type BudgetDto, type BudgetMonthlyResponse } from "@/types/budget";
 import { TransactionType, type ExpenseCategory } from "@/types/category";
 import type { ProfileResponse } from "@/types/profile";
-import { endOfMonth, format } from "date-fns";
+import { format } from "date-fns";
 import { AlertTriangle, Loader2, WalletCards } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
@@ -31,13 +40,15 @@ function createFallbackBudgetMeta(
     return null;
   }
 
-  const [year, month] = selectedMonth.split("-").map(Number);
-  const startDate = `${selectedMonth}-01`;
-  const endDate = format(endOfMonth(new Date(year, month - 1, 1)), "yyyy-MM-dd");
+  const { start: monthStart, end: monthEnd } = monthBoundsFromYyyyMm(selectedMonth);
+  const startDate = budget.startDate?.trim() ? budget.startDate : monthStart;
+  const endDate = budget.endDate?.trim() ? budget.endDate : monthEnd;
+  const inferredCustom = !isSameCalendarMonthRange(startDate, endDate, selectedMonth);
+  const periodType = budget.periodType ?? (inferredCustom ? "CUSTOM" : "MONTHLY");
 
   return {
     budgetId: budget.budgetId,
-    periodType: "MONTHLY",
+    periodType,
     startDate,
     endDate,
     totalAmount: budget.summary.totalBudget,
@@ -64,7 +75,7 @@ function dedupeCategories(categories: ExpenseCategory[]) {
 }
 
 export default function Budget() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedMonth, setSelectedMonth] = useState(format(new Date(), "yyyy-MM"));
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [expenseCategories, setExpenseCategories] = useState<ExpenseCategory[]>([]);
@@ -80,14 +91,51 @@ export default function Budget() {
   const [savingCategoryId, setSavingCategoryId] = useState<string | null>(null);
   const [removingCategoryId, setRemovingCategoryId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<"reset" | "delete" | null>(null);
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
 
-  const periodLabel = useMemo(() => {
-    const [year, month] = selectedMonth.split("-").map(Number);
-    return format(new Date(year, month - 1, 1), "MMMM yyyy");
-  }, [selectedMonth]);
+  const hasBudget = Boolean(budget?.budgetId);
+
+  const { periodBadge, headingDescription } = useMemo(() => {
+    const locale = dateFnsLocaleForLanguage(i18n.language);
+    const monthNav = formatSelectedCalendarMonth(selectedMonth, locale);
+    const rs = budget?.startDate?.trim();
+    const re = budget?.endDate?.trim();
+    const ms = budgetMeta?.startDate?.trim();
+    const me = budgetMeta?.endDate?.trim();
+    const fromResponse = rs && re ? { start: rs, end: re } : null;
+    const fromMeta = ms && me ? { start: ms, end: me } : null;
+    const bounds = fromResponse ?? fromMeta;
+
+    if (!hasBudget || !bounds?.start || !bounds?.end) {
+      return {
+        periodBadge: monthNav,
+        headingDescription: t("budget.header.browseHint", { monthNav } as any),
+      };
+    }
+
+    const rangeStr = formatBudgetRangeLabel(bounds.start, bounds.end, locale);
+    const spansMulti = spansMultipleCalendarMonths(bounds.start, bounds.end);
+
+    if (spansMulti) {
+      return {
+        periodBadge: t("budget.header.badgeCrossMonth", { budgetRange: rangeStr } as any),
+        headingDescription: t("budget.header.subtitleCrossMonth", {
+          monthNav,
+          budgetRange: rangeStr,
+        } as any),
+      };
+    }
+
+    return {
+      periodBadge: t("budget.header.badgeInMonth", { monthNav, budgetRange: rangeStr } as any),
+      headingDescription: t("budget.header.subtitleSingleMonth", {
+        monthNav,
+        budgetRange: rangeStr,
+      } as any),
+    };
+  }, [budget, budgetMeta, selectedMonth, hasBudget, i18n.language, t]);
 
   const effectiveBudgetMeta = budgetMeta ?? createFallbackBudgetMeta(budget, selectedMonth);
-  const hasBudget = Boolean(budget?.budgetId);
   const currency = profile?.currency || "USD";
   const profileDailyLimit = profile?.dailyLimit ?? 0;
   const hasHiddenCategories = useMemo(() => {
@@ -127,15 +175,43 @@ export default function Budget() {
     try {
       const response = await budgetService.getBudgetByMonth(year, month);
       setBudget(response);
-      setBudgetMeta((current) => {
-        if (current && current.budgetId === response.budgetId) {
-          return {
-            ...current,
-            totalAmount: response.summary.totalBudget,
-          };
+      setBudgetMeta((prev) => {
+        if (!response.budgetId) {
+          return prev;
         }
-
-        return current;
+        const { start: fbStart, end: fbEnd } = monthBoundsFromYyyyMm(selectedMonth);
+        const same = prev?.budgetId === response.budgetId;
+        const fromApiStart = response.startDate?.trim() || undefined;
+        const fromApiEnd = response.endDate?.trim() || undefined;
+        const canCarryPrev =
+          same &&
+          prev &&
+          prev.startDate &&
+          prev.endDate &&
+          calendarMonthOverlapsBudgetRange(selectedMonth, prev.startDate, prev.endDate);
+        const startDate =
+          fromApiStart && fromApiEnd
+            ? fromApiStart
+            : canCarryPrev
+              ? prev.startDate
+              : fbStart;
+        const endDate =
+          fromApiStart && fromApiEnd
+            ? fromApiEnd
+            : canCarryPrev
+              ? prev.endDate
+              : fbEnd;
+        return {
+          budgetId: response.budgetId,
+          periodType:
+            response.periodType ??
+            (same && prev ? prev.periodType : "MONTHLY"),
+          startDate,
+          endDate,
+          totalAmount: response.summary.totalBudget,
+          status: same && prev ? prev.status : "ACTIVE",
+          createdAt: same && prev ? prev.createdAt : new Date().toISOString(),
+        };
       });
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) {
@@ -179,6 +255,9 @@ export default function Budget() {
       const created = await budgetService.createBudget(request);
       setBudgetMeta(created);
       setDialogOpen(false);
+      if (created.startDate?.length >= 7) {
+        setSelectedMonth(created.startDate.slice(0, 7));
+      }
       await loadBudget();
       toast.success(t("budget.feedback.created"));
     } catch (error) {
@@ -273,6 +352,29 @@ export default function Budget() {
     }
   };
 
+  const handleExportBudgetExcel = useCallback(async () => {
+    const budgetId = budget?.budgetId;
+    if (!budgetId) {
+      return;
+    }
+    setIsExportingExcel(true);
+    try {
+      await toast.promise(budgetService.downloadBudgetExcelReport(budgetId), {
+        pending: t("budget.header.exportingExcel"),
+        success: t("budget.feedback.excelExportSuccess"),
+        error: {
+          render({ data }: { data?: unknown }) {
+            return data instanceof Error ? data.message : t("budget.feedback.excelExportFailed");
+          },
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsExportingExcel(false);
+    }
+  }, [budget?.budgetId, t]);
+
   const handleReset = async () => {
     if (!budget?.budgetId) {
       return;
@@ -365,10 +467,12 @@ export default function Budget() {
     <div className="space-y-6">
       <BudgetHeader
         selectedMonth={selectedMonth}
-        periodLabel={periodLabel}
+        periodLabel={periodBadge}
+        headingDescription={headingDescription}
         hasBudget={hasBudget}
         budgetStatus={effectiveBudgetMeta?.status}
-        isBusy={isBudgetLoading || isDialogSubmitting || actionLoading !== null}
+        isBusy={isBudgetLoading || isDialogSubmitting || actionLoading !== null || isExportingExcel}
+        isExportingExcel={isExportingExcel}
         onMonthChange={setSelectedMonth}
         onCreate={() => {
           setDialogMode("create");
@@ -381,6 +485,7 @@ export default function Budget() {
         onRefresh={() => void loadBudget()}
         onReset={() => void handleReset()}
         onDelete={() => void handleDelete()}
+        onExportExcel={hasBudget ? handleExportBudgetExcel : undefined}
       />
 
       {budgetError && (
@@ -419,7 +524,7 @@ export default function Budget() {
             <BudgetSummary
               summary={budget.summary}
               topSpending={budget.topSpending}
-              periodLabel={periodLabel}
+              periodLabel={periodBadge}
               currency={currency}
               profileDailyLimit={profileDailyLimit}
             />
@@ -433,7 +538,7 @@ export default function Budget() {
             </div>
             <div className="space-y-2">
               <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
-                {t("budget.empty.title", { month: periodLabel })}
+                {t("budget.empty.title", { period: periodBadge } as any)}
               </h2>
               <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-200">
                 {t("budget.empty.description")}

@@ -412,7 +412,13 @@
   "budget": {
     "header": {
       "title": "予算プランニング",
-      "subtitle": "{{month}} の配分を監視し、使い過ぎの兆候を早めに把握できます。",
+      "subtitle": "{{period}} の配分を監視し、使い過ぎの兆候を早めに把握できます。",
+      "periodWithRange": "{{monthNav}} · 対象期間 {{range}}",
+      "browseHint": "表示中のカレンダー月は {{monthNav}} です。この月の予算を作成するか、矢印で他の月に切り替えてください。",
+      "badgeCrossMonth": "予算の期間: {{budgetRange}}",
+      "badgeInMonth": "{{monthNav}} · 予算: {{budgetRange}}",
+      "subtitleCrossMonth": "{{monthNav}} · 予算 {{budgetRange}}（月を変えてもこの期間は同じ）。",
+      "subtitleSingleMonth": "{{monthNav}} · 予算 {{budgetRange}}。",
       "activePlan": "有効",
       "noPlan": "未作成",
       "selectMonth": "予算月を選択",
@@ -422,17 +428,19 @@
       "createPlan": "プラン作成",
       "editPlan": "プラン編集",
       "reset": "リセット",
-      "delete": "削除"
+      "delete": "削除",
+      "exportExcel": "Excelレポート",
+      "exportingExcel": "Excelを準備中…"
     },
     "empty": {
-      "title": "{{month}} の予算プランはまだありません",
+      "title": "{{period}} の予算プランはまだありません",
       "description": "月間総予算とカテゴリ配分を作成すると、バックエンドのスナップショットを基準に実際の支出管理が始められます。",
       "hint": "まずは必須カテゴリから配分してください。月の途中でも各カテゴリの上限はあとから調整できます。",
       "cta": "月間予算を作成"
     },
     "summary": {
       "title": "予算サマリー",
-      "description": "{{month}} の API スナップショットに基づく現在の状況です。",
+      "description": "{{period}}",
       "totalBudget": "総予算",
       "totalSpent": "支出合計",
       "remaining": "残額",
@@ -478,7 +486,7 @@
     },
     "dialog": {
       "createTitle": "月間予算を作成",
-      "createDescription": "まず総予算を設定し、今月追跡したい支出カテゴリを選択してください。",
+      "createDescription": "まず総予算を設定し、追跡する支出カテゴリを選びます。カレンダー月以外の期間は「カスタム期間」で開始日・終了日を指定できます。",
       "editTitle": "予算設定を編集",
       "editDescription": "月間総予算を更新します。カテゴリ配分はサマリー下の一覧から管理できます。",
       "totalAmount": "合計金額",
@@ -486,10 +494,10 @@
       "color": "カラー",
       "leaveBlankHint": "編集モードでは予算総額のみを変更できます。",
       "allocatedSummary": "配分サマリー",
-      "visualHint": "計画を現実的に保つため、カテゴリ配分の合計は月間総予算内に収めてください。",
+      "visualHint": "配分合計と月間総額を照合表示しています。合計が総額を超えても保存できます。",
       "allocationOver": "カテゴリ配分の合計は月間総予算を超えられません。",
       "unassigned": "未割当",
-      "overAllocated": "超過割当",
+      "overAllocated": "月間総額を上回る分",
       "cannotExceedTitle": "予算を超えられません",
       "categoryPlanning": "カテゴリ計画",
       "selectCategories": "今月含める支出カテゴリを選び、それぞれに配分額とアラートしきい値を設定してください。選択したカテゴリをドラッグして並べ替えできます。",
@@ -497,7 +505,15 @@
       "allocation": "カテゴリ配分額",
       "categoryThresholdHint": "80 は、そのカテゴリ予算の 80% を使った時点で警告することを意味します。",
       "createSubmit": "予算を作成",
-      "updateSubmit": "予算を更新"
+      "updateSubmit": "予算を更新",
+      "customPeriod": "カスタム期間（日付範囲）",
+      "customPeriodHint": "オフのときは、上の月選択に対応する暦月全体が対象です。オンにすると開始日・終了日を明示して指定します。",
+      "periodStart": "開始日",
+      "periodEnd": "終了日",
+      "pickStartDate": "開始日を選択",
+      "pickEndDate": "終了日を選択",
+      "dateRangeInvalidTitle": "日付が無効です",
+      "dateRangeInvalid": "終了日は開始日以降である必要があります。"
     },
     "feedback": {
       "loadFailed": "予算データの読み込みに失敗しました。",
@@ -522,7 +538,9 @@
       "confirmRemoveCategoryTitle": "このカテゴリを予算から削除しますか？",
       "confirmRemoveCategoryText": "この月次予算からカテゴリ配分を削除します。後で再追加できます。",
       "confirmButton": "確認",
-      "cancelButton": "キャンセル"
+      "cancelButton": "キャンセル",
+      "excelExportSuccess": "予算の Excel レポートをダウンロードしました。",
+      "excelExportFailed": "予算レポートの生成またはダウンロードに失敗しました。しばらくしてから再度お試しください。"
     }
   },
   "transactions": {
@@ -650,6 +668,7 @@
       "addDescription": "新しい取引の詳細を入力してください",
       "editDescription": "取引の詳細を更新してください",
       "typeLabel": "取引タイプ",
+      "typeLockedHint": "ここではタイプを変更できません。金額・日付・カテゴリ・メモは編集できます。",
       "categoryLabel": "カテゴリ",
       "categoryPlaceholder": "カテゴリを選択",
       "selectTypeFirst": "まず取引タイプを選択してください",
@@ -671,7 +690,14 @@
       "saving": "保存中...",
       "save": "取引を保存",
       "createSuccess": "取引を作成しました",
-      "updateSuccess": "取引を更新しました"
+      "updateSuccess": "取引を更新しました",
+      "budgetHintLoading": "この月の予算を確認しています…",
+      "budgetHintPickCategory": "カテゴリを選ぶと、{{month}} の配分・使用額・残りが表示されます。",
+      "budgetHintNoPlan": "{{month}} の予算はまだありません。",
+      "budgetHintOutsidePeriod": "取引日は予算期間（{{range}}、両端を含む）の外です。",
+      "budgetHintNotInPlan": "このカテゴリは {{month}} の予算に含まれていません。",
+      "budgetHintOpenBudget": "予算ページを開く",
+      "budgetHintOk": "{{month}} — 配分 {{allocated}} · 使用 {{spent}} · 残り {{remaining}} · カテゴリ予算の {{usage}}% 使用"
     },
     "importCsv": {
       "title": "CSVから取引をインポート",

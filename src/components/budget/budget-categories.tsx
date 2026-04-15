@@ -227,17 +227,12 @@ export function BudgetCategories({
                       category.allocated
                     ));
               
-              // Calculate what total would be if this category is saved
-              const totalAllocatedWithChange = totalAllocated - category.allocated + allocatedAmount;
-              const wouldExceedBudget = totalAllocatedWithChange > totalBudget;
-              
               const isInvalid =
                 !Number.isFinite(allocatedAmount) ||
                 allocatedAmount < 0 ||
                 !Number.isFinite(alertThresholdPercent) ||
                 alertThresholdPercent < 0 ||
-                alertThresholdPercent > 100 ||
-                wouldExceedBudget;
+                alertThresholdPercent > 100;
 
               return (
                 <div key={category.budgetCategoryId} className="rounded-3xl border bg-card p-5 shadow-xs transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm">
@@ -245,18 +240,24 @@ export function BudgetCategories({
                     <div className="flex items-start gap-4">
                       <div
                         className="flex h-12 w-12 items-center justify-center rounded-2xl border text-2xl shadow-xs"
-                        style={{ backgroundColor: `${category.color}18`, color: category.color, borderColor: `${category.color}30` }}
+                        style={{
+                          backgroundColor: `${category.color}18`,
+                          color: category.color,
+                          borderColor: `${category.color}30`,
+                        }}
                       >
                         {category.icon}
                       </div>
                       <div className="space-y-2">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{category.name}</h3>
+                          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                            {category.name}
+                          </h3>
                           <Badge variant="outline" className={statusStyles.badgeClassName}>
                             {t(statusStyles.translationKey)}
                           </Badge>
                         </div>
-                        <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-200">
+                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                           <span>
                             {t("budget.categories.spent")}: {formatCurrency(category.spent, currency)}
                           </span>
@@ -272,10 +273,10 @@ export function BudgetCategories({
 
                     <div className="flex items-center gap-2">
                       <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 text-right shadow-xs">
-                        <div className="text-[10px] uppercase tracking-[0.15em] text-slate-500 dark:text-slate-300">
+                        <div className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
                           {t("budget.categories.usage")}
                         </div>
-                        <div className="text-sm font-semibold text-slate-900 dark:text-white">{category.usagePercent}%</div>
+                        <div className="text-sm font-semibold text-foreground">{category.usagePercent}%</div>
                       </div>
                       <Button
                         size="sm"
@@ -294,7 +295,7 @@ export function BudgetCategories({
                   </div>
 
                   <div className="mt-4 space-y-2">
-                    <div className="flex items-center justify-between text-sm text-slate-700 dark:text-white">
+                    <div className="flex items-center justify-between text-sm text-foreground">
                       <span>{t("budget.categories.progress")}</span>
                       <span className="font-medium">{category.usagePercent}%</span>
                     </div>
@@ -303,7 +304,7 @@ export function BudgetCategories({
                       className="h-2"
                       indicatorClassName={statusStyles.progressClassName}
                     />
-                    <p className="text-xs text-slate-600 dark:text-slate-200">
+                    <p className="text-xs text-muted-foreground">
                       {t("budget.categories.alertAt", {
                         percent: normalizeAlertThresholdPercent(
                           category.alertThreshold,
@@ -315,7 +316,7 @@ export function BudgetCategories({
 
                   <div className="mt-5 grid gap-4 rounded-2xl border bg-muted/25 p-4 lg:grid-cols-[1fr_1fr_auto] lg:items-end">
                     <div className="space-y-2">
-                      <Label htmlFor={`allocated-${category.budgetCategoryId}`} className="text-slate-900 dark:text-white">
+                      <Label htmlFor={`allocated-${category.budgetCategoryId}`} className="text-foreground">
                         {t("budget.categories.allocated")}
                       </Label>
                       <Input
@@ -336,7 +337,7 @@ export function BudgetCategories({
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor={`threshold-${category.budgetCategoryId}`} className="text-slate-900 dark:text-white">
+                      <Label htmlFor={`threshold-${category.budgetCategoryId}`} className="text-foreground">
                         {t("budget.categories.threshold")}
                       </Label>
                       <Input
@@ -386,22 +387,6 @@ export function BudgetCategories({
                       </div>
                     </div>
                   )}
-                  
-                  {wouldExceedBudget && hasChanges && (
-                    <div className="mt-4 rounded-2xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/50 p-3 text-sm text-orange-700 dark:text-orange-300">
-                      <div className="flex items-start gap-2">
-                        <AlertTriangle className="mt-0.5 h-4 w-4" />
-                        <div>
-                          <div className="font-medium mb-1">{t("budget.categories.exceedsBudgetTitle")}</div>
-                          <div>{t("budget.categories.exceedsBudgetMessage", {
-                            newTotal: formatCurrency(totalAllocatedWithChange, currency),
-                            totalBudget: formatCurrency(totalBudget, currency),
-                            excess: formatCurrency(totalAllocatedWithChange - totalBudget, currency)
-                          })}</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -410,27 +395,32 @@ export function BudgetCategories({
 
         {untrackedCategories.length > 0 && (
           <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-muted/20 p-4">
-            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-white">
+            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
               <Plus className="h-4 w-4" />
               {t("budget.categories.addCategory")}
             </div>
             <div className="space-y-2">
               {untrackedCategories.map((cat) => {
                 const addAmount = Number(addAmounts[cat.categoryId] ?? 0);
-                const totalWithNewCategory = totalAllocated + addAmount;
-                const wouldExceedBudget = addAmount > 0 && totalWithNewCategory > totalBudget;
                 const isInvalidAmount = !addAmounts[cat.categoryId] || addAmount <= 0;
                 
                 return (
                   <div key={cat.categoryId} className="space-y-2">
                     <div className="flex items-center gap-3 rounded-xl border bg-card p-3">
                       <div
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
-                        style={{ backgroundColor: `${cat.color}18`, color: cat.color, borderColor: `${cat.color}30` }}
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-lg"
+                        style={{
+                          backgroundColor: `${cat.color}18`,
+                          color: cat.color,
+                          borderColor: `${cat.color}30`,
+                        }}
                       >
                         {cat.icon}
                       </div>
-                      <span className="flex-1 text-sm font-medium" style={{ color: cat.color }}>
+                      <span
+                        className="flex-1 text-sm font-medium"
+                        style={{ color: cat.color }}
+                      >
                         {cat.displayName}
                       </span>
                       <Input
@@ -447,7 +437,7 @@ export function BudgetCategories({
                       />
                       <Button
                         size="sm"
-                        disabled={isInvalidAmount || wouldExceedBudget}
+                        disabled={isInvalidAmount}
                         onClick={async () => {
                           const wasAdded = await onAddCategory(
                             cat.categoryId,
@@ -462,22 +452,6 @@ export function BudgetCategories({
                         {t("budget.categories.add")}
                       </Button>
                     </div>
-                    
-                    {wouldExceedBudget && (
-                      <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/50 p-2.5 text-xs text-orange-700 dark:text-orange-300">
-                        <div className="flex items-start gap-2">
-                          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                          <div>
-                            <div className="font-medium mb-0.5">{t("budget.categories.exceedsBudgetTitle")}</div>
-                            <div>{t("budget.categories.exceedsBudgetMessage", {
-                              newTotal: formatCurrency(totalWithNewCategory, currency),
-                              totalBudget: formatCurrency(totalBudget, currency),
-                              excess: formatCurrency(totalWithNewCategory - totalBudget, currency)
-                            })}</div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 );
               })}

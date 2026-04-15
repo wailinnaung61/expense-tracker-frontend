@@ -412,7 +412,13 @@
   "budget": {
     "header": {
       "title": "Budget Planning",
-      "subtitle": "Monitor monthly allocations, spot risk early, and keep {{month}} under control.",
+      "subtitle": "Monitor allocations, spot risk early, and keep {{period}} on track.",
+      "periodWithRange": "{{monthNav}} · {{range}}",
+      "browseHint": "You’re viewing {{monthNav}}. Create a budget for this calendar month, or switch months using the arrows.",
+      "badgeCrossMonth": "Budget period: {{budgetRange}}",
+      "badgeInMonth": "{{monthNav}} · Budget: {{budgetRange}}",
+      "subtitleCrossMonth": "{{monthNav}} · Budget {{budgetRange}} — same period when you change month.",
+      "subtitleSingleMonth": "{{monthNav}} · Budget {{budgetRange}}.",
       "activePlan": "ACTIVE",
       "noPlan": "NO PLAN",
       "selectMonth": "Select budget month",
@@ -422,17 +428,19 @@
       "createPlan": "Create Plan",
       "editPlan": "Edit Plan",
       "reset": "Reset",
-      "delete": "Delete"
+      "delete": "Delete",
+      "exportExcel": "Excel report",
+      "exportingExcel": "Preparing Excel…"
     },
     "empty": {
-      "title": "No budget plan for {{month}} yet",
+      "title": "No budget plan for {{period}} yet",
       "description": "Create a monthly plan with a total budget and category allocations so this page can track spending against real limits from your backend snapshots.",
       "hint": "Start with your essential categories first. You can keep the total budget tight, then adjust each category allocation as spending changes.",
       "cta": "Create Monthly Budget"
     },
     "summary": {
       "title": "Budget Summary",
-      "description": "Live overview for {{month}} using your API snapshot.",
+      "description": "Live overview for {{period}}",
       "totalBudget": "Total Budget",
       "totalSpent": "Total Spent",
       "remaining": "Remaining",
@@ -478,7 +486,7 @@
     },
     "dialog": {
       "createTitle": "Create Monthly Budget",
-      "createDescription": "Set the total budget first, then decide which expense categories should be tracked for this month.",
+      "createDescription": "Set the total budget first, then choose categories. Use a custom date range if this plan is not a full calendar month.",
       "editTitle": "Edit Budget Settings",
       "editDescription": "Update the overall monthly budget. Category allocations are managed from the list below the summary.",
       "totalAmount": "Total Amount",
@@ -486,10 +494,10 @@
       "color": "Color",
       "leaveBlankHint": "Edit mode allows updating the total budget amount only.",
       "allocatedSummary": "Allocation Summary",
-      "visualHint": "Keep total allocated within the monthly total so the plan remains realistic.",
+      "visualHint": "Allocated vs total is shown for reference. You can save when allocated is above or below the total.",
       "allocationOver": "Allocated category amounts cannot be greater than the total monthly budget.",
       "unassigned": "Unassigned",
-      "overAllocated": "Over Allocated",
+      "overAllocated": "Above monthly total",
       "cannotExceedTitle": "Cannot Exceed Budget",
       "categoryPlanning": "Category Planning",
       "selectCategories": "Select expense categories to include in this month and give each one its own allocation and alert threshold. Drag selected categories to reorder them.",
@@ -497,7 +505,15 @@
       "allocation": "Category Allocation",
       "categoryThresholdHint": "80 means the warning should start when the category has used 80% of its budget.",
       "createSubmit": "Create Budget",
-      "updateSubmit": "Update Budget"
+      "updateSubmit": "Update Budget",
+      "customPeriod": "Custom date range",
+      "customPeriodHint": "When off, the full calendar month from the month selector is used. When on, set explicit start and end dates.",
+      "periodStart": "Start date",
+      "periodEnd": "End date",
+      "pickStartDate": "Pick start date",
+      "pickEndDate": "Pick end date",
+      "dateRangeInvalidTitle": "Invalid dates",
+      "dateRangeInvalid": "End date must be on or after the start date."
     },
     "feedback": {
       "loadFailed": "Failed to load budget data.",
@@ -522,7 +538,9 @@
       "confirmRemoveCategoryTitle": "Remove this category from budget?",
       "confirmRemoveCategoryText": "This will remove the category allocation from this monthly budget. You can add it again later.",
       "confirmButton": "Confirm",
-      "cancelButton": "Cancel"
+      "cancelButton": "Cancel",
+      "excelExportSuccess": "Budget Excel report downloaded.",
+      "excelExportFailed": "Could not generate or download the budget report. Try again later."
     }
   },
   "transactions": {
@@ -650,6 +668,7 @@
       "addDescription": "Fill in the details to add a new transaction",
       "editDescription": "Update the transaction details below",
       "typeLabel": "Transaction Type",
+      "typeLockedHint": "This type cannot be switched here. You can still edit amount, date, category, and notes.",
       "categoryLabel": "Category",
       "categoryPlaceholder": "Select a category",
       "selectTypeFirst": "Please select a transaction type first",
@@ -671,7 +690,14 @@
       "saving": "Saving...",
       "save": "Save Transaction",
       "createSuccess": "Transaction created successfully",
-      "updateSuccess": "Transaction updated successfully"
+      "updateSuccess": "Transaction updated successfully",
+      "budgetHintLoading": "Checking budget for this month…",
+      "budgetHintPickCategory": "Select a category to see its plan for {{month}} (allocated, spent, and remaining).",
+      "budgetHintNoPlan": "No budget for {{month}}.",
+      "budgetHintOutsidePeriod": "This transaction date is outside your budget period ({{range}}, inclusive).",
+      "budgetHintNotInPlan": "This category is not in your {{month}} budget.",
+      "budgetHintOpenBudget": "Open Budget",
+      "budgetHintOk": "{{month}} — {{allocated}} allocated · {{spent}} spent · {{remaining}} left · {{usage}}% of this category’s budget used"
     },
     "importCsv": {
       "title": "Import Transactions from CSV",
