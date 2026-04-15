@@ -1,7 +1,9 @@
 import { apiClient } from "@/lib/api";
+import { normalizeBudgetDto, normalizeBudgetMonthlyResponse } from "@/lib/budget-api-normalize";
 import type {
   BudgetCategoryDto,
   BudgetDto,
+  BudgetExcelExportJobResponse,
   BudgetMonthlyResponse,
   CreateBudgetCategoryRequest,
   CreateBudgetRequest,
@@ -9,18 +11,37 @@ import type {
   UpdateBudgetCategoryRequest,
   UpdateBudgetRequest,
 } from "@/types/budget";
+import type { ExportDownloadResponse } from "@/types/export";
+
+function readBudgetExcelJobId(raw: unknown): string {
+  const r = raw as Record<string, unknown>;
+  const v = r.jobId ?? r.JobId;
+  return v != null && String(v).length > 0 ? String(v) : "";
+}
+
+function normalizeBudgetExcelDownload(raw: unknown): ExportDownloadResponse {
+  const r = raw as Record<string, unknown>;
+  return {
+    downloadUrl: String(r.downloadUrl ?? r.DownloadUrl ?? r.url ?? ""),
+    fileName: String(r.fileName ?? r.FileName ?? "budget-report.xlsx"),
+    expiresAt: String(r.expiresAt ?? r.ExpiresAt ?? ""),
+  };
+}
 
 export const budgetService = {
-  getBudgetByMonth(year: number, month: number) {
-    return apiClient.get<BudgetMonthlyResponse>(`/api/budgets/${year}/${month}`);
+  async getBudgetByMonth(year: number, month: number) {
+    const raw = await apiClient.get<BudgetMonthlyResponse>(`/api/budgets/${year}/${month}`);
+    return normalizeBudgetMonthlyResponse(raw);
   },
 
-  createBudget(data: CreateBudgetRequest) {
-    return apiClient.post<BudgetDto>("/api/budgets", data);
+  async createBudget(data: CreateBudgetRequest) {
+    const raw = await apiClient.post<BudgetDto>("/api/budgets", data);
+    return normalizeBudgetDto(raw);
   },
 
-  updateBudget(budgetId: string, data: UpdateBudgetRequest) {
-    return apiClient.put<BudgetDto>(`/api/budgets/${budgetId}`, data);
+  async updateBudget(budgetId: string, data: UpdateBudgetRequest) {
+    const raw = await apiClient.put<BudgetDto>(`/api/budgets/${budgetId}`, data);
+    return normalizeBudgetDto(raw);
   },
 
   addBudgetCategory(budgetId: string, data: CreateBudgetCategoryRequest) {
@@ -47,5 +68,48 @@ export const budgetService = {
 
   deleteBudget(budgetId: string) {
     return apiClient.delete<MessageResponse>(`/api/budgets/${budgetId}`);
+  },
+
+  /** POST /api/budgets/{budgetId}/reports/excel — builds workbook, uploads to S3, returns export job. */
+  async createBudgetExcelReport(budgetId: string) {
+    const raw = await apiClient.post<unknown>(`/api/budgets/${budgetId}/reports/excel`, {});
+    const jobId = readBudgetExcelJobId(raw);
+    if (!jobId) {
+      throw new Error("Budget export did not return a job id.");
+    }
+    return { ...(raw as BudgetExcelExportJobResponse), jobId };
+  },
+
+  /** GET /api/budgets/reports/{jobId}/download — presigned URL for the generated workbook. */
+  async getBudgetExcelReportDownloadUrl(jobId: string) {
+    const raw = await apiClient.request<unknown>(
+      `/api/budgets/reports/${encodeURIComponent(jobId)}/download`,
+      { method: "GET" }
+    );
+    return normalizeBudgetExcelDownload(raw);
+  },
+
+  /** Request report then open download (expects job ready after POST per API contract). */
+  async downloadBudgetExcelReport(budgetId: string): Promise<void> {
+    const postRaw = await apiClient.post<unknown>(`/api/budgets/${budgetId}/reports/excel`, {});
+    const jobId = readBudgetExcelJobId(postRaw);
+    if (!jobId) {
+      throw new Error("Budget export did not return a job id.");
+    }
+    const getRaw = await apiClient.request<unknown>(
+      `/api/budgets/reports/${encodeURIComponent(jobId)}/download`,
+      { method: "GET" }
+    );
+    const download = normalizeBudgetExcelDownload(getRaw);
+    if (!download.downloadUrl) {
+      throw new Error("Download URL was not returned.");
+    }
+    const link = document.createElement("a");
+    link.href = download.downloadUrl;
+    link.download = download.fileName || "budget-report.xlsx";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   },
 };

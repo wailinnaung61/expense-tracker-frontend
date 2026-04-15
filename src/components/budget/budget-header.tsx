@@ -17,6 +17,7 @@ import { addMonths, format, subMonths } from "date-fns";
 import {
   ChevronLeft,
   ChevronRight,
+  FileSpreadsheet,
   PencilLine,
   Plus,
   RefreshCcw,
@@ -28,29 +29,38 @@ import { useMemo, useState } from "react";
 interface BudgetHeaderProps {
   selectedMonth: string;
   periodLabel: string;
+  /** Explains calendar month vs budget dates (from i18n in parent). */
+  headingDescription: string;
   hasBudget: boolean;
   budgetStatus?: string;
   isBusy: boolean;
+  /** When true, Excel report is generating (disables the export button only if combined in parent). */
+  isExportingExcel?: boolean;
   onMonthChange: (value: string) => void;
   onCreate: () => void;
   onEdit: () => void;
   onRefresh: () => void;
   onReset: () => void;
   onDelete: () => void;
+  /** Download budget workbook (POST + presigned GET). Hidden when no budget. */
+  onExportExcel?: () => void;
 }
 
 export function BudgetHeader({
   selectedMonth,
   periodLabel,
+  headingDescription,
   hasBudget,
   budgetStatus,
   isBusy,
+  isExportingExcel = false,
   onMonthChange,
   onCreate,
   onEdit,
   onRefresh,
   onReset,
   onDelete,
+  onExportExcel,
 }: BudgetHeaderProps) {
   const { t } = useTranslation();
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
@@ -118,14 +128,14 @@ export function BudgetHeader({
 
             <Badge
               variant="outline"
-              className="border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300"
+              className="max-w-[min(100%,36rem)] whitespace-normal border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-left text-slate-600 dark:text-slate-300"
             >
               {periodLabel}
             </Badge>
           </div>
 
           <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-            {t("budget.header.subtitle", { month: periodLabel })}
+            {headingDescription}
           </p>
         </div>
 
@@ -248,6 +258,19 @@ export function BudgetHeader({
 
               {hasBudget ? (
                 <>
+                  {onExportExcel && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={onExportExcel}
+                      disabled={isBusy}
+                    >
+                      <FileSpreadsheet className="mr-2 h-4 w-4" />
+                      {isExportingExcel
+                        ? t("budget.header.exportingExcel")
+                        : t("budget.header.exportExcel")}
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"

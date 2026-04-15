@@ -80,7 +80,7 @@ export function BudgetSummary({
       <CardHeader className="border-b bg-card pb-4">
         <CardTitle className="text-foreground">{t("budget.summary.title")}</CardTitle>
         <CardDescription>
-          {t("budget.summary.description", { month: periodLabel })}
+          {t("budget.summary.description", { period: periodLabel } as any)}
         </CardDescription>
       </CardHeader>
 

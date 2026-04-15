@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 @import "tw-animate-css";
 
 
@@ -681,7 +682,7 @@
 
   /* Other colors */
   --card: oklch(21.3422% 0 0);
-  --card-foreground: oklch(68.8869% 0 0);
+  --card-foreground: var(--foreground);
   --popover: oklch(21.3422% 0 0);
   --popover-foreground: oklch(94.9119% 0 0);
   --primary: var(--teal);

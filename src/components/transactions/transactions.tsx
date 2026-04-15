@@ -189,8 +189,12 @@ export default function TransactionsTable({
                       <div className="flex items-center gap-2">
                         {category && (
                           <>
-                            <span className="text-lg">{category.icon}</span>
-                            <span className="text-sm">{category.displayName}</span>
+                            <span className="text-lg" style={{ color: category.color }}>
+                              {category.icon}
+                            </span>
+                            <span className="text-sm font-medium" style={{ color: category.color }}>
+                              {category.displayName}
+                            </span>
                           </>
                         )}
                         {!category && (

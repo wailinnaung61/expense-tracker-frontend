@@ -23,27 +23,59 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ApiError } from "@/lib/api";
 import { categoryService } from "@/services/categoryService";
+import { budgetService } from "@/services/budgetService";
 import { transactionService } from "@/services/transactionService";
 import { s3Service } from "@/services/s3Service";
+import type { BudgetCategoryDto } from "@/types/budget";
 import type { ExpenseCategory } from "@/types/category";
-import { TransactionType } from "@/types/transaction";
-import { PaymentStatus } from "@/types/transaction";
-import type { Transaction } from "@/types/transaction";
+import {
+  PaymentStatus,
+  TransactionType,
+  type Transaction,
+} from "@/types/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { enUS, ja } from "date-fns/locale";
+import type { Locale } from "date-fns";
 import { CalendarIcon, Upload, X, FileIcon, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "@/hooks/useTranslation";
+import {
+  dateFnsLocaleForLanguage,
+  formatBudgetRangeLabel,
+  isTransactionDayInBudgetPeriod,
+} from "@/lib/budget-period";
+import { cn, formatCurrency } from "@/lib/utils";
+
+const BUDGET_MONTH_LOCALES: Record<string, Locale> = { en: enUS, ja };
+
+function formatBudgetMonthLabel(date: Date, lang: string): string {
+  const key = lang.split("-")[0] || "en";
+  const locale = BUDGET_MONTH_LOCALES[key] ?? enUS;
+  return format(date, "MMMM yyyy", { locale });
+}
+
+type ExpenseBudgetHint =
+  | { kind: "hidden" }
+  | { kind: "loading" }
+  | { kind: "pick_category"; monthLabel: string }
+  | { kind: "no_budget"; monthLabel: string }
+  | { kind: "outside_period"; monthLabel: string; rangeLabel: string }
+  | { kind: "not_in_budget"; monthLabel: string }
+  | { kind: "ok"; monthLabel: string; row: BudgetCategoryDto };
 
 interface AddTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
   transaction?: Transaction | null;
+  currency?: string;
 }
 
 type TransactionFormData = {
@@ -62,6 +94,7 @@ export function AddTransactionDialog({
   onOpenChange,
   onSuccess,
   transaction,
+  currency = "USD",
 }: AddTransactionDialogProps) {
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [filteredCategories, setFilteredCategories] = useState<ExpenseCategory[]>([]);
@@ -69,7 +102,8 @@ export function AddTransactionDialog({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [expenseBudgetHint, setExpenseBudgetHint] = useState<ExpenseBudgetHint>({ kind: "hidden" });
 
   const transactionSchema = useMemo(() => z.object({
     type: z.string().min(1, t("validation.typeRequired")),
@@ -110,6 +144,93 @@ export function AddTransactionDialog({
   });
 
   const selectedType = watch("type");
+  const tranactionDate = watch("tranactionDate");
+  const watchedCategoryId = watch("categoryId");
+
+  const lockAdvancedTransactionType = Boolean(
+    transaction &&
+      (transaction.type === TransactionType.Investment ||
+        transaction.type === TransactionType.Savings)
+  );
+
+  useEffect(() => {
+    if (!open) {
+      setExpenseBudgetHint({ kind: "hidden" });
+      return;
+    }
+
+    const typeNum = Number(selectedType);
+    if (typeNum !== TransactionType.Expense) {
+      setExpenseBudgetHint({ kind: "hidden" });
+      return;
+    }
+
+    if (!(tranactionDate instanceof Date) || Number.isNaN(tranactionDate.getTime())) {
+      setExpenseBudgetHint({ kind: "hidden" });
+      return;
+    }
+
+    const monthLabel = formatBudgetMonthLabel(tranactionDate, i18n.language || "en");
+
+    if (!watchedCategoryId) {
+      setExpenseBudgetHint({ kind: "pick_category", monthLabel });
+      return;
+    }
+
+    let cancelled = false;
+    setExpenseBudgetHint({ kind: "loading" });
+
+    const year = tranactionDate.getFullYear();
+    const month = tranactionDate.getMonth() + 1;
+
+    void (async () => {
+      try {
+        const res = await budgetService.getBudgetByMonth(year, month);
+        if (cancelled) return;
+
+        if (!res.budgetId) {
+          setExpenseBudgetHint({ kind: "no_budget", monthLabel });
+          return;
+        }
+
+        const rangeStart = (res.startDate ?? "").trim();
+        const rangeEnd = (res.endDate ?? "").trim();
+        if (
+          rangeStart &&
+          rangeEnd &&
+          !isTransactionDayInBudgetPeriod(tranactionDate, rangeStart, rangeEnd)
+        ) {
+          const rangeLabel = formatBudgetRangeLabel(
+            rangeStart,
+            rangeEnd,
+            dateFnsLocaleForLanguage(i18n.language)
+          );
+          setExpenseBudgetHint({ kind: "outside_period", monthLabel, rangeLabel });
+          return;
+        }
+
+        const row = (res.categories ?? []).find((c) => c.categoryId === watchedCategoryId);
+        if (!row) {
+          setExpenseBudgetHint({ kind: "not_in_budget", monthLabel });
+          return;
+        }
+
+        setExpenseBudgetHint({ kind: "ok", monthLabel, row });
+      } catch (e) {
+        if (cancelled) return;
+        if (e instanceof ApiError && e.status === 404) {
+          setExpenseBudgetHint({ kind: "no_budget", monthLabel });
+          return;
+        }
+        console.error(e);
+        setExpenseBudgetHint({ kind: "hidden" });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, selectedType, tranactionDate, watchedCategoryId, i18n.language]);
 
   // Fetch categories
   useEffect(() => {
@@ -143,7 +264,7 @@ export function AddTransactionDialog({
   useEffect(() => {
     const typeNum = Number(selectedType);
     if (selectedType && !isNaN(typeNum)) {
-      const filtered = categories.filter((cat) => cat.type === typeNum);
+      const filtered = categories.filter((cat) => Number(cat.type) === typeNum);
       setFilteredCategories(filtered);
       
       // Reset category selection if current category doesn't match the new type
@@ -314,74 +435,63 @@ export function AddTransactionDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Transaction Type */}
+          {/* Transaction Type (Expense & Income only; Investment/Savings stay read-only when editing) */}
           <div>
             <Label>{t("transactions.addDialog.typeLabel")}</Label>
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <RadioGroup
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  className="grid grid-cols-2 gap-4 mt-2"
-                >
-                  <div>
-                    <RadioGroupItem
-                      value={String(TransactionType.Expense)}
-                      id="expense"
-                      className="peer sr-only"
-                    />
+            {lockAdvancedTransactionType ? (
+              <div className="mt-2 rounded-md border border-border bg-muted/30 px-3 py-2.5 text-sm">
+                <span className="font-medium text-foreground">
+                  {transaction!.type === TransactionType.Investment
+                    ? t("transactions.type.investment")
+                    : t("transactions.type.savings")}
+                </span>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t("transactions.addDialog.typeLockedHint")}
+                </p>
+              </div>
+            ) : (
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <RadioGroup
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    className="grid grid-cols-2 gap-4 mt-2"
+                  >
                     <Label
-                      htmlFor="expense"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                      htmlFor="add-tx-type-expense"
+                      className={cn(
+                        "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground",
+                        "has-data-[state=checked]:border-primary has-data-[state=checked]:shadow-[inset_0_0_0_1px] has-data-[state=checked]:shadow-primary/40"
+                      )}
                     >
+                      <RadioGroupItem
+                        value={String(TransactionType.Expense)}
+                        id="add-tx-type-expense"
+                        className="sr-only"
+                      />
                       <span>{t("transactions.type.expense")}</span>
                     </Label>
-                  </div>
-                  <div>
-                    <RadioGroupItem
-                      value={String(TransactionType.Income)}
-                      id="income"
-                      className="peer sr-only"
-                    />
                     <Label
-                      htmlFor="income"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                      htmlFor="add-tx-type-income"
+                      className={cn(
+                        "flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground",
+                        "has-data-[state=checked]:border-primary has-data-[state=checked]:shadow-[inset_0_0_0_1px] has-data-[state=checked]:shadow-primary/40"
+                      )}
                     >
+                      <RadioGroupItem
+                        value={String(TransactionType.Income)}
+                        id="add-tx-type-income"
+                        className="sr-only"
+                      />
                       <span>{t("transactions.type.income")}</span>
                     </Label>
-                  </div>
-                  <div>
-                    <RadioGroupItem
-                      value={String(TransactionType.Investment)}
-                      id="investment"
-                      className="peer sr-only"
-                    />
-                    <Label
-                      htmlFor="investment"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                    >
-                      <span>{t("transactions.type.investment")}</span>
-                    </Label>
-                  </div>
-                  <div>
-                    <RadioGroupItem
-                      value={String(TransactionType.Savings)}
-                      id="savings"
-                      className="peer sr-only"
-                    />
-                    <Label
-                      htmlFor="savings"
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
-                    >
-                      <span>{t("transactions.type.savings")}</span>
-                    </Label>
-                  </div>
-                </RadioGroup>
-              )}
-            />
-            {errors.type && (
+                  </RadioGroup>
+                )}
+              />
+            )}
+            {!lockAdvancedTransactionType && errors.type && (
               <p className="text-sm text-red-600">{errors.type.message}</p>
             )}
           </div>
@@ -446,6 +556,61 @@ export function AddTransactionDialog({
               )}
             </div>
           </div>
+
+          {Number(selectedType) === TransactionType.Expense && expenseBudgetHint.kind !== "hidden" && (
+            <div className="rounded-lg border border-border bg-muted/35 px-3 py-2.5 text-sm">
+              {expenseBudgetHint.kind === "loading" && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />
+                  <span>{t("transactions.addDialog.budgetHintLoading")}</span>
+                </div>
+              )}
+              {expenseBudgetHint.kind === "pick_category" && (
+                <p className="text-muted-foreground">
+                  {t("transactions.addDialog.budgetHintPickCategory", {
+                    month: expenseBudgetHint.monthLabel,
+                  })}
+                </p>
+              )}
+              {expenseBudgetHint.kind === "no_budget" && (
+                <p className="text-muted-foreground">
+                  {t("transactions.addDialog.budgetHintNoPlan", { month: expenseBudgetHint.monthLabel })}{" "}
+                  <Link to="/budget" className="font-medium text-primary underline underline-offset-2">
+                    {t("transactions.addDialog.budgetHintOpenBudget")}
+                  </Link>
+                </p>
+              )}
+              {expenseBudgetHint.kind === "outside_period" && (
+                <p className="text-muted-foreground">
+                  {t("transactions.addDialog.budgetHintOutsidePeriod", {
+                    range: expenseBudgetHint.rangeLabel,
+                  })}{" "}
+                  <Link to="/budget" className="font-medium text-primary underline underline-offset-2">
+                    {t("transactions.addDialog.budgetHintOpenBudget")}
+                  </Link>
+                </p>
+              )}
+              {expenseBudgetHint.kind === "not_in_budget" && (
+                <p className="text-muted-foreground">
+                  {t("transactions.addDialog.budgetHintNotInPlan", { month: expenseBudgetHint.monthLabel })}{" "}
+                  <Link to="/budget" className="font-medium text-primary underline underline-offset-2">
+                    {t("transactions.addDialog.budgetHintOpenBudget")}
+                  </Link>
+                </p>
+              )}
+              {expenseBudgetHint.kind === "ok" && (
+                <p className="text-foreground">
+                  {t("transactions.addDialog.budgetHintOk", {
+                    month: expenseBudgetHint.monthLabel,
+                    allocated: formatCurrency(expenseBudgetHint.row.allocated, currency),
+                    spent: formatCurrency(expenseBudgetHint.row.spent, currency),
+                    remaining: formatCurrency(expenseBudgetHint.row.remaining, currency),
+                    usage: String(Math.round(expenseBudgetHint.row.usagePercent)),
+                  })}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Transaction Date */}

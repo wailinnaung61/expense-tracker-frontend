@@ -19,17 +19,45 @@ import { ImportCsvDialog } from "@/components/transactions/import-csv-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { CHATBOT_REFRESH_EVENT, type ChatbotRefreshEventDetail } from "@/lib/chatbot-refresh";
+import { spansMultipleCalendarMonths } from "@/lib/budget-period";
 import { ApiError } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import { Wallet, CreditCard, Banknote } from "lucide-react";
 
 type BudgetInsight = {
   hasBudget: boolean;
+  /** False for CUSTOM or multi-calendar-month budgets — Expenses pulse is misleading there. */
+  showMonthlyPulse: boolean;
   totalBudget: number;
   totalSpent: number;
   remaining: number;
   usagePercent: number;
 };
+
+function isSimpleMonthlyBudgetForExpensesPulse(
+  periodType: string | null | undefined,
+  startDate: string,
+  endDate: string
+): boolean {
+  if (periodType?.toUpperCase() === "CUSTOM") return false;
+  if (!startDate || !endDate) return false;
+  if (spansMultipleCalendarMonths(startDate, endDate)) return false;
+  return true;
+}
+
+/** Month to query for overlapping GET /api/budgets/{y}/{m} when the filter spans multiple days. */
+function budgetInsightReferenceDate(start: string | undefined, end: string | undefined): Date {
+  const fallback = new Date();
+  if (!start) return fallback;
+  const rangeStart = new Date(`${start}T00:00:00`);
+  if (Number.isNaN(rangeStart.getTime())) return fallback;
+  if (!end) return rangeStart;
+  const rangeEnd = new Date(`${end}T23:59:59.999`);
+  if (Number.isNaN(rangeEnd.getTime())) return rangeStart;
+  const now = new Date();
+  if (now >= rangeStart && now <= rangeEnd) return now;
+  return new Date((rangeStart.getTime() + rangeEnd.getTime()) / 2);
+}
 
 export default function Transactions() {
   const { user } = useAuth();
@@ -71,6 +99,7 @@ export default function Transactions() {
   const [budgetLoading, setBudgetLoading] = useState(false);
   const [budgetInsight, setBudgetInsight] = useState<BudgetInsight>({
     hasBudget: false,
+    showMonthlyPulse: true,
     totalBudget: 0,
     totalSpent: 0,
     remaining: 0,
@@ -82,11 +111,9 @@ export default function Transactions() {
   const currency = user?.currency || "USD";
 
   const budgetMonthLabel = useMemo(() => {
-    const reference = startDate ? new Date(`${startDate}T00:00:00`) : new Date();
-    return Number.isNaN(reference.getTime())
-      ? format(new Date(), "MMM yyyy")
-      : format(reference, "MMM yyyy");
-  }, [startDate]);
+    const reference = budgetInsightReferenceDate(startDate, endDate);
+    return format(reference, "MMM yyyy");
+  }, [startDate, endDate]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -181,10 +208,14 @@ export default function Transactions() {
   }, [fetchTransactions, transactionsRefreshKey, currentCursor, currentCursorId]);
 
   const fetchBudgetInsight = useCallback(async () => {
-    const reference = startDate ? new Date(`${startDate}T00:00:00`) : new Date();
+    const reference = budgetInsightReferenceDate(startDate, endDate);
 
     if (Number.isNaN(reference.getTime())) {
-      setBudgetInsight((current) => ({ ...current, hasBudget: false }));
+      setBudgetInsight((current) => ({
+        ...current,
+        hasBudget: false,
+        showMonthlyPulse: true,
+      }));
       return;
     }
 
@@ -195,8 +226,15 @@ export default function Transactions() {
         reference.getMonth() + 1
       );
 
+      const sd = response.startDate?.trim() ?? "";
+      const ed = response.endDate?.trim() ?? "";
+      const showMonthlyPulse =
+        Boolean(response.budgetId) &&
+        isSimpleMonthlyBudgetForExpensesPulse(response.periodType, sd, ed);
+
       setBudgetInsight({
         hasBudget: Boolean(response.budgetId),
+        showMonthlyPulse,
         totalBudget: response.summary.totalBudget,
         totalSpent: response.summary.totalSpent,
         remaining: response.summary.remaining,
@@ -206,6 +244,7 @@ export default function Transactions() {
       if (error instanceof ApiError && error.status === 404) {
         setBudgetInsight({
           hasBudget: false,
+          showMonthlyPulse: true,
           totalBudget: 0,
           totalSpent: 0,
           remaining: 0,
@@ -217,7 +256,7 @@ export default function Transactions() {
     } finally {
       setBudgetLoading(false);
     }
-  }, [startDate]);
+  }, [startDate, endDate]);
 
   useEffect(() => {
     void fetchBudgetInsight();
@@ -373,6 +412,9 @@ export default function Transactions() {
     setBudgetRefreshKey((prev) => prev + 1);
   }, []);
 
+  const showExpensesBudgetPulseCard =
+    !budgetInsight.hasBudget || budgetInsight.showMonthlyPulse;
+
   const handleRefreshClick = useCallback(() => {
     setCurrentPage(1);
     setCurrentCursor(null);
@@ -394,6 +436,7 @@ export default function Transactions() {
         onImportCsvClick={handleImportCsvClick}
       />
 
+      {showExpensesBudgetPulseCard && (
       <Card className="border-slate-200 dark:border-slate-700 bg-card">
         <CardContent className="space-y-4 p-5">
           <div className="flex items-center justify-between gap-4">
@@ -463,6 +506,7 @@ export default function Transactions() {
           ) : null}
         </CardContent>
       </Card>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
@@ -520,6 +564,7 @@ export default function Transactions() {
         onOpenChange={setDialogOpen}
         onSuccess={handleDialogSuccess}
         transaction={selectedTransaction}
+        currency={currency}
       />
 
       <BulkAddTransactionDialog
