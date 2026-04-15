@@ -128,10 +128,10 @@ export function TransactionFilters({
   }, [type]);
 
   return (
-    <div className="rounded-xl border bg-card/50 backdrop-blur-sm shadow-md">
-      <div className="p-6 space-y-5">
+    <div className="rounded-xl border bg-card/50 shadow-sm backdrop-blur-sm sm:shadow-md">
+      <div className="space-y-4 p-4 sm:space-y-5 sm:p-6">
         {/* Search and Filters Row */}
-        <div className="flex flex-col lg:flex-row gap-4 items-stretch">
+        <div className="flex flex-col items-stretch gap-3 lg:flex-row lg:gap-4">
           <div className="relative flex-1 min-w-0">
             <Search className="absolute inset-s-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
@@ -142,9 +142,9 @@ export function TransactionFilters({
             />
           </div>
           
-          <div className="flex flex-wrap sm:flex-nowrap gap-2.5">
+          <div className="grid grid-cols-1 gap-2.5 sm:flex sm:flex-nowrap">
             <Select value={type} onValueChange={onTypeChange}>
-              <SelectTrigger className="w-full sm:w-36 h-11 border-muted-foreground/20">
+              <SelectTrigger className="h-10 w-full border-muted-foreground/20 sm:h-11 sm:w-36">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
@@ -157,7 +157,7 @@ export function TransactionFilters({
             </Select>
             
             <Select value={status} onValueChange={onStatusChange}>
-              <SelectTrigger className="w-full sm:w-36 h-11 border-muted-foreground/20">
+              <SelectTrigger className="h-10 w-full border-muted-foreground/20 sm:h-11 sm:w-36">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -169,7 +169,7 @@ export function TransactionFilters({
             </Select>
             
             <Select value={categoryId} onValueChange={onCategoryChange}>
-              <SelectTrigger className="w-full sm:w-40 h-11 border-muted-foreground/20">
+              <SelectTrigger className="h-10 w-full border-muted-foreground/20 sm:h-11 sm:w-40">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent className="max-h-100">
@@ -185,12 +185,12 @@ export function TransactionFilters({
         </div>
 
         {/* Date Range Row */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:gap-3">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full sm:w-64 h-11 justify-start text-left font-normal border-muted-foreground/20 hover:bg-accent/50"
+                className="h-10 w-full justify-start border-muted-foreground/20 text-left font-normal hover:bg-accent/50 sm:h-11 sm:w-64"
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {startDateLocal ? (
@@ -214,7 +214,7 @@ export function TransactionFilters({
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full sm:w-64 h-11 justify-start text-left font-normal border-muted-foreground/20 hover:bg-accent/50"
+                className="h-10 w-full justify-start border-muted-foreground/20 text-left font-normal hover:bg-accent/50 sm:h-11 sm:w-64"
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {endDateLocal ? (

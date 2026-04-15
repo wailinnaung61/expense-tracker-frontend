@@ -304,7 +304,7 @@ export default function Transactions() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 px-3 pb-2 sm:space-y-6 sm:px-0 sm:pb-0">
       <ExpensesHeader
         onRefresh={handleRefreshClick}
         onAddClick={handleAddClick}
@@ -312,7 +312,7 @@ export default function Transactions() {
         onImportCsvClick={handleImportCsvClick}
       />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <TransactionFilters
             type={type}

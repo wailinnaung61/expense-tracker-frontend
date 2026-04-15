@@ -3,6 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import dashboardEng from "@/assets/landingpic/dashboard-eng.png";
+import dashboardJp from "@/assets/landingpic/dashboard-jp.png";
+import dashboardMy from "@/assets/landingpic/dashboard-my.png";
+import tabletEng from "@/assets/landingpic/tablet-eng.png";
+import tabletJp from "@/assets/landingpic/tablet-jp.png";
+import tabletMy from "@/assets/landingpic/tablet-my.png";
+import mobileEng from "@/assets/landingpic/mobile-eng.png";
+import mobileJp from "@/assets/landingpic/mobile-jp.png";
+import mobileMy from "@/assets/landingpic/mobile-my.png";
 import {
   ArrowRight,
   BarChart3,
@@ -16,8 +25,6 @@ import {
   Lock,
   Smartphone,
   Globe,
-  LayoutDashboard,
-  Table as TableIcon,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -25,6 +32,21 @@ export default function LandingPage() {
   const { t, i18n } = useTranslation();
   const isMyanmar = i18n.language === 'my';
   const isJapanese = i18n.language === 'ja';
+  const dashboardPreviewSrc = i18n.language.startsWith("ja")
+    ? dashboardJp
+    : i18n.language.startsWith("my")
+      ? dashboardMy
+      : dashboardEng;
+  const tabletPreviewSrc = i18n.language.startsWith("ja")
+    ? tabletJp
+    : i18n.language.startsWith("my")
+      ? tabletMy
+      : tabletEng;
+  const mobilePreviewSrc = i18n.language.startsWith("ja")
+    ? mobileJp
+    : i18n.language.startsWith("my")
+      ? mobileMy
+      : mobileEng;
 
   const features = [
     {
@@ -76,7 +98,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen relative overflow-hidden bg-white">
       {/* Animated Background Elements */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
+      <div className="fixed inset-0 -z-10 hidden overflow-hidden sm:block">
         <div className="absolute top-0 -left-40 w-80 h-80 bg-sky-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-0 -right-40 w-80 h-80 bg-cyan-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute -bottom-40 left-20 w-80 h-80 bg-teal-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
@@ -145,7 +167,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-linear-to-b from-sky-50/30 via-white to-white">
         {/* Premium Animated Background */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 hidden overflow-hidden sm:block">
           {/* Animated gradient mesh */}
           <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-sky-100/40 via-cyan-50/30 to-teal-100/40 animate-gradient-shift"></div>
           
@@ -203,7 +225,7 @@ export default function LandingPage() {
         <div className="absolute bottom-3/5 left-1/4 w-24 h-24 border-2 border-cyan-300/25 rounded-full animate-float" style={{animationDuration: '6.8s', animationDelay: '0.9s'}}></div>
         <div className="absolute top-4/5 right-2/5 w-30 h-30 border-2 border-teal-300/23 rounded-full animate-float" style={{animationDuration: '7.8s', animationDelay: '1.3s'}}></div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-28 sm:pt-32 sm:pb-36">
+        <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-18 sm:px-6 sm:pt-32 sm:pb-36 lg:px-8">
           <div className="text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-linear-to-r from-sky-500/10 to-cyan-500/10 border border-sky-200/50 backdrop-blur-sm mb-8 animate-in fade-in zoom-in duration-700 delay-100 hover:scale-110 transition-all cursor-default group animate-float shadow-lg hover:shadow-sky-500/30">
@@ -219,7 +241,7 @@ export default function LandingPage() {
             </div>
             
             {/* Main Heading */}
-            <h1 className={`text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight mb-6 ${(isMyanmar || isJapanese) ? 'leading-relaxed' : 'leading-tight'}`}>
+            <h1 className={`mb-5 text-3xl font-black tracking-tight sm:mb-6 sm:text-6xl lg:text-7xl xl:text-8xl ${(isMyanmar || isJapanese) ? 'leading-relaxed' : 'leading-tight'}`}>
               <span className="block text-gray-900 animate-in fade-in slide-in-from-bottom duration-700 delay-200">
                 {t('landing.hero.title1')}
               </span>
@@ -234,18 +256,18 @@ export default function LandingPage() {
             </h1>
             
             {/* Subtitle */}
-            <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom duration-700 delay-400">
+            <p className="mx-auto mb-8 max-w-3xl text-base leading-relaxed text-gray-600 animate-in fade-in slide-in-from-bottom duration-700 delay-400 sm:mb-12 sm:text-2xl">
               {t('landing.hero.subtitle')} 
               <span className="font-semibold text-sky-600">{t('landing.hero.subtitleBold')}</span>. {' '}
               {t('landing.hero.subtitleEnd')}
             </p>
             
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-in fade-in slide-in-from-bottom duration-700 delay-500">
+            <div className="mb-10 flex flex-col justify-center gap-3 animate-in fade-in slide-in-from-bottom duration-700 delay-500 sm:mb-16 sm:flex-row sm:gap-4">
               <Button 
                 size="lg" 
                 onClick={() => navigate("/signup")}
-                className="relative overflow-hidden bg-linear-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-lg px-10 h-14 shadow-2xl shadow-sky-500/40 hover:shadow-sky-500/60 hover:scale-110 transition-all text-white font-semibold group animate-pulse-glow"
+                className="relative h-11 overflow-hidden bg-linear-to-r from-sky-500 to-cyan-500 px-6 text-base font-semibold text-white shadow-xl shadow-sky-500/30 transition-all hover:from-sky-600 hover:to-cyan-600 hover:shadow-sky-500/60 sm:h-14 sm:px-10 sm:text-lg sm:hover:scale-110 group animate-pulse-glow"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   {t('landing.hero.ctaStart')}
@@ -259,7 +281,7 @@ export default function LandingPage() {
               <Button 
                 size="lg" 
                 onClick={() => navigate("/login")}
-                className="relative overflow-hidden bg-white hover:bg-white text-lg px-10 h-14 shadow-xl shadow-sky-500/20 hover:shadow-2xl hover:shadow-sky-500/40 hover:scale-110 transition-all text-gray-900 font-semibold group border-2 border-sky-200 hover:border-sky-400"
+                className="relative h-11 overflow-hidden border-2 border-sky-200 bg-white px-6 text-base font-semibold text-gray-900 shadow-lg shadow-sky-500/15 transition-all hover:border-sky-400 hover:bg-white hover:shadow-2xl hover:shadow-sky-500/40 sm:h-14 sm:px-10 sm:text-lg sm:hover:scale-110 group"
               >
                 <span className="relative z-10 flex items-center gap-2 group-hover:text-sky-600 transition-colors">
                   {t('landing.hero.ctaDemo')}
@@ -276,7 +298,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="py-24 sm:py-32 bg-white relative">
+      <section id="features" className="relative bg-white py-16 sm:py-32">
         {/* Decorative background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(14,165,233,0.05),transparent_70%)]"></div>
         
@@ -344,7 +366,7 @@ export default function LandingPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-24 sm:py-32 relative overflow-hidden">
+      <section className="relative overflow-hidden py-16 sm:py-32">
         {/* Animated background gradient */}
         <div className="absolute inset-0 bg-linear-to-br from-sky-600 via-cyan-600 to-teal-600"></div>
         <div className="absolute inset-0 opacity-10">
@@ -397,7 +419,7 @@ export default function LandingPage() {
       </section>
 
       {/* Screenshots Section */}
-      <section className="py-24 sm:py-32 bg-linear-to-b from-gray-50 to-white relative overflow-hidden">
+      <section className="relative overflow-hidden bg-linear-to-b from-gray-50 to-white py-16 sm:py-32">
         {/* Decorative elements - Enhanced with more spots and bubbles */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-40 right-10 w-72 h-72 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
@@ -438,13 +460,13 @@ export default function LandingPage() {
         <div className="absolute bottom-3/5 right-1/7 w-18 h-18 border border-sky-300/36 rounded-full animate-float" style={{animationDelay: '1.8s', animationDuration: '6.2s'}}></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20 animate-smooth-reveal">
+          <div className="mb-12 text-center animate-smooth-reveal sm:mb-20">
             <div className="inline-block mb-4 animate-fade-in-up-soft">
               <span className="text-sm font-bold uppercase tracking-wider text-sky-600 bg-sky-100 px-4 py-2 rounded-full">
                 {t('landing.screenshots.badge')}
               </span>
             </div>
-            <h2 className={`text-4xl sm:text-5xl lg:text-6xl font-black mb-6 animate-smooth-reveal animation-delay-100 ${(isMyanmar || isJapanese) ? 'leading-relaxed' : ''}`}>
+            <h2 className={`mb-5 text-3xl font-black animate-smooth-reveal animation-delay-100 sm:mb-6 sm:text-5xl lg:text-6xl ${(isMyanmar || isJapanese) ? 'leading-relaxed' : ''}`}>
               <span className="block text-gray-900">{t('landing.screenshots.title1')}</span>
               <span className={`relative inline-block ${(isMyanmar || isJapanese) ? 'mt-4' : 'mt-2'}`}>
                 <span className="absolute inset-0 bg-linear-to-r from-sky-600 to-cyan-600 blur-2xl opacity-20"></span>
@@ -453,72 +475,40 @@ export default function LandingPage() {
                 </span>
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="mx-auto max-w-3xl text-base text-gray-600 sm:text-xl">
               {t('landing.screenshots.description')}
             </p>
           </div>
 
           {/* Rotating Carousel */}
-          <div className="relative max-w-5xl mx-auto">
-            <div className="relative h-125 sm:h-150 flex items-center justify-center">
+          <div className="relative mx-auto max-w-5xl">
+            <div className="relative flex h-96 items-center justify-center sm:h-132">
               
               {/* Dashboard View */}
               <div className="absolute inset-0 flex items-center justify-center animate-carousel-1 transition-all duration-700">
                 <div className="relative group max-w-4xl w-full">
-                  <div className="absolute -inset-1 bg-linear-to-r from-sky-600 via-cyan-600 to-teal-600 rounded-3xl blur-2xl opacity-20 group-hover:opacity-50 transition-all duration-700"></div>
-                  <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-sky-900/20 border-8 border-gray-100 bg-white group-hover:shadow-sky-900/50 transition-all duration-700 group-hover:scale-[1.02]">
-                    <div className="aspect-16/10 bg-linear-to-br from-sky-50 via-cyan-50 to-teal-50 p-8">
-                      {/* Mock Dashboard UI */}
-                      <div className="h-full flex flex-col gap-4">
-                        {/* Header */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
-                              <LayoutDashboard className="h-5 w-5 text-white" />
-                            </div>
-                            <div>
-                              <div className="h-3 w-24 bg-gray-800 rounded"></div>
-                              <div className="h-2 w-16 bg-gray-400 rounded mt-1"></div>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <div className="h-8 w-20 bg-sky-200 rounded-lg"></div>
-                            <div className="h-8 w-20 bg-cyan-200 rounded-lg"></div>
-                          </div>
+                  <div className="absolute -inset-2 rounded-4xl bg-linear-to-r from-sky-500/30 via-cyan-500/25 to-teal-500/30 blur-3xl opacity-40 group-hover:opacity-70 transition-all duration-700"></div>
+                  <div className="relative rounded-[1.75rem] overflow-hidden shadow-[0_28px_80px_-22px_rgba(14,116,144,0.45)] border border-white/70 bg-white/95 backdrop-blur-sm group-hover:shadow-[0_36px_90px_-20px_rgba(14,116,144,0.55)] transition-all duration-700 group-hover:scale-[1.015]">
+                    <div className="border-b border-slate-200/80 bg-linear-to-r from-slate-50 to-slate-100/80 px-4 py-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2.5 w-2.5 rounded-full bg-rose-400/90"></span>
+                          <span className="h-2.5 w-2.5 rounded-full bg-amber-400/90"></span>
+                          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90"></span>
                         </div>
-                        
-                        {/* Stats Cards */}
-                        <div className="grid grid-cols-4 gap-3">
-                          <div className="bg-white rounded-xl p-3 shadow-md border border-sky-100">
-                            <div className="h-2 w-12 bg-gray-300 rounded mb-2"></div>
-                            <div className="h-4 w-16 bg-sky-600 rounded"></div>
-                          </div>
-                          <div className="bg-white rounded-xl p-3 shadow-md border border-cyan-100">
-                            <div className="h-2 w-12 bg-gray-300 rounded mb-2"></div>
-                            <div className="h-4 w-16 bg-cyan-600 rounded"></div>
-                          </div>
-                          <div className="bg-white rounded-xl p-3 shadow-md border border-teal-100">
-                            <div className="h-2 w-12 bg-gray-300 rounded mb-2"></div>
-                            <div className="h-4 w-16 bg-teal-600 rounded"></div>
-                          </div>
-                          <div className="bg-white rounded-xl p-3 shadow-md border border-emerald-100">
-                            <div className="h-2 w-12 bg-gray-300 rounded mb-2"></div>
-                            <div className="h-4 w-16 bg-emerald-600 rounded"></div>
-                          </div>
-                        </div>
-                        
-                        {/* Chart Area */}
-                        <div className="flex-1 bg-white rounded-xl p-4 shadow-md border border-sky-100">
-                          <div className="h-3 w-32 bg-gray-700 rounded mb-3"></div>
-                          <div className="h-full flex items-end justify-around gap-2">
-                            <div className="w-full bg-linear-to-t from-sky-500 to-sky-300 rounded-t" style={{height: '60%'}}></div>
-                            <div className="w-full bg-linear-to-t from-cyan-500 to-cyan-300 rounded-t" style={{height: '80%'}}></div>
-                            <div className="w-full bg-linear-to-t from-teal-500 to-teal-300 rounded-t" style={{height: '45%'}}></div>
-                            <div className="w-full bg-linear-to-t from-emerald-500 to-emerald-300 rounded-t" style={{height: '70%'}}></div>
-                            <div className="w-full bg-linear-to-t from-sky-500 to-sky-300 rounded-t" style={{height: '55%'}}></div>
-                            <div className="w-full bg-linear-to-t from-cyan-500 to-cyan-300 rounded-t" style={{height: '90%'}}></div>
-                          </div>
-                        </div>
+                        <div className="h-7 w-52 rounded-full border border-slate-200 bg-white/90"></div>
+                        <div className="h-2.5 w-14 rounded-full bg-slate-300/80"></div>
+                      </div>
+                    </div>
+                    <div className="relative aspect-[16/8.8] bg-linear-to-br from-sky-50 via-cyan-50 to-teal-50 p-2 sm:p-3">
+                      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(255,255,255,0.45),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(224,242,254,0.22),transparent_35%)]"></div>
+                      <div className="relative flex h-full w-full items-center justify-center rounded-2xl">
+                        <img
+                          src={dashboardPreviewSrc}
+                          alt="Spendio dashboard preview"
+                          loading="lazy"
+                          className="max-h-full max-w-full rounded-2xl border border-slate-200/80 object-contain shadow-[0_10px_30px_-14px_rgba(15,23,42,0.35)]"
+                        />
                       </div>
                     </div>
                   </div>
@@ -527,125 +517,52 @@ export default function LandingPage() {
 
               {/* Table View */}
               <div className="absolute inset-0 flex items-center justify-center animate-carousel-2 transition-all duration-700">
-                <div className="relative group max-w-4xl w-full">
-                  <div className="absolute -inset-1 bg-linear-to-r from-cyan-600 via-teal-600 to-emerald-600 rounded-3xl blur-2xl opacity-20 group-hover:opacity-50 transition-all duration-700"></div>
-                  <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-cyan-900/20 border-8 border-gray-100 bg-white group-hover:shadow-cyan-900/50 transition-all duration-700 group-hover:scale-[1.02]">
-                    <div className="aspect-16/10 bg-linear-to-br from-cyan-50 via-teal-50 to-emerald-50 p-8">
-                      {/* Mock Table UI */}
-                      <div className="h-full flex flex-col gap-4">
-                        {/* Header */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-cyan-500 to-teal-500 flex items-center justify-center">
-                              <TableIcon className="h-5 w-5 text-white" />
-                            </div>
-                            <div>
-                              <div className="h-3 w-32 bg-gray-800 rounded"></div>
-                              <div className="h-2 w-20 bg-gray-400 rounded mt-1"></div>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <div className="h-8 w-16 bg-cyan-200 rounded-lg"></div>
-                            <div className="h-8 w-16 bg-teal-200 rounded-lg"></div>
-                          </div>
-                        </div>
-                        
-                        {/* Table */}
-                        <div className="flex-1 bg-white rounded-xl shadow-md border border-cyan-100 overflow-hidden">
-                          {/* Table Header */}
-                          <div className="grid grid-cols-5 gap-3 bg-linear-to-r from-cyan-100 to-teal-100 p-3 border-b border-cyan-200">
-                            <div className="h-2.5 w-12 bg-cyan-700 rounded"></div>
-                            <div className="h-2.5 w-16 bg-cyan-700 rounded"></div>
-                            <div className="h-2.5 w-14 bg-cyan-700 rounded"></div>
-                            <div className="h-2.5 w-12 bg-cyan-700 rounded"></div>
-                            <div className="h-2.5 w-10 bg-cyan-700 rounded"></div>
-                          </div>
-                          
-                          {/* Table Rows */}
-                          {[1, 2, 3, 4, 5, 6].map((_, i) => (
-                            <div key={i} className="grid grid-cols-5 gap-3 p-3 border-b border-gray-100 hover:bg-cyan-50/30 transition-colors">
-                              <div className="h-2 w-16 bg-gray-600 rounded"></div>
-                              <div className="h-2 w-20 bg-gray-400 rounded"></div>
-                              <div className="h-2 w-12 bg-gray-400 rounded"></div>
-                              <div className={`h-2 w-14 rounded ${i % 2 === 0 ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
-                              <div className="h-2 w-8 bg-gray-300 rounded"></div>
-                            </div>
-                          ))}
-                        </div>
+                <div className="relative group max-w-3xl w-full px-2 sm:px-0">
+                  <div className="absolute -inset-3 rounded-[2.25rem] bg-linear-to-r from-cyan-500/25 via-teal-500/20 to-emerald-500/25 blur-3xl opacity-45 group-hover:opacity-70 transition-all duration-700"></div>
+                  <div className="relative rounded-[2.1rem] border border-slate-300/70 bg-linear-to-b from-slate-200/95 to-slate-100/95 p-3 shadow-[0_30px_90px_-28px_rgba(13,148,136,0.6)] group-hover:shadow-[0_40px_95px_-24px_rgba(13,148,136,0.65)] transition-all duration-700 group-hover:scale-[1.02]">
+                    <div className="mb-2 flex items-center gap-2 px-1">
+                      <span className="h-2.5 w-2.5 rounded-full bg-rose-400/90"></span>
+                      <span className="h-2.5 w-2.5 rounded-full bg-amber-400/90"></span>
+                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90"></span>
+                    </div>
+                    <div className="rounded-[1.65rem] border border-slate-300/70 bg-white p-2">
+                      <div className="relative aspect-4/3 overflow-hidden rounded-[1.3rem] bg-linear-to-br from-cyan-50 via-teal-50 to-emerald-50">
+                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_15%,rgba(255,255,255,0.35),transparent_35%),radial-gradient(circle_at_20%_85%,rgba(204,251,241,0.22),transparent_38%)]"></div>
+                        <img
+                          src={tabletPreviewSrc}
+                          alt="Spendio tablet preview"
+                          loading="lazy"
+                          className="h-full w-full object-cover object-top"
+                        />
                       </div>
                     </div>
+                    <div className="mx-auto mt-2 h-1 w-20 rounded-full bg-slate-400/75"></div>
                   </div>
                 </div>
               </div>
 
               {/* Mobile View */}
               <div className="absolute inset-0 flex items-center justify-center animate-carousel-3 transition-all duration-700">
-                <div className="relative group max-w-sm w-full">
-                  <div className="absolute -inset-1 bg-linear-to-r from-teal-600 via-emerald-600 to-sky-600 rounded-3xl blur-2xl opacity-20 group-hover:opacity-50 transition-all duration-700"></div>
-                  <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-teal-900/20 border-8 border-gray-100 bg-white group-hover:shadow-teal-900/50 transition-all duration-700 group-hover:scale-[1.02]">
-                    <div className="aspect-9/16 bg-linear-to-br from-teal-50 via-emerald-50 to-cyan-50 p-6">
-                      {/* Mock Mobile UI */}
-                      <div className="h-full flex flex-col gap-3">
-                        {/* Mobile Header */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
-                              <Smartphone className="h-4 w-4 text-white" />
-                            </div>
-                            <div className="h-3 w-20 bg-gray-800 rounded"></div>
-                          </div>
-                          <div className="h-6 w-6 rounded-full bg-teal-200"></div>
-                        </div>
-                        
-                        {/* Balance Card */}
-                        <div className="bg-linear-to-br from-teal-500 to-emerald-500 rounded-2xl p-4 text-white shadow-lg">
-                          <div className="h-2 w-16 bg-white/60 rounded mb-2"></div>
-                          <div className="h-5 w-28 bg-white rounded mb-3"></div>
-                          <div className="flex gap-2">
-                            <div className="h-6 w-16 bg-white/30 rounded-lg"></div>
-                            <div className="h-6 w-16 bg-white/30 rounded-lg"></div>
-                          </div>
-                        </div>
-                        
-                        {/* Quick Stats */}
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-white rounded-xl p-3 shadow border border-teal-100">
-                            <div className="h-2 w-10 bg-gray-300 rounded mb-2"></div>
-                            <div className="h-3 w-14 bg-emerald-600 rounded"></div>
-                          </div>
-                          <div className="bg-white rounded-xl p-3 shadow border border-emerald-100">
-                            <div className="h-2 w-10 bg-gray-300 rounded mb-2"></div>
-                            <div className="h-3 w-14 bg-teal-600 rounded"></div>
-                          </div>
-                        </div>
-                        
-                        {/* Recent Transactions */}
-                        <div className="flex-1 bg-white rounded-xl p-3 shadow border border-teal-100">
-                          <div className="h-2.5 w-24 bg-gray-700 rounded mb-3"></div>
-                          <div className="space-y-2">
-                            {[1, 2, 3, 4].map((_, i) => (
-                              <div key={i} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                                <div className="flex items-center gap-2">
-                                  <div className={`w-8 h-8 rounded-full ${i % 2 === 0 ? 'bg-teal-100' : 'bg-emerald-100'}`}></div>
-                                  <div>
-                                    <div className="h-2 w-16 bg-gray-600 rounded mb-1"></div>
-                                    <div className="h-1.5 w-12 bg-gray-300 rounded"></div>
-                                  </div>
-                                </div>
-                                <div className={`h-2.5 w-12 rounded ${i % 2 === 0 ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        {/* Bottom Navigation */}
-                        <div className="grid grid-cols-4 gap-2 pt-2 border-t border-gray-200">
-                          {[1, 2, 3, 4].map((_, i) => (
-                            <div key={i} className={`h-8 rounded-lg ${i === 0 ? 'bg-teal-500' : 'bg-gray-200'}`}></div>
-                          ))}
-                        </div>
+                <div className="relative group max-w-xs w-full px-2 sm:px-0">
+                  <div className="absolute -inset-3 rounded-[3rem] bg-linear-to-r from-teal-500/30 via-emerald-500/25 to-sky-500/30 blur-3xl opacity-45 group-hover:opacity-70 transition-all duration-700"></div>
+                  <div className="relative rounded-[2.75rem] border border-slate-300/70 bg-linear-to-b from-slate-200/95 to-slate-100/95 p-2.5 shadow-[0_30px_90px_-28px_rgba(13,148,136,0.6)] group-hover:shadow-[0_42px_100px_-24px_rgba(13,148,136,0.68)] transition-all duration-700 group-hover:scale-[1.02]">
+                    <div className="mb-2 flex items-center gap-2 px-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-rose-400/90"></span>
+                      <span className="h-2.5 w-2.5 rounded-full bg-amber-400/90"></span>
+                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90"></span>
+                    </div>
+                    <div className="rounded-[2.25rem] border border-slate-300/75 bg-white p-2">
+                      <div className="relative aspect-9/16 overflow-hidden rounded-[1.85rem] bg-linear-to-br from-teal-50 via-emerald-50 to-cyan-50">
+                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_75%_8%,rgba(255,255,255,0.38),transparent_35%),radial-gradient(circle_at_20%_86%,rgba(204,251,241,0.2),transparent_40%)]"></div>
+                        <img
+                          src={mobilePreviewSrc}
+                          alt="Spendio mobile preview"
+                          loading="lazy"
+                          className="h-full w-full object-cover object-top"
+                        />
                       </div>
                     </div>
+                    <div className="mx-auto mt-2 h-1 w-14 rounded-full bg-slate-400/75"></div>
                   </div>
                 </div>
               </div>
@@ -653,27 +570,27 @@ export default function LandingPage() {
             </div>
 
             {/* Carousel Indicators */}
-            <div className="flex justify-center gap-3 mt-12 animate-in fade-in duration-1000 delay-300">
+            <div className="mt-8 flex flex-wrap justify-center gap-2.5 animate-in fade-in duration-1000 delay-300 sm:mt-12 sm:gap-3">
               <Button
                 variant="outline"
-                className="flex items-center gap-2 px-4 py-2 h-auto rounded-full bg-sky-100 border border-sky-200 hover:bg-sky-200 hover:scale-110 transition-all duration-300 text-sky-700 hover:text-sky-800"
+                className="h-auto rounded-full border border-sky-200 bg-sky-100 px-3 py-2 text-sky-700 transition-all duration-300 hover:bg-sky-200 sm:px-4 sm:hover:scale-110 hover:text-sky-800"
               >
                 <div className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></div>
-                <span className="text-sm font-semibold">{t('landing.screenshots.dashboard')}</span>
+                <span className="text-xs font-semibold sm:text-sm">{t('landing.screenshots.dashboard')}</span>
               </Button>
               <Button
                 variant="outline"
-                className="flex items-center gap-2 px-4 py-2 h-auto rounded-full bg-cyan-100 border border-cyan-200 hover:bg-cyan-200 hover:scale-110 transition-all duration-300 text-cyan-700 hover:text-cyan-800"
+                className="h-auto rounded-full border border-cyan-200 bg-cyan-100 px-3 py-2 text-cyan-700 transition-all duration-300 hover:bg-cyan-200 sm:px-4 sm:hover:scale-110 hover:text-cyan-800"
               >
                 <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" style={{animationDelay: '0.3s'}}></div>
-                <span className="text-sm font-semibold">{t('landing.screenshots.tablet')}</span>
+                <span className="text-xs font-semibold sm:text-sm">{t('landing.screenshots.tablet')}</span>
               </Button>
               <Button
                 variant="outline"
-                className="flex items-center gap-2 px-4 py-2 h-auto rounded-full bg-teal-100 border border-teal-200 hover:bg-teal-200 hover:scale-110 transition-all duration-300 text-teal-700 hover:text-teal-800"
+                className="h-auto rounded-full border border-teal-200 bg-teal-100 px-3 py-2 text-teal-700 transition-all duration-300 hover:bg-teal-200 sm:px-4 sm:hover:scale-110 hover:text-teal-800"
               >
                 <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" style={{animationDelay: '0.6s'}}></div>
-                <span className="text-sm font-semibold">{t('landing.screenshots.mobile')}</span>
+                <span className="text-xs font-semibold sm:text-sm">{t('landing.screenshots.mobile')}</span>
               </Button>
             </div>
           </div>
@@ -681,7 +598,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 sm:py-32 relative overflow-hidden bg-white">
+      <section className="relative overflow-hidden bg-white py-16 sm:py-32">
         {/* Animated background */}
         <div className="absolute inset-0">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 bg-linear-to-r from-sky-300 via-cyan-300 to-teal-300 rounded-full blur-3xl opacity-10 animate-pulse"></div>

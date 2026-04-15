@@ -12,27 +12,27 @@ interface TransactionsHeaderProps {
 export function ExpensesHeader({ onRefresh, onAddClick, onBulkAddClick, onImportCsvClick }: TransactionsHeaderProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex justify-between items-start md:items-center gap-3">
+    <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
       <div>
-        <h1 className="text-xl font-semibold tracking-wide">{t("transactions.header.title")}</h1>
+        <h1 className="text-lg font-semibold tracking-wide sm:text-xl">{t("transactions.header.title")}</h1>
         <p className="text-sm text-muted-foreground tracking-wide"></p>
       </div>
-      <div className="flex gap-2">
-        <Button onClick={onRefresh} size="sm" variant="outline">
-          <RefreshCcw className="mr-2 h-4 w-4" />
-          {t("transactions.header.refresh")}
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+        <Button onClick={onRefresh} size="sm" variant="outline" className="h-10">
+          <RefreshCcw className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">{t("transactions.header.refresh")}</span>
         </Button>
-        <Button onClick={onImportCsvClick} size="sm" variant="outline">
-          <FileUp className="mr-2 h-4 w-4" />
-          {t("transactions.header.importCsv")}
+        <Button onClick={onImportCsvClick} size="sm" variant="outline" className="h-10">
+          <FileUp className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">{t("transactions.header.importCsv")}</span>
         </Button>
-        <Button onClick={onBulkAddClick} size="sm" variant="outline">
-          <ListPlus className="mr-2 h-4 w-4" />
-          {t("transactions.header.bulkAdd")}
+        <Button onClick={onBulkAddClick} size="sm" variant="outline" className="h-10">
+          <ListPlus className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">{t("transactions.header.bulkAdd")}</span>
         </Button>
-        <Button onClick={onAddClick} size="sm">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          {t("transactions.header.addTransaction")}
+        <Button onClick={onAddClick} size="sm" className="h-10">
+          <PlusCircle className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">{t("transactions.header.addTransaction")}</span>
         </Button>
       </div>
     </div>
