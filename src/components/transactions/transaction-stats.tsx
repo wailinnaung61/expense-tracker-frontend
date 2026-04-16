@@ -24,7 +24,7 @@ import { aggregationService } from "@/services/aggregationService";
 import { Link } from "react-router-dom";
 import type { ExpenseBreakdown, MonthlyAggregation } from "@/types/aggregation";
 import { formatCurrency } from "@/lib/utils";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { ChevronLeft, ChevronRight, PiggyBank, TrendingUp, ArrowRight, Wallet, CreditCard, Receipt, CalendarIcon } from "lucide-react";
 import { format, addMonths, subMonths, parseISO } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
@@ -66,6 +66,19 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   const [error, setError] = useState<string | null>(null);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const { t } = useTranslation();
+  const queryRef = useRef({
+    currentMonth,
+    useCustomRange,
+    customStartDate,
+    customEndDate,
+  });
+
+  queryRef.current = {
+    currentMonth,
+    useCustomRange,
+    customStartDate,
+    customEndDate,
+  };
 
   const fetchExpenseBreakdown = useCallback(async (
     date: Date,
@@ -128,21 +141,35 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   // Refresh when transaction changes - retry with delay for backend aggregation consistency
   useEffect(() => {
     if (refreshKey === 0) return; // Skip on initial mount
-    fetchExpenseBreakdown(currentMonth, {
-      useCustomRange,
-      customStartDate,
-      customEndDate,
+    const {
+      currentMonth: latestMonth,
+      useCustomRange: latestUseCustomRange,
+      customStartDate: latestCustomStartDate,
+      customEndDate: latestCustomEndDate,
+    } = queryRef.current;
+
+    fetchExpenseBreakdown(latestMonth, {
+      useCustomRange: latestUseCustomRange,
+      customStartDate: latestCustomStartDate,
+      customEndDate: latestCustomEndDate,
     });
     // Retry after a short delay to catch backend aggregation updates
     const timer = setTimeout(() => {
-      fetchExpenseBreakdown(currentMonth, {
-        useCustomRange,
-        customStartDate,
-        customEndDate,
+      const {
+        currentMonth: retryMonth,
+        useCustomRange: retryUseCustomRange,
+        customStartDate: retryCustomStartDate,
+        customEndDate: retryCustomEndDate,
+      } = queryRef.current;
+
+      fetchExpenseBreakdown(retryMonth, {
+        useCustomRange: retryUseCustomRange,
+        customStartDate: retryCustomStartDate,
+        customEndDate: retryCustomEndDate,
       });
     }, 2000);
     return () => clearTimeout(timer);
-  }, [refreshKey, currentMonth, fetchExpenseBreakdown, useCustomRange, customStartDate, customEndDate]);
+  }, [refreshKey, fetchExpenseBreakdown]);
 
   const handlePreviousMonth = useCallback(() => {
     setCurrentMonth(prev => subMonths(prev, 1));
