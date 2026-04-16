@@ -6,6 +6,7 @@ import type {
   YearlyAggregation,
   CategoryMonthlyAggregation,
   ExpenseBreakdown,
+  CustomDateAggregationResponse,
 } from '@/types/aggregation';
 
 export const aggregationService = {
@@ -69,6 +70,16 @@ export const aggregationService = {
 
   async getExpenseBreakdownByRange(startDate: string, endDate: string): Promise<ExpenseBreakdown> {
     return apiClient.get<ExpenseBreakdown>('/api/Aggregation/expense-breakdown', {
+      startDate,
+      endDate,
+    });
+  },
+
+  async getCustomDateAggregation(
+    startDate: string,
+    endDate: string
+  ): Promise<CustomDateAggregationResponse> {
+    return apiClient.get<CustomDateAggregationResponse>('/api/Aggregation/custom', {
       startDate,
       endDate,
     });

@@ -641,6 +641,12 @@
     "stats": {
       "title": "လစဥ် အကျဥ်းချုပ်",
       "financialSummary": "{{month}} ဘဏ္ဍာရေးအကျဉ်းချုပ်",
+      "monthlyMode": "လစဉ်",
+      "customMode": "စိတ်ကြိုက်ရက်စွဲ",
+      "customStartDate": "စတင်ရက်",
+      "customEndDate": "ပြီးဆုံးရက်",
+      "customDateRequired": "စတင်ရက်နဲ့ ပြီးဆုံးရက် နှစ်ခုလုံးကို ရွေးပါ။",
+      "customDateInvalid": "စတင်ရက်သည် ပြီးဆုံးရက်ထက် နောက်မကျရပါ။",
       "month": "လ",
       "year": "နှစ်",
       "done": "ပြီးဆုံး",

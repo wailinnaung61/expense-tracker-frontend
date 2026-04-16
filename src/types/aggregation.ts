@@ -67,6 +67,11 @@ export interface ExpenseBreakdown {
   comparison: ExpenseBreakdownComparison | null; // Backend: MonthlyComparison? (nullable)
 }
 
+export interface CustomDateAggregationResponse {
+  summary: MonthlyAggregation;
+  breakdown: ExpenseBreakdown;
+}
+
 // Type aliases for backend naming compatibility
 export type CategoryBreakdownItem = ExpenseBreakdownCategory;
 export type MonthlyComparison = ExpenseBreakdownComparison;

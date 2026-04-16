@@ -641,6 +641,12 @@
     "stats": {
       "title": "Monthly Overview",
       "financialSummary": "{{month}} financial summary",
+      "monthlyMode": "Monthly",
+      "customMode": "Custom dates",
+      "customStartDate": "Start date",
+      "customEndDate": "End date",
+      "customDateRequired": "Please choose both start and end dates.",
+      "customDateInvalid": "Start date must be on or before end date.",
       "month": "Month",
       "year": "Year",
       "done": "Done",

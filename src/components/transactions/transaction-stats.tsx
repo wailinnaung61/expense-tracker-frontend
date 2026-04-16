@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
@@ -24,8 +25,8 @@ import { Link } from "react-router-dom";
 import type { ExpenseBreakdown, MonthlyAggregation } from "@/types/aggregation";
 import { formatCurrency } from "@/lib/utils";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { ChevronLeft, ChevronRight, PiggyBank, TrendingUp, ArrowRight, Wallet, CreditCard, Receipt } from "lucide-react";
-import { format, addMonths, subMonths } from "date-fns";
+import { ChevronLeft, ChevronRight, PiggyBank, TrendingUp, ArrowRight, Wallet, CreditCard, Receipt, CalendarIcon } from "lucide-react";
+import { format, addMonths, subMonths, parseISO } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -48,19 +49,56 @@ const COLORS = [
   "rgba(156, 163, 175, 0.7)",  // gray
 ];
 
+function dateFromYyyyMmDd(value: string): Date | undefined {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  const d = parseISO(value);
+  return Number.isNaN(d.getTime()) ? undefined : d;
+}
+
 export default function TransactionStats({ currency = "USD", refreshKey = 0 }: TransactionStatsProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [data, setData] = useState<ExpenseBreakdown | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyAggregation | null>(null);
+  const [useCustomRange, setUseCustomRange] = useState(false);
+  const [customStartDate, setCustomStartDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
+  const [customEndDate, setCustomEndDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const { t } = useTranslation();
 
-  const fetchExpenseBreakdown = useCallback(async (date: Date) => {
+  const fetchExpenseBreakdown = useCallback(async (
+    date: Date,
+    options?: { useCustomRange?: boolean; customStartDate?: string; customEndDate?: string }
+  ) => {
     setLoading(true);
     setError(null);
     try {
+      const shouldUseCustomRange = options?.useCustomRange ?? false;
+      if (shouldUseCustomRange) {
+        const startDate = options?.customStartDate ?? "";
+        const endDate = options?.customEndDate ?? "";
+
+        if (!startDate || !endDate) {
+          setError(t("transactions.stats.customDateRequired"));
+          setData(null);
+          setMonthlyData(null);
+          return;
+        }
+
+        if (startDate > endDate) {
+          setError(t("transactions.stats.customDateInvalid"));
+          setData(null);
+          setMonthlyData(null);
+          return;
+        }
+
+        const customAggregation = await aggregationService.getCustomDateAggregation(startDate, endDate);
+        setData(customAggregation.breakdown);
+        setMonthlyData(customAggregation.summary);
+        return;
+      }
+
       const monthStr = format(date, "yyyy-MM");
       const [breakdown, monthly] = await Promise.all([
         aggregationService.getExpenseBreakdown(monthStr),
@@ -70,7 +108,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
       setMonthlyData(monthly);
     } catch (err: any) {
       console.error("Failed to fetch expense breakdown:", err);
-      setError(err.message || "Failed to load data");
+      setError(err.message || t("errors.fetchFailed"));
       setData(null);
       setMonthlyData(null);
     } finally {
@@ -80,19 +118,31 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
 
   // Initial fetch when month changes
   useEffect(() => {
-    fetchExpenseBreakdown(currentMonth);
-  }, [currentMonth, fetchExpenseBreakdown]);
+    fetchExpenseBreakdown(currentMonth, {
+      useCustomRange,
+      customStartDate,
+      customEndDate,
+    });
+  }, [currentMonth, fetchExpenseBreakdown, useCustomRange, customStartDate, customEndDate]);
 
   // Refresh when transaction changes - retry with delay for backend aggregation consistency
   useEffect(() => {
     if (refreshKey === 0) return; // Skip on initial mount
-    fetchExpenseBreakdown(currentMonth);
+    fetchExpenseBreakdown(currentMonth, {
+      useCustomRange,
+      customStartDate,
+      customEndDate,
+    });
     // Retry after a short delay to catch backend aggregation updates
     const timer = setTimeout(() => {
-      fetchExpenseBreakdown(currentMonth);
+      fetchExpenseBreakdown(currentMonth, {
+        useCustomRange,
+        customStartDate,
+        customEndDate,
+      });
     }, 2000);
     return () => clearTimeout(timer);
-  }, [refreshKey, currentMonth, fetchExpenseBreakdown]);
+  }, [refreshKey, currentMonth, fetchExpenseBreakdown, useCustomRange, customStartDate, customEndDate]);
 
   const handlePreviousMonth = useCallback(() => {
     setCurrentMonth(prev => subMonths(prev, 1));
@@ -127,6 +177,22 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
     [currentMonth]
   );
 
+  const handleUseMonthly = useCallback(() => {
+    setUseCustomRange(false);
+  }, []);
+
+  const handleUseCustomRange = useCallback(() => {
+    setUseCustomRange(true);
+    if (!customStartDate || !customEndDate) {
+      const today = format(new Date(), "yyyy-MM-dd");
+      setCustomStartDate(today);
+      setCustomEndDate(today);
+    }
+  }, [customStartDate, customEndDate]);
+
+  const customStartDateObj = useMemo(() => dateFromYyyyMmDd(customStartDate), [customStartDate]);
+  const customEndDateObj = useMemo(() => dateFromYyyyMmDd(customEndDate), [customEndDate]);
+
   // Transform data for pie chart with colors
   const chartData = useMemo(() => 
     data?.categories.map((cat, index) => ({
@@ -141,9 +207,11 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   return (
     <Card className="sticky top-12">
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <CardTitle className="dark:text-slate-50">{t("transactions.stats.title")}</CardTitle>
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="wrap-break-word leading-snug dark:text-slate-50">
+              {t("transactions.stats.title")}
+            </CardTitle>
             <CardDescription className="dark:text-slate-400">
               {monthlyData ? (
                 <>
@@ -156,7 +224,72 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
               )}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex w-full flex-wrap items-center gap-1 md:w-auto md:justify-end">
+            <Button
+              variant={!useCustomRange ? "default" : "outline"}
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={handleUseMonthly}
+            >
+              {t("transactions.stats.monthlyMode")}
+            </Button>
+            <Button
+              variant={useCustomRange ? "default" : "outline"}
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={handleUseCustomRange}
+            >
+              {t("transactions.stats.customMode")}
+            </Button>
+
+            {useCustomRange ? (
+              <div className="flex items-center gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-7 w-36 justify-start text-left text-xs font-normal"
+                    >
+                      <CalendarIcon className="mr-1.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      {customStartDateObj ? format(customStartDateObj, "MMM dd, yyyy") : t("transactions.stats.customStartDate")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={customStartDateObj}
+                      onSelect={(d) => setCustomStartDate(d ? format(d, "yyyy-MM-dd") : "")}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-7 w-36 justify-start text-left text-xs font-normal"
+                    >
+                      <CalendarIcon className="mr-1.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      {customEndDateObj ? format(customEndDateObj, "MMM dd, yyyy") : t("transactions.stats.customEndDate")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={customEndDateObj}
+                      onSelect={(d) => setCustomEndDate(d ? format(d, "yyyy-MM-dd") : "")}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            ) : null}
+
+            {!useCustomRange && (
+              <>
             <Button
               variant="ghost"
               size="icon"
@@ -244,6 +377,8 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
+              </>
+            )}
           </div>
         </div>
       </CardHeader>
@@ -255,7 +390,17 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-sm text-muted-foreground mb-2">{error}</p>
-            <Button variant="outline" size="sm" onClick={() => fetchExpenseBreakdown(currentMonth)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                fetchExpenseBreakdown(currentMonth, {
+                  useCustomRange,
+                  customStartDate,
+                  customEndDate,
+                })
+              }
+            >
               {t("transactions.stats.retry")}
             </Button>
           </div>

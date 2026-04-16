@@ -641,6 +641,12 @@
     "stats": {
       "title": "月次概要",
       "financialSummary": "{{month}} 財務サマリー",
+      "monthlyMode": "月次",
+      "customMode": "任意の日付",
+      "customStartDate": "開始日",
+      "customEndDate": "終了日",
+      "customDateRequired": "開始日と終了日の両方を選択してください。",
+      "customDateInvalid": "開始日は終了日以前である必要があります。",
       "month": "月",
       "year": "年",
       "done": "完了",
