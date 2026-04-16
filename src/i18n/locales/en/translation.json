@@ -1194,7 +1194,16 @@
     "qReports": "Reports",
     "savingTagline": "Track your savings goals",
     "investmentTagline": "View your investments",
-    "netBalance": "Net Balance"
+    "netBalance": "Net Balance",
+    "monthlyMode": "Monthly",
+    "customMode": "Custom",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "apply": "Apply",
+    "customDateRequired": "Please select both start and end dates.",
+    "customDateInvalid": "Start date must be before end date.",
+    "customDateMax24": "Date range cannot exceed 24 months.",
+    "customDateMax24Tip": "Maximum range is 24 months."
   },
   "reports": {
     "title": "Reports",

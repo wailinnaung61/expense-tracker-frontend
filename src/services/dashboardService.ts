@@ -8,4 +8,11 @@ export const dashboardService = {
       method: "GET",
     });
   },
+
+  async getDashboardByRange(startDate: string, endDate: string): Promise<DashboardResponse> {
+    return apiClient.get<DashboardResponse>("/api/Dashboard/custom", {
+      startDate,
+      endDate,
+    });
+  },
 };

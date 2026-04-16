@@ -1195,7 +1195,16 @@
     "qReports": "レポート",
     "savingTagline": "貯蓄目標を追跡",
     "investmentTagline": "投資状況を確認",
-    "netBalance": "純残高"
+    "netBalance": "純残高",
+    "monthlyMode": "月別",
+    "customMode": "カスタム",
+    "startDate": "開始日",
+    "endDate": "終了日",
+    "apply": "適用",
+    "customDateRequired": "開始日と終了日を選択してください。",
+    "customDateInvalid": "開始日は終了日より前でなければなりません。",
+    "customDateMax24": "日付範囲は24か月を超えることはできません。",
+    "customDateMax24Tip": "最大範囲は24か月です。"
   },
   "reports": {
     "title": "レポート",
