@@ -140,17 +140,6 @@ export function BudgetSummary({
                 </div>
               </div>
             </div>
-            <div className="rounded-xl border border-blue-300 dark:border-blue-700 bg-white/90 dark:bg-blue-950/50 px-3 py-2 text-right shadow-xs backdrop-blur-sm">
-              <div className="flex items-center justify-end gap-1.5 text-[10px] uppercase tracking-[0.15em] text-slate-600 dark:text-slate-200">
-                <Wallet className="h-3 w-3" />
-                {t("budget.summary.dailyLimit")}
-              </div>
-              <div className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
-                {profileDailyLimit > 0
-                  ? formatCurrency(profileDailyLimit, currency)
-                  : t("budget.summary.notSet")}
-              </div>
-            </div>
           </div>
           <div className="mt-5 rounded-2xl border border-blue-300 dark:border-blue-700 bg-white/90 dark:bg-blue-950/50 p-4 shadow-xs backdrop-blur-sm">
             <div className="flex items-center gap-2 text-sm font-medium text-slate-900 dark:text-white">
