@@ -539,7 +539,7 @@ export function BudgetFormDialog({
                   <div className="flex shrink-0 gap-2">
                     <Button
                       type="button"
-                      variant="secondary"
+                      variant="outline"
                       size="sm"
                       className="flex-1 sm:flex-none"
                       onClick={() => applyTotalDelta(1)}
@@ -549,7 +549,7 @@ export function BudgetFormDialog({
                     </Button>
                     <Button
                       type="button"
-                      variant="secondary"
+                      variant="outline"
                       size="sm"
                       className="flex-1 sm:flex-none"
                       onClick={() => applyTotalDelta(-1)}
