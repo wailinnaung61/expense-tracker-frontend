@@ -112,15 +112,25 @@ export function DashboardHeader({
 
       {/* Bottom row: monthly nav OR custom date pickers */}
       {mode === "monthly" ? (
-        <div className="flex items-center gap-1 rounded-xl border bg-card px-1 py-1 w-fit">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={goPrev}>
+        <div className="inline-flex items-center gap-1.5 rounded-2xl border bg-card px-2 py-1.5 shadow-sm w-fit">
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl" onClick={goPrev}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-medium px-2 min-w-30 text-center">{label}</span>
+          <span className="text-sm font-semibold px-3 min-w-32 text-center">{label}</span>
+          {!isCurrentMonth && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 rounded-xl px-2.5 text-xs font-medium"
+              onClick={() => onMonthChange(format(new Date(), "yyyy-MM"))}
+            >
+              {t("dashboard.today")}
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-xl"
             onClick={goNext}
             disabled={isCurrentMonth}
           >
@@ -128,75 +138,81 @@ export function DashboardHeader({
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Start date */}
-            <Popover open={startOpen} onOpenChange={setStartOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "h-9 px-3 justify-start text-left font-normal min-w-[140px]",
-                    !customStart && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {customStart
-                    ? format(parseISO(customStart), "MMM dd, yyyy")
-                    : t("dashboard.startDate")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateFromStr(customStart)}
-                  onSelect={(d) => {
-                    if (d) {
-                      onCustomStartChange(format(d, "yyyy-MM-dd"));
-                      setStartOpen(false);
-                    }
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+        <div className="flex flex-col gap-2 rounded-2xl border bg-muted/20 p-3 sm:p-3.5">
+          <div className="flex flex-col lg:flex-row lg:items-end gap-2.5">
+            <div className="flex flex-1 flex-col sm:flex-row sm:items-center gap-2">
+              {/* Start date */}
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <span className="text-xs font-medium text-muted-foreground">{t("dashboard.startDate")}</span>
+                <Popover open={startOpen} onOpenChange={setStartOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "h-9 px-3 justify-start text-left font-normal min-w-[170px] bg-background",
+                        !customStart && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {customStart
+                        ? format(parseISO(customStart), "MMM dd, yyyy")
+                        : t("dashboard.startDate")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateFromStr(customStart)}
+                      onSelect={(d) => {
+                        if (d) {
+                          onCustomStartChange(format(d, "yyyy-MM-dd"));
+                          setStartOpen(false);
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
 
-            <span className="text-sm text-muted-foreground">—</span>
+              {/* End date */}
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <span className="text-xs font-medium text-muted-foreground">{t("dashboard.endDate")}</span>
+                <Popover open={endOpen} onOpenChange={setEndOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn(
+                        "h-9 px-3 justify-start text-left font-normal min-w-[170px] bg-background",
+                        !customEnd && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {customEnd
+                        ? format(parseISO(customEnd), "MMM dd, yyyy")
+                        : t("dashboard.endDate")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateFromStr(customEnd)}
+                      onSelect={(d) => {
+                        if (d) {
+                          onCustomEndChange(format(d, "yyyy-MM-dd"));
+                          setEndOpen(false);
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
 
-            {/* End date */}
-            <Popover open={endOpen} onOpenChange={setEndOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "h-9 px-3 justify-start text-left font-normal min-w-[140px]",
-                    !customEnd && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {customEnd
-                    ? format(parseISO(customEnd), "MMM dd, yyyy")
-                    : t("dashboard.endDate")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateFromStr(customEnd)}
-                  onSelect={(d) => {
-                    if (d) {
-                      onCustomEndChange(format(d, "yyyy-MM-dd"));
-                      setEndOpen(false);
-                    }
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-
-            <Button size="sm" onClick={onApplyCustom} disabled={loading}>
+            <Button size="sm" className="h-9 px-4 lg:self-end" onClick={onApplyCustom} disabled={loading}>
               {t("dashboard.apply")}
             </Button>
           </div>

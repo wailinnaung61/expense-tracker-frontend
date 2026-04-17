@@ -13,8 +13,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { categoryService } from "@/services/categoryService";
 import { recurringPaymentService } from "@/services/recurringPaymentService";
 import { transactionService } from "@/services/transactionService";
+import type { ExpenseCategory } from "@/types/category";
 import type { RecurringPayment } from "@/types/recurringPayment";
 import { PaymentStatus, TransactionType } from "@/types/transaction";
 import { differenceInDays, format } from "date-fns";
@@ -43,6 +45,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
   const [selectedPayment, setSelectedPayment] = useState<RecurringPayment | null>(null);
   const [localRefreshKey, setLocalRefreshKey] = useState(0);
   const [showAll, setShowAll] = useState(false);
+  const [categoryById, setCategoryById] = useState<Record<string, ExpenseCategory>>({});
 
   const fetchPayments = useCallback(async () => {
     if (!startDate || !endDate) {
@@ -52,11 +55,22 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
 
     setLoading(true);
     try {
-      const data = await recurringPaymentService.getUpcomingPayments({
-        startDate,
-        endDate,
-      });
+      const [data, categoriesResponse] = await Promise.all([
+        recurringPaymentService.getUpcomingPayments({
+          startDate,
+          endDate,
+        }),
+        categoryService.getCategories({
+          type: String(TransactionType.Expense),
+          pageSize: 999999,
+        }),
+      ]);
       setPayments(data);
+      const nextCategoryById: Record<string, ExpenseCategory> = {};
+      for (const cat of categoriesResponse.items || []) {
+        nextCategoryById[cat.categoryId] = cat;
+      }
+      setCategoryById(nextCategoryById);
       setShowAll(false); // Reset to show only 5 when data refreshes
     } catch (error) {
       console.error("Failed to fetch upcoming payments:", error);
@@ -100,6 +114,20 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
     if (daysLeft <= 3) return "text-red-600 dark:text-red-400";
     if (daysLeft <= 7) return "text-amber-600 dark:text-amber-400";
     return "text-muted-foreground";
+  };
+
+  const getFrequencyLabel = (frequency: string) => {
+    switch (String(frequency).toUpperCase()) {
+      case "DAILY":
+        return t("transactions.recurringDialog.daily");
+      case "WEEKLY":
+        return t("transactions.recurringDialog.weekly");
+      case "YEARLY":
+        return t("transactions.recurringDialog.yearly");
+      case "MONTHLY":
+      default:
+        return t("transactions.recurringDialog.monthly");
+    }
   };
 
   const handlePayNow = async (payment: RecurringPayment) => {
@@ -232,6 +260,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
             <>
               {(showAll ? payments : payments.slice(0, 5)).map((payment) => {
                 const daysLeft = getDaysLeft(payment.nextDueDate);
+                const category = categoryById[payment.categoryId];
                 return (
                   <div
                     key={payment.recurringId}
@@ -259,7 +288,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
                             className="px-1.5 py-0.5 text-xs"
                           >
                             <Repeat className="h-3 w-3 mr-1" />
-                            {payment.frequency}
+                            {getFrequencyLabel(payment.frequency)}
                           </Badge>
                           {payment.missedCount > 0 && (
                             <Badge
@@ -270,7 +299,18 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {payment.categoryName || t("transactions.upcoming.unknownCategory")} &bull; {t("transactions.upcoming.due")}{" "}
+                          {category ? (
+                            <span
+                              className="inline-flex items-center gap-1.5"
+                              style={{ color: category.color || undefined }}
+                            >
+                              <span>{category.icon}</span>
+                              <span>{category.displayName}</span>
+                            </span>
+                          ) : (
+                            payment.categoryName || t("transactions.upcoming.unknownCategory")
+                          )}{" "}
+                          &bull; {t("transactions.upcoming.due")}{" "}
                           {format(new Date(payment.nextDueDate), "MMM dd")}
                           {payment.lastPaidDate && (
                             <> &bull; {t("transactions.upcoming.lastPaid")} {format(new Date(payment.lastPaidDate), "MMM dd")}</>

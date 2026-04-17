@@ -80,6 +80,15 @@ export function ProfileSettings() {
 
   const selectedCurrency = watch("currency");
   const selectedLocale = watch("locale");
+  const displayName = profile?.userName || user?.userName || "User";
+  const displayEmail = profile?.email || user?.email || "";
+  const avatarInitials = (() => {
+    const parts = displayName.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return displayName.slice(0, 2).toUpperCase() || "US";
+  })();
 
   // Fetch profile data on mount
   useEffect(() => {
@@ -233,19 +242,21 @@ export function ProfileSettings() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Avatar Section */}
-            <div className="flex items-center gap-6 pb-8 border-b">
-              <Avatar className="h-20 w-20">
-                <AvatarImage
-                  src="/placeholder.svg?height=96&width=96"
-                  alt="User"
-                />
-                <AvatarFallback className="text-xl">
-                  {profile?.userName?.substring(0, 2).toUpperCase() || user?.userName?.substring(0, 2).toUpperCase() || "US"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold">{profile?.userName || user?.userName || "User"}</h3>
-                <p className="text-sm text-muted-foreground">{profile?.email || user?.email || ""}</p>
+            <div className="flex items-center gap-5 rounded-2xl border bg-muted/20 p-4 sm:gap-6 sm:p-5">
+              <div className="rounded-full bg-linear-to-br from-primary/20 via-primary/10 to-transparent p-[3px] shadow-sm">
+                <Avatar className="h-20 w-20 border border-white/60 dark:border-slate-700">
+                  <AvatarImage src="" alt={displayName} />
+                  <AvatarFallback className="bg-linear-to-br from-primary to-primary/80 text-xl font-semibold text-primary-foreground">
+                    {avatarInitials}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+              <div className="min-w-0 flex-1 space-y-1">
+                <h3 className="truncate text-lg font-semibold">{displayName}</h3>
+                <p className="truncate text-sm text-muted-foreground">{displayEmail}</p>
+                <div className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                  {t("settings.profile.accountDetails")}
+                </div>
               </div>
             </div>
 

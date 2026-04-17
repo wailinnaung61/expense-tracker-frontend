@@ -430,7 +430,10 @@
       "reset": "ပြန်စမည်",
       "delete": "ဖျက်မည်",
       "exportExcel": "Excel အစီရင်ခံစာ",
-      "exportingExcel": "Excel ပြင်ဆင်နေသည်…"
+      "exportingExcel": "Excel ပြင်ဆင်နေသည်…",
+      "quickCyclesLabel": "ဒီလအတွက် ဘတ်ဂျက်ကာလ ပြောင်းပါ",
+      "budgetPeriodLabel": "ဘတ်ဂျက်ကာလ",
+      "budgetPeriodPlaceholder": "ကာလ ရွေးပါ"
     },
     "empty": {
       "title": "{{period}} အတွက် ဘတ်ဂျက်အစီအစဉ် မရှိသေးပါ",
@@ -490,6 +493,11 @@
       "editTitle": "ဘတ်ဂျက်ဆက်တင် ပြင်မည်",
       "editDescription": "လစဉ်စုစုပေါင်းဘတ်ဂျက်ကို ပြင်ပါ။ Category allocation တွေကို summary အောက်က list မှာ စီမံနိုင်ပါတယ်။",
       "totalAmount": "စုစုပေါင်းပမာဏ",
+      "quickAdjustLabel": "ပမာဏ ထပ်မံညှိမည်",
+      "quickAdjustPlaceholder": "ဥပမာ 20000",
+      "addToTotal": "ပေါင်းမည်",
+      "subtractFromTotal": "လျှော့မည်",
+      "quickAdjustHint": "ပမာဏ ထည့်ပြီး ပေါင်းမည် သို့မဟုတ် လျှော့မည် နှိပ်ပါ—စုစုပေါင်းကို လက်ဖြင့်တွက်စရာ မလိုပါ။",
       "icon": "အိုင်ကွန်",
       "color": "အရောင်",
       "leaveBlankHint": "Edit mode တွင် စုစုပေါင်း budget ပမာဏကိုသာ ပြင်ဆင်နိုင်ပါသည်။",

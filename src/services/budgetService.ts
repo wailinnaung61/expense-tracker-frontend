@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/api";
+import { ApiError, apiClient } from "@/lib/api";
 import { normalizeBudgetDto, normalizeBudgetMonthlyResponse } from "@/lib/budget-api-normalize";
 import type {
   BudgetCategoryDto,
@@ -31,6 +31,37 @@ function normalizeBudgetExcelDownload(raw: unknown): ExportDownloadResponse {
 export const budgetService = {
   async getBudgetByMonth(year: number, month: number) {
     const raw = await apiClient.get<BudgetMonthlyResponse>(`/api/budgets/${year}/${month}`);
+    return normalizeBudgetMonthlyResponse(raw);
+  },
+
+  /** Budget whose period contains this day (yyyy-MM-dd)—correct for split pay cycles in one month. */
+  async getBudgetContainingDate(date: string) {
+    const raw = await apiClient.get<BudgetMonthlyResponse>(
+      `/api/budgets/containing?date=${encodeURIComponent(date)}`
+    );
+    return normalizeBudgetMonthlyResponse(raw);
+  },
+
+  /** Same as getBudgetContainingDate but returns null on 404 (for probing month edges). */
+  async getBudgetContainingDateOrNull(date: string): Promise<BudgetMonthlyResponse | null> {
+    try {
+      const raw = await apiClient.get<BudgetMonthlyResponse>(
+        `/api/budgets/containing?date=${encodeURIComponent(date)}`
+      );
+      return normalizeBudgetMonthlyResponse(raw);
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 404) {
+        return null;
+      }
+      throw e;
+    }
+  },
+
+  /** Merged budget view for every budget overlapping the inclusive date range (dashboard semantics). */
+  async getBudgetByDateRange(startDate: string, endDate: string) {
+    const raw = await apiClient.get<BudgetMonthlyResponse>(
+      `/api/budgets/range?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`
+    );
     return normalizeBudgetMonthlyResponse(raw);
   },
 

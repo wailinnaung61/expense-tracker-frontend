@@ -1,6 +1,6 @@
 import { BudgetCategories } from "@/components/budget/budget-categories";
 import { BudgetFormDialog } from "@/components/budget/budget-form-dialog";
-import { BudgetHeader } from "@/components/budget/budget-header";
+import { BudgetHeader, type BudgetCycleSplitOption } from "@/components/budget/budget-header";
 import { BudgetSummary } from "@/components/budget/budget-summary";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -11,15 +11,22 @@ import {
   calendarMonthOverlapsBudgetRange,
   dateFnsLocaleForLanguage,
   formatBudgetRangeLabel,
+  budgetProbeDatesForCalendarMonth,
   formatSelectedCalendarMonth,
   isSameCalendarMonthRange,
+  mergeCycleOptionsFromProbes,
   monthBoundsFromYyyyMm,
+  representativeBudgetQueryDateForMonth,
   spansMultipleCalendarMonths,
 } from "@/lib/budget-period";
 import { budgetService } from "@/services/budgetService";
 import { categoryService } from "@/services/categoryService";
 import { profileService } from "@/services/profileService";
-import { toAlertThresholdRatio, type BudgetDto, type BudgetMonthlyResponse } from "@/types/budget";
+import {
+  toAlertThresholdRatio,
+  type BudgetDto,
+  type BudgetMonthlyResponse,
+} from "@/types/budget";
 import { TransactionType, type ExpenseCategory } from "@/types/category";
 import type { ProfileResponse } from "@/types/profile";
 import { format } from "date-fns";
@@ -76,7 +83,12 @@ function dedupeCategories(categories: ExpenseCategory[]) {
 
 export default function Budget() {
   const { t, i18n } = useTranslation();
-  const [selectedMonth, setSelectedMonth] = useState(format(new Date(), "yyyy-MM"));
+  const initialMonth = format(new Date(), "yyyy-MM");
+  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+  const [budgetAsOfDate, setBudgetAsOfDate] = useState(() =>
+    representativeBudgetQueryDateForMonth(initialMonth)
+  );
+  const [cycleSplitOptions, setCycleSplitOptions] = useState<BudgetCycleSplitOption[]>([]);
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [expenseCategories, setExpenseCategories] = useState<ExpenseCategory[]>([]);
   const [budget, setBudget] = useState<BudgetMonthlyResponse | null>(null);
@@ -167,19 +179,43 @@ export default function Budget() {
     }
   }, [t]);
 
-  const loadBudget = useCallback(async () => {
-    const [year, month] = selectedMonth.split("-").map(Number);
+  const loadBudgetForMonth = useCallback(async (ym: string, asOfDate: string) => {
     setIsBudgetLoading(true);
     setBudgetError(null);
-
+    const locale = dateFnsLocaleForLanguage(i18n.language);
     try {
-      const response = await budgetService.getBudgetByMonth(year, month);
+      const probeDates = budgetProbeDatesForCalendarMonth(ym);
+      const probeResults = await Promise.all(
+        probeDates.map((d) => budgetService.getBudgetContainingDateOrNull(d))
+      );
+      let cycleOpts = mergeCycleOptionsFromProbes(probeDates, probeResults, locale);
+
+      const response = await budgetService.getBudgetContainingDate(asOfDate);
+      const mainId = response.budgetId?.trim();
+      if (
+        mainId &&
+        !cycleOpts.some((o) => o.budgetId === mainId) &&
+        response.startDate &&
+        response.endDate
+      ) {
+        cycleOpts = [
+          ...cycleOpts,
+          {
+            anchorDate: asOfDate,
+            budgetId: mainId,
+            periodStart: response.startDate.trim() || asOfDate,
+            rangeLabel: formatBudgetRangeLabel(response.startDate, response.endDate, locale),
+          },
+        ].sort((a, b) => a.periodStart.localeCompare(b.periodStart));
+      }
+
+      setCycleSplitOptions(cycleOpts.length > 1 ? cycleOpts : []);
       setBudget(response);
       setBudgetMeta((prev) => {
         if (!response.budgetId) {
           return prev;
         }
-        const { start: fbStart, end: fbEnd } = monthBoundsFromYyyyMm(selectedMonth);
+        const { start: fbStart, end: fbEnd } = monthBoundsFromYyyyMm(ym);
         const same = prev?.budgetId === response.budgetId;
         const fromApiStart = response.startDate?.trim() || undefined;
         const fromApiEnd = response.endDate?.trim() || undefined;
@@ -188,7 +224,7 @@ export default function Budget() {
           prev &&
           prev.startDate &&
           prev.endDate &&
-          calendarMonthOverlapsBudgetRange(selectedMonth, prev.startDate, prev.endDate);
+          calendarMonthOverlapsBudgetRange(ym, prev.startDate, prev.endDate);
         const startDate =
           fromApiStart && fromApiEnd
             ? fromApiStart
@@ -214,6 +250,7 @@ export default function Budget() {
         };
       });
     } catch (error) {
+      setCycleSplitOptions([]);
       if (error instanceof ApiError && error.status === 404) {
         setBudget(null);
         setBudgetMeta(null);
@@ -225,7 +262,17 @@ export default function Budget() {
     } finally {
       setIsBudgetLoading(false);
     }
-  }, [selectedMonth, t]);
+  }, [t, i18n.language]);
+
+  const loadBudget = useCallback(
+    () => loadBudgetForMonth(selectedMonth, budgetAsOfDate),
+    [loadBudgetForMonth, selectedMonth, budgetAsOfDate]
+  );
+
+  const handleMonthChange = useCallback((ym: string) => {
+    setSelectedMonth(ym);
+    setBudgetAsOfDate(representativeBudgetQueryDateForMonth(ym));
+  }, []);
 
   useEffect(() => {
     loadReferenceData();
@@ -256,9 +303,14 @@ export default function Budget() {
       setBudgetMeta(created);
       setDialogOpen(false);
       if (created.startDate?.length >= 7) {
-        setSelectedMonth(created.startDate.slice(0, 7));
+        const ym = created.startDate.slice(0, 7);
+        const asOf = representativeBudgetQueryDateForMonth(ym);
+        setSelectedMonth(ym);
+        setBudgetAsOfDate(asOf);
+        await loadBudgetForMonth(ym, asOf);
+      } else {
+        await loadBudget();
       }
-      await loadBudget();
       toast.success(t("budget.feedback.created"));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("budget.feedback.createFailed"));
@@ -473,7 +525,10 @@ export default function Budget() {
         budgetStatus={effectiveBudgetMeta?.status}
         isBusy={isBudgetLoading || isDialogSubmitting || actionLoading !== null || isExportingExcel}
         isExportingExcel={isExportingExcel}
-        onMonthChange={setSelectedMonth}
+        onBudgetAsOfDateChange={setBudgetAsOfDate}
+        cycleSplitOptions={cycleSplitOptions}
+        activeBudgetId={budget?.budgetId ?? null}
+        onMonthChange={handleMonthChange}
         onCreate={() => {
           setDialogMode("create");
           setDialogOpen(true);

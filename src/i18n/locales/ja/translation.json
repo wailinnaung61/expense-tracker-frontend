@@ -430,7 +430,10 @@
       "reset": "リセット",
       "delete": "削除",
       "exportExcel": "Excelレポート",
-      "exportingExcel": "Excelを準備中…"
+      "exportingExcel": "Excelを準備中…",
+      "quickCyclesLabel": "この月の予算サイクルを切り替え",
+      "budgetPeriodLabel": "予算期間",
+      "budgetPeriodPlaceholder": "期間を選ぶ"
     },
     "empty": {
       "title": "{{period}} の予算プランはまだありません",
@@ -490,6 +493,11 @@
       "editTitle": "予算設定を編集",
       "editDescription": "月間総予算を更新します。カテゴリ配分はサマリー下の一覧から管理できます。",
       "totalAmount": "合計金額",
+      "quickAdjustLabel": "増減する金額",
+      "quickAdjustPlaceholder": "例: 20000",
+      "addToTotal": "足す",
+      "subtractFromTotal": "引く",
+      "quickAdjustHint": "金額を入力して「足す」「引く」で合計を更新できます。",
       "icon": "アイコン",
       "color": "カラー",
       "leaveBlankHint": "編集モードでは予算総額のみを変更できます。",

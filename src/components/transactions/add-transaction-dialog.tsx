@@ -180,12 +180,11 @@ export function AddTransactionDialog({
     let cancelled = false;
     setExpenseBudgetHint({ kind: "loading" });
 
-    const year = tranactionDate.getFullYear();
-    const month = tranactionDate.getMonth() + 1;
-
     void (async () => {
       try {
-        const res = await budgetService.getBudgetByMonth(year, month);
+        const res = await budgetService.getBudgetContainingDate(
+          format(tranactionDate, "yyyy-MM-dd")
+        );
         if (cancelled) return;
 
         if (!res.budgetId) {

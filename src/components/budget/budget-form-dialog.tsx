@@ -28,7 +28,7 @@ import {
 import { monthBoundsFromYyyyMm } from "@/lib/budget-period";
 import { formatCurrency } from "@/lib/utils";
 import { budgetService } from "@/services/budgetService";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, subMonths } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import type { DragEndEvent } from "@dnd-kit/core";
 import {
@@ -47,12 +47,26 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlertTriangle, CalendarIcon, GripVertical, Maximize2, Minimize2, Target } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarIcon,
+  GripVertical,
+  Maximize2,
+  Minimize2,
+  Minus,
+  Plus,
+  Target,
+} from "lucide-react";
 
 function dateFromYyyyMmDd(value: string): Date | undefined {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
   const d = parseISO(value);
   return Number.isNaN(d.getTime()) ? undefined : d;
+}
+
+function parseAmountString(raw: string): number {
+  const n = Number(String(raw).replace(/,/g, "").trim());
+  return Number.isFinite(n) ? n : NaN;
 }
 
 type CategoryDraft = {
@@ -210,6 +224,7 @@ export function BudgetFormDialog({
 }: BudgetFormDialogProps) {
   const { t } = useTranslation();
   const [totalAmount, setTotalAmount] = useState("");
+  const [totalAdjustDraft, setTotalAdjustDraft] = useState("");
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [categoryDrafts, setCategoryDrafts] = useState<Record<string, CategoryDraft>>({});
   const [isMaximized, setIsMaximized] = useState(false);
@@ -250,18 +265,19 @@ export function BudgetFormDialog({
     if (!open) {
       setIsMaximized(false);
       setUseCustomPeriod(false);
+      setTotalAdjustDraft("");
       return;
     }
 
     if (mode === "create") {
       // Try to auto-copy from previous month
       const [year, month] = selectedMonth.split("-").map(Number);
-      const prevDate = new Date(year, month - 1, 1);
-      const prevYear = prevDate.getFullYear();
-      const prevMonth = prevDate.getMonth();
+      const firstOfSelected = new Date(year, month - 1, 1);
+      const firstOfPrevMonth = subMonths(firstOfSelected, 1);
+      const prevMonthDay = format(firstOfPrevMonth, "yyyy-MM-dd");
 
       budgetService
-        .getBudgetByMonth(prevYear, prevMonth)
+        .getBudgetContainingDate(prevMonthDay)
         .then((prevBudget) => {
           if (prevBudget?.budgetId && prevBudget.categories.length > 0) {
             // Copy total budget amount
@@ -391,6 +407,18 @@ export function BudgetFormDialog({
     }));
   };
 
+  const applyTotalDelta = (sign: 1 | -1) => {
+    const delta = parseAmountString(totalAdjustDraft);
+    if (!Number.isFinite(delta) || delta <= 0) {
+      return;
+    }
+    const base = parseAmountString(totalAmount);
+    const safeBase = Number.isFinite(base) ? base : 0;
+    const next = sign === 1 ? safeBase + delta : Math.max(0, safeBase - delta);
+    setTotalAmount(String(next));
+    setTotalAdjustDraft("");
+  };
+
   const updateCategoryDraft = (
     categoryId: string,
     field: keyof CategoryDraft,
@@ -487,6 +515,54 @@ export function BudgetFormDialog({
                 onChange={(event) => setTotalAmount(event.target.value)}
                 placeholder="0.00"
               />
+              <div className="rounded-lg border border-dashed border-muted-foreground/25 bg-muted/30 p-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <Label
+                      htmlFor="budget-total-adjust"
+                      className="text-xs font-normal text-muted-foreground"
+                    >
+                      {t("budget.dialog.quickAdjustLabel" as any)}
+                    </Label>
+                    <Input
+                      id="budget-total-adjust"
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="0.01"
+                      value={totalAdjustDraft}
+                      onChange={(e) => setTotalAdjustDraft(e.target.value)}
+                      placeholder={t("budget.dialog.quickAdjustPlaceholder" as any)}
+                      className="h-9 bg-background"
+                    />
+                  </div>
+                  <div className="flex shrink-0 gap-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      className="flex-1 sm:flex-none"
+                      onClick={() => applyTotalDelta(1)}
+                    >
+                      <Plus className="mr-1.5 h-3.5 w-3.5" />
+                      {t("budget.dialog.addToTotal" as any)}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      className="flex-1 sm:flex-none"
+                      onClick={() => applyTotalDelta(-1)}
+                    >
+                      <Minus className="mr-1.5 h-3.5 w-3.5" />
+                      {t("budget.dialog.subtractFromTotal" as any)}
+                    </Button>
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {t("budget.dialog.quickAdjustHint" as any)}
+                </p>
+              </div>
             </div>
 
             {mode === "create" && (

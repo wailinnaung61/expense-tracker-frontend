@@ -48,6 +48,8 @@ const FUNCTION_REFRESH_MAP: Record<string, ChatRefreshTarget> = {
   get_yearly_summary: "summary",
   get_expense_breakdown: "summary",
   get_dashboard: "summary",
+  get_custom_date_range: "summary",
+  get_dashboard_range: "summary",
   get_saving_dashboard: "summary",
 
   list_categories: "categories",
@@ -56,6 +58,8 @@ const FUNCTION_REFRESH_MAP: Record<string, ChatRefreshTarget> = {
   delete_category: "categories",
 
   get_budget: "budget",
+  get_budget_range: "budget",
+  get_budget_containing: "budget",
   create_budget: "budget",
   update_budget: "budget",
   delete_budget: "budget",

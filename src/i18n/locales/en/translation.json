@@ -430,7 +430,10 @@
       "reset": "Reset",
       "delete": "Delete",
       "exportExcel": "Excel report",
-      "exportingExcel": "Preparing Excel…"
+      "exportingExcel": "Preparing Excel…",
+      "quickCyclesLabel": "Switch pay-cycle budget for this month",
+      "budgetPeriodLabel": "Budget period",
+      "budgetPeriodPlaceholder": "Choose a period"
     },
     "empty": {
       "title": "No budget plan for {{period}} yet",
@@ -490,6 +493,11 @@
       "editTitle": "Edit Budget Settings",
       "editDescription": "Update the overall monthly budget. Category allocations are managed from the list below the summary.",
       "totalAmount": "Total Amount",
+      "quickAdjustLabel": "Adjust by amount",
+      "quickAdjustPlaceholder": "e.g. 20000",
+      "addToTotal": "Add",
+      "subtractFromTotal": "Subtract",
+      "quickAdjustHint": "Enter an amount, then Add or Subtract to update the total without doing the math yourself.",
       "icon": "Icon",
       "color": "Color",
       "leaveBlankHint": "Edit mode allows updating the total budget amount only.",
