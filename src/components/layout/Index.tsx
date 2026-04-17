@@ -55,7 +55,7 @@ export function Layout() {
         <main className="flex-1 p-4 px-12 sm:px-6 lg:px-8"><Outlet /></main>
         <Footer />
       </div>
-      
+
       {/* AI Chat Bot */}
       <ChatBot />
     </div>

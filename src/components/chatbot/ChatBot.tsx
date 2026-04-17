@@ -15,7 +15,11 @@ import {
 } from "@/lib/chatbot-refresh";
 import { useTranslation } from "@/hooks/useTranslation";
 
-export function ChatBot() {
+interface ChatBotProps {
+  placement?: "floating" | "footer";
+}
+
+export function ChatBot({ placement = "floating" }: ChatBotProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -286,7 +290,7 @@ export function ChatBot() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label={isOpen ? t("chatbot.closeChat") : t("chatbot.openChat")}
-        className={`group fixed bottom-32 right-0 z-50 translate-x-1/4 overflow-hidden rounded-full bg-linear-to-br from-sky-500 via-cyan-500 to-teal-500 transition-all duration-300 hover:scale-105 active:scale-95 sm:bottom-28 md:bottom-20 ${
+        className={`group ${placement === "footer" ? "absolute right-4 top-1/2 -translate-y-1/2 z-30 sm:right-6" : "fixed bottom-4 right-7 z-50 sm:bottom-4 sm:right-9 md:bottom-4 md:right-10"} overflow-hidden rounded-full bg-linear-to-br from-sky-500 via-cyan-500 to-teal-500 transition-all duration-300 hover:scale-105 active:scale-95 ${
           isOpen
             ? "h-9 w-9 shadow-md opacity-70 hover:opacity-100"
             : "h-12 w-12 sm:h-14 sm:w-14 shadow-[0_14px_34px_-8px_rgba(6,182,212,0.75)]"
@@ -303,7 +307,7 @@ export function ChatBot() {
           {isOpen ? (
             <X className="h-4 w-4 text-white group-hover:rotate-90 transition-transform duration-300" />
           ) : (
-            <MessageCircle className="h-7 w-7 text-white group-hover:rotate-12 transition-transform duration-300" />
+            <MessageCircle className="h-8 w-8 text-white group-hover:rotate-12 transition-transform duration-300" />
           )}
         </div>
       </button>
