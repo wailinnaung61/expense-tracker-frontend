@@ -286,10 +286,10 @@ export function ChatBot() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label={isOpen ? t("chatbot.closeChat") : t("chatbot.openChat")}
-        className={`group fixed bottom-36 right-4 z-50 overflow-hidden rounded-full bg-linear-to-br from-sky-500 via-cyan-500 to-teal-500 transition-all duration-300 hover:scale-105 active:scale-95 md:bottom-24 sm:right-6 ${
+        className={`group fixed bottom-32 right-0 z-50 translate-x-1/4 overflow-hidden rounded-full bg-linear-to-br from-sky-500 via-cyan-500 to-teal-500 transition-all duration-300 hover:scale-105 active:scale-95 sm:bottom-28 md:bottom-20 ${
           isOpen
             ? "h-9 w-9 shadow-md opacity-70 hover:opacity-100"
-            : "h-14 w-14 sm:h-16 sm:w-16 shadow-[0_14px_34px_-8px_rgba(6,182,212,0.75)]"
+            : "h-12 w-12 sm:h-14 sm:w-14 shadow-[0_14px_34px_-8px_rgba(6,182,212,0.75)]"
         }`}
       >
         {/* Animated background */}

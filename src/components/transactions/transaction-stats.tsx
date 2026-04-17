@@ -234,9 +234,9 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   return (
     <Card className="sticky top-12">
       <CardHeader className="pb-3">
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div className="min-w-0 flex-1">
-            <CardTitle className="wrap-break-word leading-snug dark:text-slate-50">
+        <div className="flex flex-col gap-3">
+          <div className="w-full basis-full">
+            <CardTitle className="leading-snug whitespace-normal break-normal dark:text-slate-50">
               {t("transactions.stats.title")}
             </CardTitle>
             <CardDescription className="dark:text-slate-400">
@@ -251,7 +251,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
               )}
             </CardDescription>
           </div>
-          <div className="flex w-full flex-wrap items-center gap-1 md:w-auto md:justify-end">
+          <div className="flex w-full flex-wrap items-center gap-1">
             <Button
               variant={!useCustomRange ? "default" : "outline"}
               size="sm"
