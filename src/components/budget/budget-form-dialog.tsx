@@ -261,6 +261,22 @@ export function BudgetFormDialog({
     setUseCustomPeriod(false);
   }, [open, mode, selectedMonth]);
 
+  const budgetId = budget?.budgetId;
+  const budgetServerTotal = budget?.totalAmount;
+
+  // Edit mode: sync from server only when the dialog opens or the loaded budget identity/total changes.
+  // Do not depend on `availableCategories` or the whole `budget` object — new references would wipe
+  // the total after quick-adjust (Add/Subtract) or any other local edit.
+  useEffect(() => {
+    if (!open || mode !== "edit") {
+      return;
+    }
+    setTotalAmount(String(budgetServerTotal ?? ""));
+    setSelectedCategoryIds([]);
+    setCategoryDrafts({});
+    setUseCustomPeriod(false);
+  }, [open, mode, budgetId, budgetServerTotal]);
+
   useEffect(() => {
     if (!open) {
       setIsMaximized(false);
@@ -269,61 +285,47 @@ export function BudgetFormDialog({
       return;
     }
 
-    if (mode === "create") {
-      // Try to auto-copy from previous month
-      const [year, month] = selectedMonth.split("-").map(Number);
-      const firstOfSelected = new Date(year, month - 1, 1);
-      const firstOfPrevMonth = subMonths(firstOfSelected, 1);
-      const prevMonthDay = format(firstOfPrevMonth, "yyyy-MM-dd");
+    if (mode !== "create") {
+      return;
+    }
 
-      budgetService
-        .getBudgetContainingDate(prevMonthDay)
-        .then((prevBudget) => {
-          if (prevBudget?.budgetId && prevBudget.categories.length > 0) {
-            // Copy total budget amount
-            setTotalAmount(String(prevBudget.summary.totalBudget));
+    // Try to auto-copy from previous month
+    const [year, month] = selectedMonth.split("-").map(Number);
+    const firstOfSelected = new Date(year, month - 1, 1);
+    const firstOfPrevMonth = subMonths(firstOfSelected, 1);
+    const prevMonthDay = format(firstOfPrevMonth, "yyyy-MM-dd");
 
-            // Copy categories with their allocations
-            const prevCategoryIds = prevBudget.categories.map((c: BudgetCategoryDto) => c.categoryId);
-            setSelectedCategoryIds(prevCategoryIds);
+    budgetService
+      .getBudgetContainingDate(prevMonthDay)
+      .then((prevBudget) => {
+        if (prevBudget?.budgetId && prevBudget.categories.length > 0) {
+          // Copy total budget amount
+          setTotalAmount(String(prevBudget.summary.totalBudget));
 
-            const drafts: Record<string, CategoryDraft> = {};
-            availableCategories.forEach((category) => {
-              const prevCategory = prevBudget.categories.find(
-                (c: BudgetCategoryDto) => c.categoryId === category.categoryId
-              );
-              if (prevCategory) {
-                drafts[category.categoryId] = {
-                  allocatedAmount: String(prevCategory.allocated),
-                  alertThresholdPercent: String((prevCategory.alertThreshold * 100).toFixed(0)),
-                };
-              } else {
-                drafts[category.categoryId] = {
-                  allocatedAmount: "",
-                  alertThresholdPercent: "80",
-                };
-              }
-            });
-            setCategoryDrafts(drafts);
-          } else {
-            // Previous budget exists but has no categories - initialize empty
-            setTotalAmount("");
-            setSelectedCategoryIds([]);
-            setCategoryDrafts(
-              Object.fromEntries(
-                availableCategories.map((category) => [
-                  category.categoryId,
-                  {
-                    allocatedAmount: "",
-                    alertThresholdPercent: "80",
-                  },
-                ])
-              )
+          // Copy categories with their allocations
+          const prevCategoryIds = prevBudget.categories.map((c: BudgetCategoryDto) => c.categoryId);
+          setSelectedCategoryIds(prevCategoryIds);
+
+          const drafts: Record<string, CategoryDraft> = {};
+          availableCategories.forEach((category) => {
+            const prevCategory = prevBudget.categories.find(
+              (c: BudgetCategoryDto) => c.categoryId === category.categoryId
             );
-          }
-        })
-        .catch(() => {
-          // No previous budget found - use defaults
+            if (prevCategory) {
+              drafts[category.categoryId] = {
+                allocatedAmount: String(prevCategory.allocated),
+                alertThresholdPercent: String((prevCategory.alertThreshold * 100).toFixed(0)),
+              };
+            } else {
+              drafts[category.categoryId] = {
+                allocatedAmount: "",
+                alertThresholdPercent: "80",
+              };
+            }
+          });
+          setCategoryDrafts(drafts);
+        } else {
+          // Previous budget exists but has no categories - initialize empty
           setTotalAmount("");
           setSelectedCategoryIds([]);
           setCategoryDrafts(
@@ -337,15 +339,25 @@ export function BudgetFormDialog({
               ])
             )
           );
-        });
-      return;
-    }
-
-    setTotalAmount(String(budget?.totalAmount ?? ""));
-    setSelectedCategoryIds([]);
-    setCategoryDrafts({});
-    setUseCustomPeriod(false);
-  }, [availableCategories, budget, mode, open, selectedMonth]);
+        }
+      })
+      .catch(() => {
+        // No previous budget found - use defaults
+        setTotalAmount("");
+        setSelectedCategoryIds([]);
+        setCategoryDrafts(
+          Object.fromEntries(
+            availableCategories.map((category) => [
+              category.categoryId,
+              {
+                allocatedAmount: "",
+                alertThresholdPercent: "80",
+              },
+            ])
+          )
+        );
+      });
+  }, [availableCategories, mode, open, selectedMonth]);
 
   const totalAmountValue = Number(totalAmount);
   const allocatedTotal = useMemo(() => {

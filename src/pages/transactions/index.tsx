@@ -327,6 +327,7 @@ export default function Transactions() {
             onKeywordChange={handleKeywordChange}
             onStartDateChange={handleStartDateChange}
             onEndDateChange={handleEndDateChange}
+            categoriesRefreshKey={categoriesRefreshKey}
           />
 
           {loading ? (

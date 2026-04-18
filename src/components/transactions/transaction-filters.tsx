@@ -34,6 +34,7 @@ interface TransactionFiltersProps {
   onKeywordChange: (newKeyword: string) => void;
   onStartDateChange: (newStartDate: string) => void;
   onEndDateChange: (newEndDate: string) => void;
+  categoriesRefreshKey?: number;
 }
 
 export function TransactionFilters({
@@ -49,6 +50,7 @@ export function TransactionFilters({
   onKeywordChange,
   onStartDateChange,
   onEndDateChange,
+  categoriesRefreshKey = 0,
 }: TransactionFiltersProps) {
   const { t } = useTranslation();
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
@@ -62,6 +64,7 @@ export function TransactionFilters({
     !!startDateLocal &&
     !!endDateLocal &&
     startDateLocal.getTime() > endDateLocal.getTime();
+  const selectedCategory = categories.find((cat) => cat.categoryId === categoryId);
 
   const handleStartDateSelect = (date: Date | undefined) => {
     setStartDateLocal(date);
@@ -125,7 +128,7 @@ export function TransactionFilters({
       }
     };
     fetchCategories();
-  }, [type]);
+  }, [type, categoriesRefreshKey, categoryId, onCategoryChange]);
 
   return (
     <div className="rounded-xl border bg-card/50 shadow-sm backdrop-blur-sm sm:shadow-md">
@@ -170,13 +173,23 @@ export function TransactionFilters({
             
             <Select value={categoryId} onValueChange={onCategoryChange}>
               <SelectTrigger className="h-10 w-full border-muted-foreground/20 sm:h-11 sm:w-40">
-                <SelectValue placeholder="Category" />
+                {categoryId === "all" || !selectedCategory ? (
+                  <SelectValue placeholder="Category" />
+                ) : (
+                  <div className="flex items-center gap-2" style={{ color: selectedCategory.color }}>
+                    <span>{selectedCategory.icon}</span>
+                    <span className="truncate">{selectedCategory.displayName}</span>
+                  </div>
+                )}
               </SelectTrigger>
               <SelectContent className="max-h-100">
                 <SelectItem value="all">{t("transactions.filters.allCategories")}</SelectItem>
                 {categories.map((cat) => (
                   <SelectItem key={cat.categoryId} value={cat.categoryId}>
-                    {cat.icon} {cat.displayName}
+                    <div className="flex items-center gap-2" style={{ color: cat.color }}>
+                      <span>{cat.icon}</span>
+                      <span>{cat.displayName}</span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
