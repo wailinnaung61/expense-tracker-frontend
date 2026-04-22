@@ -68,7 +68,19 @@ export function ExpenseBreakdownCard({ breakdown, currency }: ExpenseBreakdownCa
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      formatter={(value) => formatCurrency(Number(value), currency)}
+                      className="border-border bg-popover text-foreground"
+                      labelClassName="text-foreground"
+                      formatter={(value, name, item) => (
+                        <div className="flex w-full items-center justify-between gap-4">
+                          <span className="text-muted-foreground">{name}</span>
+                          <span className="font-medium text-foreground">
+                            {formatCurrency(Number(value), currency)}
+                            {item?.payload?.percentage !== undefined
+                              ? ` (${Math.round(Number(item.payload.percentage))}%)`
+                              : ""}
+                          </span>
+                        </div>
+                      )}
                     />
                   }
                 />

@@ -386,6 +386,8 @@ export function MonthlyTrendChart({ currency, month }: TrendChartProps) {
                   cursor={false}
                   content={
                     <ChartTooltipContent
+                      className="border-border bg-popover text-foreground"
+                      labelClassName="text-foreground"
                       formatter={(value, name) => (
                         <div className="flex w-full items-center justify-between gap-4">
                           <span className="text-muted-foreground">
