@@ -510,7 +510,15 @@ export default function Reports() {
                     <XAxis dataKey="month" tick={{ fontSize: 11 }} className="fill-muted-foreground" />
                     <YAxis tick={{ fontSize: 11 }} className="fill-muted-foreground" tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v} />
                     <Tooltip
-                      contentStyle={{ borderRadius: 12, fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }}
+                      contentStyle={{
+                        borderRadius: 12,
+                        fontSize: 12,
+                        border: "1px solid hsl(var(--border))",
+                        background: "hsl(var(--card))",
+                        color: "hsl(var(--foreground))",
+                      }}
+                      labelStyle={{ color: "hsl(var(--foreground))" }}
+                      itemStyle={{ color: "hsl(var(--foreground))" }}
                       formatter={(value: number, name: string) => [
                         formatCurrency(value, currency),
                         name === "income" ? t("reports.totalIncome") : t("reports.totalExpense"),
@@ -779,7 +787,15 @@ export default function Reports() {
                             ))}
                           </Pie>
                           <Tooltip
-                            contentStyle={{ borderRadius: 12, fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }}
+                            contentStyle={{
+                              borderRadius: 12,
+                              fontSize: 12,
+                              border: "1px solid hsl(var(--border))",
+                              background: "hsl(var(--card))",
+                              color: "hsl(var(--foreground))",
+                            }}
+                            labelStyle={{ color: "hsl(var(--foreground))" }}
+                            itemStyle={{ color: "hsl(var(--foreground))" }}
                             formatter={(value: number, name: string) => [
                               formatCurrency(value, currency),
                               name,

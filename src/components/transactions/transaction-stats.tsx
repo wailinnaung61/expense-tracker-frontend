@@ -572,7 +572,15 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ borderRadius: 12, fontSize: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))" }}
+                    contentStyle={{
+                      borderRadius: 12,
+                      fontSize: 12,
+                      border: "1px solid hsl(var(--border))",
+                      background: "hsl(var(--card))",
+                      color: "hsl(var(--foreground))",
+                    }}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
+                    itemStyle={{ color: "hsl(var(--foreground))" }}
                     formatter={(value: number, name: string, props: any) => [
                       `${formatCurrency(value, currency)} (${Math.round(props.payload.percentage)}%)`,
                       name,
