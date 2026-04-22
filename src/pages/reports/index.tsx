@@ -307,6 +307,48 @@ export default function Reports() {
     }));
   }, [categoryBreakdown]);
 
+  const renderAreaTooltip = useCallback((props: any) => {
+    if (!props?.active || !props.payload?.length) return null;
+
+    return (
+      <div className="rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs shadow-xl">
+        {props.label ? <div className="mb-1 text-muted-foreground">{String(props.label)}</div> : null}
+        <div className="space-y-1">
+          {props.payload.map((entry: any, index: number) => {
+            const isIncome = entry?.dataKey === "income";
+            const label = isIncome ? t("reports.totalIncome") : t("reports.totalExpense");
+
+            return (
+              <div key={`${entry?.dataKey ?? "item"}-${index}`} className="flex items-center justify-between gap-3">
+                <span className="text-muted-foreground">{label}</span>
+                <span className="font-medium text-foreground">
+                  {formatCurrency(Number(entry?.value ?? 0), currency)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }, [currency, t]);
+
+  const renderCategoryTooltip = useCallback((props: any) => {
+    if (!props?.active || !props.payload?.length) return null;
+
+    const item = props.payload[0];
+    const amount = Number(item?.value ?? 0);
+    const categoryName = String(item?.name ?? "");
+
+    return (
+      <div className="rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs shadow-xl">
+        <div className="text-muted-foreground">{categoryName}</div>
+        <div className="font-medium text-foreground">
+          {formatCurrency(amount, currency)}
+        </div>
+      </div>
+    );
+  }, [currency]);
+
   const handlePrevYear = () => setYear((y) => y - 1);
   const handleNextYear = () => setYear((y) => y + 1);
   const handleThisYear = () => {
@@ -509,21 +551,7 @@ export default function Reports() {
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis dataKey="month" tick={{ fontSize: 11 }} className="fill-muted-foreground" />
                     <YAxis tick={{ fontSize: 11 }} className="fill-muted-foreground" tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v} />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: 12,
-                        fontSize: 12,
-                        border: "1px solid hsl(var(--border))",
-                        background: "hsl(var(--card))",
-                        color: "hsl(var(--foreground))",
-                      }}
-                      labelStyle={{ color: "hsl(var(--foreground))" }}
-                      itemStyle={{ color: "hsl(var(--foreground))" }}
-                      formatter={(value: number, name: string) => [
-                        formatCurrency(value, currency),
-                        name === "income" ? t("reports.totalIncome") : t("reports.totalExpense"),
-                      ]}
-                    />
+                    <Tooltip content={renderAreaTooltip} />
                     <Legend
                       formatter={(value) => (
                         <span className="text-xs text-muted-foreground">
@@ -786,21 +814,7 @@ export default function Reports() {
                               <Cell key={i} fill={entry.fill} />
                             ))}
                           </Pie>
-                          <Tooltip
-                            contentStyle={{
-                              borderRadius: 12,
-                              fontSize: 12,
-                              border: "1px solid hsl(var(--border))",
-                              background: "hsl(var(--card))",
-                              color: "hsl(var(--foreground))",
-                            }}
-                            labelStyle={{ color: "hsl(var(--foreground))" }}
-                            itemStyle={{ color: "hsl(var(--foreground))" }}
-                            formatter={(value: number, name: string) => [
-                              formatCurrency(value, currency),
-                              name,
-                            ]}
-                          />
+                          <Tooltip content={renderCategoryTooltip} />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>

@@ -231,6 +231,24 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
     [data]
   );
 
+  const renderExpenseTooltip = useCallback((props: any) => {
+    if (!props?.active || !props.payload?.length) return null;
+
+    const item = props.payload[0];
+    const amount = Number(item?.value ?? 0);
+    const categoryName = String(item?.name ?? "");
+    const percentage = Math.round(Number(item?.payload?.percentage ?? 0));
+
+    return (
+      <div className="rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs shadow-xl">
+        <div className="text-muted-foreground">{categoryName}</div>
+        <div className="font-medium text-foreground">
+          {formatCurrency(amount, currency)} ({percentage}%)
+        </div>
+      </div>
+    );
+  }, [currency]);
+
   return (
     <Card className="sticky top-12">
       <CardHeader className="pb-3">
@@ -571,21 +589,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: 12,
-                      fontSize: 12,
-                      border: "1px solid hsl(var(--border))",
-                      background: "hsl(var(--card))",
-                      color: "hsl(var(--foreground))",
-                    }}
-                    labelStyle={{ color: "hsl(var(--foreground))" }}
-                    itemStyle={{ color: "hsl(var(--foreground))" }}
-                    formatter={(value: number, name: string, props: any) => [
-                      `${formatCurrency(value, currency)} (${Math.round(props.payload.percentage)}%)`,
-                      name,
-                    ]}
-                  />
+                  <Tooltip content={renderExpenseTooltip} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center px-4 pointer-events-none">
