@@ -40,7 +40,7 @@ export const apiClient = {
       throw new Error('No refresh token or username available');
     }
 
-    const language = localStorage.getItem("i18nextLng") || "en";
+    const language = localStorage.getItem("i18nextLng") || "ja";
 
     const response = await fetch(`${API_BASE_URL}/api/Auth/refresh`, {
       method: 'POST',
@@ -113,7 +113,7 @@ export const apiClient = {
 
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = localStorage.getItem("accessToken");
-    const language = localStorage.getItem("i18nextLng") || "en";
+    const language = localStorage.getItem("i18nextLng") || "ja";
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

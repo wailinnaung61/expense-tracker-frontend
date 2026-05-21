@@ -31,7 +31,8 @@ i18n
   // Initialize i18next
   .init({
     resources,
-    fallbackLng: 'en', // Fallback language
+    lng: 'ja', // Default for first-time visitors (no saved preference)
+    fallbackLng: 'en', // Missing translation keys
     supportedLngs: ['en', 'my', 'ja'], // Supported languages
     debug: false, // Set to true for debugging
     
@@ -41,11 +42,9 @@ i18n
     
     // Language detection options
     detection: {
-      // Order of language detection
-      order: ['localStorage', 'navigator'],
-      // Cache user language
+      // Only use saved preference; do not override with browser language
+      order: ['localStorage'],
       caches: ['localStorage'],
-      // localStorage key
       lookupLocalStorage: 'i18nextLng',
     },
   });
