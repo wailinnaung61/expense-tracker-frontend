@@ -8,6 +8,7 @@ import { VerticalHeader } from "./header/vertical-header";
 import { Sidebar } from "./sidebar";
 import { ChatBot } from "@/components/chatbot/ChatBot";
 import { CalculatorFab } from "@/components/calculator/calculator-fab";
+import { CalculatorStateProvider } from "@/components/calculator/calculator-state";
 
 export function Layout() {
   const { layout, direction } = useThemeContext();
@@ -33,6 +34,7 @@ export function Layout() {
   }, [direction, isVertical, isCollapsed]);
 
   return (
+    <CalculatorStateProvider>
     <div className={containerClass}>
       {(isVertical || isMobileOpen) && (
         <Sidebar
@@ -62,6 +64,7 @@ export function Layout() {
       {/* AI Chat Bot */}
       <ChatBot />
     </div>
+    </CalculatorStateProvider>
   );
 }
 

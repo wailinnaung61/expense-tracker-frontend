@@ -5,6 +5,26 @@ import type {
   NotificationFilters 
 } from '@/types/notification';
 
+/** API may return a bare number or a wrapped object. */
+export function normalizeUnreadCount(data: unknown): number {
+  if (typeof data === 'number' && Number.isFinite(data)) {
+    return Math.max(0, Math.floor(data));
+  }
+  if (typeof data === 'string' && data.trim() !== '') {
+    const n = Number(data);
+    return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+  }
+  if (data && typeof data === 'object') {
+    const obj = data as Record<string, unknown>;
+    for (const key of ['unreadCount', 'count', 'value'] as const) {
+      if (key in obj) {
+        return normalizeUnreadCount(obj[key]);
+      }
+    }
+  }
+  return 0;
+}
+
 export const notificationService = {
   /**
    * Get notification summary (unread count + 5 latest)
@@ -19,7 +39,8 @@ export const notificationService = {
    * Used for badge polling
    */
   getUnreadCount: async (): Promise<number> => {
-    return await apiClient.get<number>('/api/notifications/unread-count');
+    const data = await apiClient.get<unknown>('/api/notifications/unread-count');
+    return normalizeUnreadCount(data);
   },
 
   /**

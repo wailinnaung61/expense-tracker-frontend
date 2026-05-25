@@ -1,7 +1,10 @@
 import { Bell, CheckCheck, X } from 'lucide-react';
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { notificationService } from '@/services/notificationService';
+import {
+  notificationService,
+  normalizeUnreadCount,
+} from '@/services/notificationService';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { NotificationDto, NotificationSummary } from '@/types/notification';
 import { Button } from '@/components/ui/button';
@@ -17,7 +20,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'react-toastify';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-const POLL_INTERVAL = 180000; // 3 minutes
+const POLL_INTERVAL_MS = 30_000; // 30 seconds
 
 export function NotificationBell() {
   const { t } = useTranslation();
@@ -27,54 +30,74 @@ export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Load summary when dropdown opens
+  /** Lightweight fetch for the badge — runs on mount, poll, and tab focus. */
+  const refreshUnreadCount = useCallback(async (options?: { silent?: boolean }) => {
+    const silent = options?.silent ?? true;
+    try {
+      const count = await notificationService.getUnreadCount();
+      setUnreadCount(count);
+    } catch (error) {
+      console.error('Failed to fetch unread count:', error);
+      if (!silent) {
+        toast.error(t('notifications.error.loadFailed'));
+      }
+    }
+  }, [t]);
+
   const loadSummary = useCallback(async () => {
     try {
       setLoading(true);
       const data = await notificationService.getSummary();
       setSummary(data);
-      setUnreadCount(data.unreadCount);
+      setUnreadCount(normalizeUnreadCount(data.unreadCount));
     } catch (error) {
       console.error('Failed to load notifications:', error);
       toast.error(t('notifications.error.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
-  // Poll for unread count
+  // Badge count: load immediately, poll, refresh when tab gains focus
   useEffect(() => {
-    const pollUnreadCount = async () => {
-      try {
-        const count = await notificationService.getUnreadCount();
-        setUnreadCount(count);
-      } catch (error) {
-        console.error('Failed to poll unread count:', error);
+    void refreshUnreadCount();
+
+    const interval = setInterval(() => {
+      void refreshUnreadCount();
+    }, POLL_INTERVAL_MS);
+
+    const onFocus = () => {
+      void refreshUnreadCount();
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void refreshUnreadCount();
       }
     };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
-    // Initial load - use summary to get count
-    loadSummary();
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [refreshUnreadCount]);
 
-    // Set up polling for just the count (lighter endpoint)
-    const interval = setInterval(pollUnreadCount, POLL_INTERVAL);
-
-    return () => clearInterval(interval);
-  }, [loadSummary]);
-
-  // Load summary when dropdown opens
-  useEffect(() => {
-    if (isOpen) {
-      loadSummary();
+  // Dropdown list: load when opened; refresh badge when closed
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open) {
+      void loadSummary();
+    } else {
+      void refreshUnreadCount();
     }
-  }, [isOpen, loadSummary]);
+  };
 
   const handleNotificationClick = async (notification: NotificationDto) => {
     try {
-      // Mark as read
       if (!notification.isRead) {
         await notificationService.markAsRead(notification.id);
-        // Update local state
         setUnreadCount((prev) => Math.max(0, prev - 1));
         if (summary) {
           setSummary({
@@ -87,14 +110,13 @@ export function NotificationBell() {
         }
       }
 
-      // Navigate based on reference type
       if (notification.referenceType && notification.referenceId) {
         const routeMap: Record<string, string> = {
           budget: `/budget`,
-          saving: `/savings`,
-          investment: `/investments`,
-          transaction: `/transactions`,
-          bill: `/transactions`,
+          saving: `/saving`,
+          investment: `/investment`,
+          transaction: `/tranaction`,
+          bill: `/tranaction`,
         };
         const route = routeMap[notification.referenceType.toLowerCase()];
         if (route) {
@@ -135,8 +157,8 @@ export function NotificationBell() {
     e.stopPropagation();
     try {
       await notificationService.deleteNotification(notificationId);
-      // Reload summary
       await loadSummary();
+      await refreshUnreadCount();
       toast.success(t('notifications.success.deleted'));
     } catch (error) {
       console.error('Failed to delete notification:', error);
@@ -145,21 +167,31 @@ export function NotificationBell() {
   };
 
   const getNotificationIcon = () => {
-    // Customize based on notification type
     return <Bell className="h-4 w-4" />;
   };
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative overflow-visible"
+          aria-label={
+            unreadCount > 0
+              ? `${t('notifications.title')} (${unreadCount})`
+              : t('notifications.title')
+          }
+        >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+            <span
+              className="pointer-events-none absolute -right-0.5 -top-0.5 z-10 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-none text-destructive-foreground shadow-sm"
+              aria-hidden
+            >
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}
-          <span className="sr-only">Notifications</span>
         </Button>
       </DropdownMenuTrigger>
 
@@ -199,7 +231,7 @@ export function NotificationBell() {
                 <DropdownMenuItem
                   key={notification.id}
                   className={cn(
-                    'flex cursor-pointer items-start gap-3 px-3 py-3',
+                    'group flex cursor-pointer items-start gap-3 px-3 py-3',
                     !notification.isRead && 'bg-accent/50'
                   )}
                   onClick={() => handleNotificationClick(notification)}
@@ -213,7 +245,7 @@ export function NotificationBell() {
                         {notification.title}
                       </p>
                       {!notification.isRead && (
-                        <div className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
+                        <div className="h-2 w-2 shrink-0 rounded-full bg-blue-500" />
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground line-clamp-2">

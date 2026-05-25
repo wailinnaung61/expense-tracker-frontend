@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCalculatorState } from "./calculator-state";
 import {
-  daysInCurrentMonth,
   formatApplyValue,
   formatResult,
   parseExpression,
@@ -46,7 +46,7 @@ const KEYS: KeyDef[] = [
 
 function BasicTab({ onApply, onClose }: CalculatorPanelProps) {
   const { t } = useTranslation();
-  const [expr, setExpr] = useState("");
+  const { expr, setExpr } = useCalculatorState();
   const [error, setError] = useState(false);
 
   const normalise = (s: string) =>
@@ -140,15 +140,20 @@ function BasicTab({ onApply, onClose }: CalculatorPanelProps) {
 
 function ExpenseTab({ onApply, onClose }: CalculatorPanelProps) {
   const { t } = useTranslation();
-
-  const [splitTotal, setSplitTotal] = useState("");
-  const [splitPeople, setSplitPeople] = useState("2");
-
-  const [tipBill, setTipBill] = useState("");
-  const [tipPct, setTipPct] = useState("10");
-
-  const [perDayAmount, setPerDayAmount] = useState("");
-  const [perDayDays, setPerDayDays] = useState(String(daysInCurrentMonth()));
+  const {
+    splitTotal,
+    splitPeople,
+    tipBill,
+    tipPct,
+    perDayAmount,
+    perDayDays,
+    setSplitTotal,
+    setSplitPeople,
+    setTipBill,
+    setTipPct,
+    setPerDayAmount,
+    setPerDayDays,
+  } = useCalculatorState();
 
   const apply = (n: number) => {
     onApply?.(formatApplyValue(n));
@@ -308,10 +313,11 @@ function ExpenseTab({ onApply, onClose }: CalculatorPanelProps) {
 
 export function CalculatorPanel({ onApply, onClose }: CalculatorPanelProps) {
   const { t } = useTranslation();
+  const { activeTab, setActiveTab } = useCalculatorState();
 
   return (
     <div className="w-72">
-      <Tabs defaultValue="basic">
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "basic" | "expense")}>
         <TabsList className="w-full">
           <TabsTrigger value="basic" className="flex-1 text-xs">
             {t("calculator.basicTab")}
