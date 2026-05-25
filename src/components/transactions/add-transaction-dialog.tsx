@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CategoryCombobox } from "@/components/categories/category-combobox";
 import { ApiError } from "@/lib/api";
 import { categoryService } from "@/services/categoryService";
 import { budgetService } from "@/services/budgetService";
@@ -46,6 +47,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useDirtyDialogGuard } from "@/hooks/useDirtyDialogGuard";
 import {
   dateFnsLocaleForLanguage,
   formatBudgetRangeLabel,
@@ -102,8 +104,11 @@ export function AddTransactionDialog({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const amountInputRef = useRef<HTMLInputElement | null>(null);
+  const addAnotherRef = useRef(false);
   const { t, i18n } = useTranslation();
   const [expenseBudgetHint, setExpenseBudgetHint] = useState<ExpenseBudgetHint>({ kind: "hidden" });
+  const isEditMode = Boolean(transaction && transaction.tranactionId);
 
   const transactionSchema = useMemo(() => z.object({
     type: z.string().min(1, t("validation.typeRequired")),
@@ -124,7 +129,7 @@ export function AddTransactionDialog({
   const {
     control,
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
     handleSubmit,
     reset,
     watch,
@@ -250,14 +255,15 @@ export function AddTransactionDialog({
         
         setCategories(Array.from(seen.values()));
       } catch (error) {
-        // Silent fail - categories will be  empty array
+        console.error("Failed to load categories for dialog:", error);
+        toast.error(t("errors.categoriesLoadFailed"));
       }
     };
 
     if (open) {
       fetchCategories();
     }
-  }, [open]);
+  }, [open, t]);
 
   // Filter categories when transaction type changes
   useEffect(() => {
@@ -278,6 +284,16 @@ export function AddTransactionDialog({
       setFilteredCategories([]);
     }
   }, [selectedType, categories, setValue, watch]);
+
+  // Autofocus the amount input when opening in create mode for quick repeated entry
+  useEffect(() => {
+    if (open && !isEditMode) {
+      const id = window.setTimeout(() => {
+        amountInputRef.current?.focus();
+      }, 80);
+      return () => window.clearTimeout(id);
+    }
+  }, [open, isEditMode]);
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -335,6 +351,7 @@ export function AddTransactionDialog({
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
       console.error('Invalid file type:', file.type);
+      toast.error(t("errors.invalidFileType"));
       return;
     }
 
@@ -342,6 +359,7 @@ export function AddTransactionDialog({
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       console.error('File too large:', file.size);
+      toast.error(t("errors.fileTooLarge"));
       return;
     }
 
@@ -383,7 +401,7 @@ export function AddTransactionDialog({
         } catch (uploadError: any) {
           setUploading(false);
           console.error('Failed to upload receipt:', uploadError);
-          toast.error(uploadError.message || 'Failed to upload receipt');
+          toast.error(uploadError.message || t("errors.receiptUploadFailed"));
           return;
         }
       }
@@ -409,18 +427,46 @@ export function AddTransactionDialog({
         toast.success(t("transactions.addDialog.createSuccess"));
       }
       onSuccess();
-      onOpenChange(false);
+
+      const shouldAddAnother = addAnotherRef.current && !isEditMode;
+      addAnotherRef.current = false;
+
+      if (shouldAddAnother) {
+        // Keep dialog open, keep type/category, clear amount + notes + receipt
+        reset({
+          type: data.type,
+          categoryId: data.categoryId,
+          amount: "",
+          tranactionDate: data.tranactionDate,
+          status: data.status,
+          description: "",
+          note: "",
+          imageUrl: "",
+        });
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        window.setTimeout(() => {
+          amountInputRef.current?.focus();
+        }, 50);
+      } else {
+        onOpenChange(false);
+      }
     } catch (error: any) {
       console.error('Failed to save transaction:', error);
       console.error('Error response:', error.message);
-      toast.error(error.message || 'Failed to save transaction. Please try again.');
+      toast.error(error.message || t("errors.transactionSaveFailed"));
     } finally {
       setUploading(false);
     }
   };
 
+  const guardedOnOpenChange = useDirtyDialogGuard(isDirty, onOpenChange);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={guardedOnOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
@@ -503,36 +549,23 @@ export function AddTransactionDialog({
                 name="categoryId"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder={t("transactions.addDialog.categoryPlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-75">
-                      {selectedType === "" ? (
-                        <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
-                          {t("transactions.addDialog.selectTypeFirst")}
-                        </div>
-                      ) : filteredCategories.length === 0 ? (
-                        <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
-                          {t("transactions.addDialog.noCategoriesForType")}
-                        </div>
-                      ) : (
-                        filteredCategories.map((category) => (
-                          <SelectItem
-                            key={category.categoryId}
-                            value={category.categoryId}
-                          >
-                            <div className="flex items-center gap-2" style={{ color: category.color }}>
-                              <span className="text-lg">
-                                {category.icon}
-                              </span>
-                              <span>{category.displayName}</span>
-                            </div>
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <CategoryCombobox
+                    id="category"
+                    value={field.value}
+                    onChange={field.onChange}
+                    categories={filteredCategories}
+                    placeholder={
+                      selectedType === ""
+                        ? t("transactions.addDialog.selectTypeFirst")
+                        : filteredCategories.length === 0
+                        ? t("transactions.addDialog.noCategoriesForType")
+                        : t("transactions.addDialog.categoryPlaceholder")
+                    }
+                    emptyHint={t("transactions.addDialog.noCategoriesForType")}
+                    disabled={selectedType === "" || filteredCategories.length === 0}
+                    invalid={!!errors.categoryId}
+                    contentClassName="max-h-75"
+                  />
                 )}
               />
               {errors.categoryId && (
@@ -543,13 +576,22 @@ export function AddTransactionDialog({
             {/* Amount */}
             <div>
               <Label htmlFor="amount">{t("transactions.addDialog.amountLabel")}</Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                {...register("amount")}
-              />
+              {(() => {
+                const { ref: rhfRef, ...amountField } = register("amount");
+                return (
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    ref={(el) => {
+                      rhfRef(el);
+                      amountInputRef.current = el;
+                    }}
+                    {...amountField}
+                  />
+                );
+              })()}
               {errors.amount && (
                 <p className="text-sm text-red-600">{errors.amount.message}</p>
               )}
@@ -772,12 +814,30 @@ export function AddTransactionDialog({
             <Button 
               type="button"
               variant="outline" 
-              onClick={() => onOpenChange(false)}
+              onClick={() => guardedOnOpenChange(false)}
               disabled={isSubmitting || uploading}
             >
               {t("common.cancel")}
             </Button>
-            <Button type="submit" disabled={isSubmitting || uploading}>
+            {!isEditMode && (
+              <Button
+                type="submit"
+                variant="outline"
+                disabled={isSubmitting || uploading}
+                onClick={() => {
+                  addAnotherRef.current = true;
+                }}
+              >
+                {t("transactions.addDialog.saveAndAddAnother")}
+              </Button>
+            )}
+            <Button
+              type="submit"
+              disabled={isSubmitting || uploading}
+              onClick={() => {
+                addAnotherRef.current = false;
+              }}
+            >
               {uploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

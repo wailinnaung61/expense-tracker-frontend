@@ -16,6 +16,7 @@ import {
 import { format, parse, addMonths, subMonths, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { dateFnsLocaleForLanguage } from "@/lib/budget-period";
 
 export type DashboardMode = "monthly" | "custom";
 
@@ -54,12 +55,13 @@ export function DashboardHeader({
   onApplyCustom,
   customError,
 }: DashboardHeaderProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = dateFnsLocaleForLanguage(i18n.language);
   const [startOpen, setStartOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
 
   const parsed = parse(month, "yyyy-MM", new Date());
-  const label = format(parsed, "MMMM yyyy");
+  const label = format(parsed, "MMMM yyyy", { locale: dateLocale });
 
   const goPrev = () => onMonthChange(format(subMonths(parsed, 1), "yyyy-MM"));
   const goNext = () => {
@@ -156,7 +158,7 @@ export function DashboardHeader({
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {customStart
-                        ? format(parseISO(customStart), "MMM dd, yyyy")
+                        ? format(parseISO(customStart), "PP", { locale: dateLocale })
                         : t("dashboard.startDate")}
                     </Button>
                   </PopoverTrigger>
@@ -191,7 +193,7 @@ export function DashboardHeader({
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {customEnd
-                        ? format(parseISO(customEnd), "MMM dd, yyyy")
+                        ? format(parseISO(customEnd), "PP", { locale: dateLocale })
                         : t("dashboard.endDate")}
                     </Button>
                   </PopoverTrigger>

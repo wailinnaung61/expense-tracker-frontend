@@ -24,11 +24,12 @@ import { aggregationService } from "@/services/aggregationService";
 import { Link } from "react-router-dom";
 import type { ExpenseBreakdown, MonthlyAggregation } from "@/types/aggregation";
 import { formatCurrency } from "@/lib/utils";
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { ChevronLeft, ChevronRight, PiggyBank, TrendingUp, ArrowRight, Wallet, CreditCard, Receipt, CalendarIcon } from "lucide-react";
 import { format, addMonths, subMonths, parseISO } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
 import { useTranslation } from "@/hooks/useTranslation";
+import { dateFnsLocaleForLanguage } from "@/lib/budget-period";
 
 interface TransactionStatsProps {
   currency?: string;
@@ -65,20 +66,8 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
-  const { t } = useTranslation();
-  const queryRef = useRef({
-    currentMonth,
-    useCustomRange,
-    customStartDate,
-    customEndDate,
-  });
-
-  queryRef.current = {
-    currentMonth,
-    useCustomRange,
-    customStartDate,
-    customEndDate,
-  };
+  const { t, i18n } = useTranslation();
+  const dateLocale = dateFnsLocaleForLanguage(i18n.language);
 
   const fetchExpenseBreakdown = useCallback(async (
     date: Date,
@@ -129,47 +118,27 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
     }
   }, []);
 
-  // Initial fetch when month changes
+  // Single fetch path. After add/edit/delete (refreshKey > 0) wait ~600 ms
+  // for backend aggregation to settle, then refetch once. clearTimeout cancels
+  // pending refetches if the user changes month/range mid-wait.
   useEffect(() => {
-    fetchExpenseBreakdown(currentMonth, {
-      useCustomRange,
-      customStartDate,
-      customEndDate,
-    });
-  }, [currentMonth, fetchExpenseBreakdown, useCustomRange, customStartDate, customEndDate]);
-
-  // Refresh when transaction changes - retry with delay for backend aggregation consistency
-  useEffect(() => {
-    if (refreshKey === 0) return; // Skip on initial mount
-    const {
-      currentMonth: latestMonth,
-      useCustomRange: latestUseCustomRange,
-      customStartDate: latestCustomStartDate,
-      customEndDate: latestCustomEndDate,
-    } = queryRef.current;
-
-    fetchExpenseBreakdown(latestMonth, {
-      useCustomRange: latestUseCustomRange,
-      customStartDate: latestCustomStartDate,
-      customEndDate: latestCustomEndDate,
-    });
-    // Retry after a short delay to catch backend aggregation updates
+    const delay = refreshKey === 0 ? 0 : 600;
     const timer = setTimeout(() => {
-      const {
-        currentMonth: retryMonth,
-        useCustomRange: retryUseCustomRange,
-        customStartDate: retryCustomStartDate,
-        customEndDate: retryCustomEndDate,
-      } = queryRef.current;
-
-      fetchExpenseBreakdown(retryMonth, {
-        useCustomRange: retryUseCustomRange,
-        customStartDate: retryCustomStartDate,
-        customEndDate: retryCustomEndDate,
+      fetchExpenseBreakdown(currentMonth, {
+        useCustomRange,
+        customStartDate,
+        customEndDate,
       });
-    }, 2000);
+    }, delay);
     return () => clearTimeout(timer);
-  }, [refreshKey, fetchExpenseBreakdown]);
+  }, [
+    currentMonth,
+    useCustomRange,
+    customStartDate,
+    customEndDate,
+    refreshKey,
+    fetchExpenseBreakdown,
+  ]);
 
   const handlePreviousMonth = useCallback(() => {
     setCurrentMonth(prev => subMonths(prev, 1));
@@ -261,11 +230,11 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
               {monthlyData ? (
                 <>
                   <span className="text-xs">
-                    {format(new Date(monthlyData.periodStart), "MMM dd")} - {format(new Date(monthlyData.periodEnd), "MMM dd, yyyy")}
+                    {format(new Date(monthlyData.periodStart), "MMM dd", { locale: dateLocale })} - {format(new Date(monthlyData.periodEnd), "PP", { locale: dateLocale })}
                   </span>
                 </>
               ) : (
-                t("transactions.stats.financialSummary", { month: format(currentMonth, "MMMM yyyy") })
+                t("transactions.stats.financialSummary", { month: format(currentMonth, "MMMM yyyy", { locale: dateLocale }) })
               )}
             </CardDescription>
           </div>
@@ -297,7 +266,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                       className="h-7 w-36 justify-start text-left text-xs font-normal"
                     >
                       <CalendarIcon className="mr-1.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                      {customStartDateObj ? format(customStartDateObj, "MMM dd, yyyy") : t("transactions.stats.customStartDate")}
+                      {customStartDateObj ? format(customStartDateObj, "PP", { locale: dateLocale }) : t("transactions.stats.customStartDate")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -318,7 +287,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                       className="h-7 w-36 justify-start text-left text-xs font-normal"
                     >
                       <CalendarIcon className="mr-1.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                      {customEndDateObj ? format(customEndDateObj, "MMM dd, yyyy") : t("transactions.stats.customEndDate")}
+                      {customEndDateObj ? format(customEndDateObj, "PP", { locale: dateLocale }) : t("transactions.stats.customEndDate")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -350,7 +319,7 @@ export default function TransactionStats({ currency = "USD", refreshKey = 0 }: T
                   size="sm"
                   className="h-7 px-3 text-xs font-medium hover:bg-accent"
                 >
-                  {format(currentMonth, "MMM yyyy")}
+                  {format(currentMonth, "MMM yyyy", { locale: dateLocale })}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-70 p-4" align="center" sideOffset={8}>

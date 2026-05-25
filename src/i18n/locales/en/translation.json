@@ -6,7 +6,6 @@
     "delete": "Delete",
     "edit": "Edit",
     "add": "Add",
-    "search": "Search",
     "yes": "Yes",
     "no": "No",
     "confirm": "Confirm",
@@ -45,7 +44,14 @@
     "septemberShort": "Sep",
     "octoberShort": "Oct",
     "novemberShort": "Nov",
-    "decemberShort": "Dec"
+    "decemberShort": "Dec",
+    "search": {
+      "placeholder": "Search...",
+      "noResults": "No results",
+      "selectCategory": "Select category",
+      "allCategories": "All categories"
+    },
+    "unsavedWarning": "You have unsaved changes. Are you sure you want to close?"
   },
   "auth": {
     "login": "Login",
@@ -230,7 +236,17 @@
   "errors": {
     "fetchFailed": "Failed to fetch data",
     "networkError": "Network error. Please check your connection.",
-    "unknownError": "An unknown error occurred"
+    "unknownError": "An unknown error occurred",
+    "transactionsLoadFailed": "Failed to load transactions",
+    "categoriesLoadFailed": "Failed to load categories",
+    "dashboardLoadFailed": "Failed to load dashboard data",
+    "transactionSaveFailed": "Failed to save transaction. Please try again.",
+    "transactionDeleteFailed": "Failed to delete transaction",
+    "transactionStatusFailed": "Failed to update transaction status",
+    "categorySaveFailed": "Failed to save category",
+    "receiptUploadFailed": "Failed to upload receipt",
+    "invalidFileType": "Invalid file type. Please upload an image or PDF.",
+    "fileTooLarge": "File is too large. Maximum size is 5MB."
   },
   "landing": {
     "badge": "The Future of Personal Finance",
@@ -703,6 +719,7 @@
       "uploading": "Uploading...",
       "saving": "Saving...",
       "save": "Save Transaction",
+      "saveAndAddAnother": "Save & Add Another",
       "createSuccess": "Transaction created successfully",
       "updateSuccess": "Transaction updated successfully",
       "budgetHintLoading": "Checking budget for this month…",

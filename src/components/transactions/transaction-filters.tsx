@@ -14,12 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  CategoryCombobox,
+  CATEGORY_COMBOBOX_ALL_VALUE,
+} from "@/components/categories/category-combobox";
 import { useTranslation } from "@/hooks/useTranslation";
 import { categoryService } from "@/services/categoryService";
 import type { ExpenseCategory, CategoryListParams } from "@/types/category";
 import { format } from "date-fns";
 import { AlertTriangle, CalendarIcon, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { dateFnsLocaleForLanguage } from "@/lib/budget-period";
 
 interface TransactionFiltersProps {
   type: string;
@@ -52,7 +57,8 @@ export function TransactionFilters({
   onEndDateChange,
   categoriesRefreshKey = 0,
 }: TransactionFiltersProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = dateFnsLocaleForLanguage(i18n.language);
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [startDateLocal, setStartDateLocal] = useState<Date | undefined>(
     startDate ? new Date(startDate) : undefined
@@ -64,7 +70,33 @@ export function TransactionFilters({
     !!startDateLocal &&
     !!endDateLocal &&
     startDateLocal.getTime() > endDateLocal.getTime();
-  const selectedCategory = categories.find((cat) => cat.categoryId === categoryId);
+
+  // Debounced keyword search: keep a local mirror, push to parent after 350 ms
+  const [keywordLocal, setKeywordLocal] = useState(keyword);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync local keyword if parent resets it externally (e.g., from URL)
+  useEffect(() => {
+    setKeywordLocal((current) => (current === keyword ? current : keyword));
+  }, [keyword]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleKeywordInput = (value: string) => {
+    setKeywordLocal(value);
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      onKeywordChange(value);
+    }, 350);
+  };
 
   const handleStartDateSelect = (date: Date | undefined) => {
     setStartDateLocal(date);
@@ -140,8 +172,8 @@ export function TransactionFilters({
             <Input
               placeholder={t("transactions.filters.searchPlaceholder")}
               className="ps-10 h-11 border-muted-foreground/20 focus-visible:ring-2"
-              value={keyword}
-              onChange={(e) => onKeywordChange(e.target.value)}
+              value={keywordLocal}
+              onChange={(e) => handleKeywordInput(e.target.value)}
             />
           </div>
           
@@ -171,29 +203,20 @@ export function TransactionFilters({
               </SelectContent>
             </Select>
             
-            <Select value={categoryId} onValueChange={onCategoryChange}>
-              <SelectTrigger className="h-10 w-full border-muted-foreground/20 sm:h-11 sm:w-40">
-                {categoryId === "all" || !selectedCategory ? (
-                  <SelectValue placeholder="Category" />
-                ) : (
-                  <div className="flex items-center gap-2" style={{ color: selectedCategory.color }}>
-                    <span>{selectedCategory.icon}</span>
-                    <span className="truncate">{selectedCategory.displayName}</span>
-                  </div>
-                )}
-              </SelectTrigger>
-              <SelectContent className="max-h-100">
-                <SelectItem value="all">{t("transactions.filters.allCategories")}</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.categoryId} value={cat.categoryId}>
-                    <div className="flex items-center gap-2" style={{ color: cat.color }}>
-                      <span>{cat.icon}</span>
-                      <span>{cat.displayName}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CategoryCombobox
+              value={categoryId === "all" ? CATEGORY_COMBOBOX_ALL_VALUE : categoryId}
+              onChange={(next) => {
+                onCategoryChange(
+                  next === CATEGORY_COMBOBOX_ALL_VALUE ? "all" : next
+                );
+              }}
+              categories={categories}
+              includeAllOption
+              allLabel={t("transactions.filters.allCategories")}
+              placeholder={t("transactions.filters.allCategories")}
+              triggerClassName="h-10 border-muted-foreground/20 sm:h-11 sm:w-40"
+              contentClassName="max-h-100"
+            />
           </div>
         </div>
 
@@ -207,7 +230,7 @@ export function TransactionFilters({
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {startDateLocal ? (
-                  <span className="font-medium">{format(startDateLocal, "PPP")}</span>
+                  <span className="font-medium">{format(startDateLocal, "PPP", { locale: dateLocale })}</span>
                 ) : (
                   <span className="text-muted-foreground">{t("transactions.filters.startDate")}</span>
                 )}
@@ -231,7 +254,7 @@ export function TransactionFilters({
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {endDateLocal ? (
-                  <span className="font-medium">{format(endDateLocal, "PPP")}</span>
+                  <span className="font-medium">{format(endDateLocal, "PPP", { locale: dateLocale })}</span>
                 ) : (
                   <span className="text-muted-foreground">{t("transactions.filters.endDate")}</span>
                 )}

@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CategoryCombobox } from "@/components/categories/category-combobox";
 import { categoryService } from "@/services/categoryService";
 import { transactionService } from "@/services/transactionService";
 import type { ExpenseCategory } from "@/types/category";
@@ -30,6 +31,7 @@ import { useEffect, useState, useRef, useMemo } from "react";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "@/hooks/useTranslation";
+import { dateFnsLocaleForLanguage } from "@/lib/budget-period";
 
 interface BulkAddTransactionDialogProps {
   open: boolean;
@@ -74,7 +76,8 @@ export function BulkAddTransactionDialog({
   const [rowErrors, setRowErrors] = useState<Record<string, RowErrors>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const amountInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = dateFnsLocaleForLanguage(i18n.language);
 
   const transactionRowSchema = useMemo(() => z.object({
     categoryId: z.string().min(1, t("validation.categoryRequired")),
@@ -363,33 +366,16 @@ export function BulkAddTransactionDialog({
                   {/* Category */}
                   <td className="p-2">
                     <div>
-                      <Select
+                      <CategoryCombobox
                         value={row.categoryId}
-                        onValueChange={(value) => updateRow(row.id, "categoryId", value)}
-                      >
-                        <SelectTrigger className={`h-9 w-full ${rowErrors[row.id]?.categoryId ? 'border-destructive' : ''}`}>
-                          <SelectValue placeholder={t("transactions.bulkAdd.categoryPlaceholder")} />
-                        </SelectTrigger>
-                        <SelectContent position="popper" className="max-h-60 w-(--radix-select-trigger-width) max-w-75" sideOffset={4}>
-                          {getFilteredCategories(row.type).length === 0 ? (
-                            <div className="p-4 text-sm text-muted-foreground">
-                              {t("transactions.bulkAdd.noCategories")}
-                            </div>
-                          ) : (
-                            getFilteredCategories(row.type).map((category) => (
-                              <SelectItem 
-                                key={category.categoryId} 
-                                value={category.categoryId}
-                              >
-                                <span className="flex items-center gap-2">
-                                  <span>{category.icon}</span>
-                                  <span>{category.displayName}</span>
-                                </span>
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                        onChange={(value) => updateRow(row.id, "categoryId", value)}
+                        categories={getFilteredCategories(row.type)}
+                        placeholder={t("transactions.bulkAdd.categoryPlaceholder")}
+                        emptyHint={t("transactions.bulkAdd.noCategories")}
+                        invalid={!!rowErrors[row.id]?.categoryId}
+                        triggerClassName="h-9"
+                        contentClassName="max-h-60 max-w-75"
+                      />
                       {rowErrors[row.id]?.categoryId && (
                         <p className="text-xs text-destructive mt-1">{rowErrors[row.id].categoryId}</p>
                       )}
@@ -423,7 +409,7 @@ export function BulkAddTransactionDialog({
                           className="h-9 w-full justify-start text-left font-normal"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {format(row.date, "MMM dd")}
+                          {format(row.date, "MMM dd", { locale: dateLocale })}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start" sideOffset={4}>

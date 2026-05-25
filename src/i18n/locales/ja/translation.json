@@ -6,7 +6,6 @@
     "delete": "削除",
     "edit": "編集",
     "add": "追加",
-    "search": "検索",
     "yes": "はい",
     "no": "いいえ",
     "confirm": "確認",
@@ -45,7 +44,14 @@
     "septemberShort": "9月",
     "octoberShort": "10月",
     "novemberShort": "11月",
-    "decemberShort": "12月"
+    "decemberShort": "12月",
+    "search": {
+      "placeholder": "検索...",
+      "noResults": "該当なし",
+      "selectCategory": "カテゴリを選択",
+      "allCategories": "すべてのカテゴリ"
+    },
+    "unsavedWarning": "保存されていない変更があります。閉じてもよろしいですか？"
   },
   "auth": {
     "login": "ログイン",
@@ -230,7 +236,17 @@
   "errors": {
     "fetchFailed": "データの取得に失敗しました",
     "networkError": "ネットワークエラーが発生しました。接続を確認してください。",
-    "unknownError": "不明なエラーが発生しました"
+    "unknownError": "不明なエラーが発生しました",
+    "transactionsLoadFailed": "取引の読み込みに失敗しました",
+    "categoriesLoadFailed": "カテゴリの読み込みに失敗しました",
+    "dashboardLoadFailed": "ダッシュボードの読み込みに失敗しました",
+    "transactionSaveFailed": "取引の保存に失敗しました。もう一度お試しください。",
+    "transactionDeleteFailed": "取引の削除に失敗しました",
+    "transactionStatusFailed": "取引ステータスの更新に失敗しました",
+    "categorySaveFailed": "カテゴリの保存に失敗しました",
+    "receiptUploadFailed": "領収書のアップロードに失敗しました",
+    "invalidFileType": "ファイル形式が無効です。画像またはPDFをアップロードしてください。",
+    "fileTooLarge": "ファイルサイズが大きすぎます。最大5MBまでです。"
   },
   "landing": {
     "badge": "次世代のパーソナルファイナンス",
@@ -703,6 +719,7 @@
       "uploading": "アップロード中...",
       "saving": "保存中...",
       "save": "取引を保存",
+      "saveAndAddAnother": "保存して続けて追加",
       "createSuccess": "取引を作成しました",
       "updateSuccess": "取引を更新しました",
       "budgetHintLoading": "この月の予算を確認しています…",

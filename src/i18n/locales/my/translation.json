@@ -6,7 +6,6 @@
     "delete": "ဖျက်မည်",
     "edit": "ပြင်မည်",
     "add": "ထည့်မည်",
-    "search": "ရှာမည်",
     "yes": "ဟုတ်ကဲ့",
     "no": "မဟုတ်ဘူး",
     "confirm": "အတည်ပြုမည်",
@@ -45,7 +44,14 @@
     "septemberShort": "စက်",
     "octoberShort": "အောက်",
     "novemberShort": "နို",
-    "decemberShort": "ဒီ"
+    "decemberShort": "ဒီ",
+    "search": {
+      "placeholder": "ရှာဖွေပါ...",
+      "noResults": "ရလဒ်မရှိ",
+      "selectCategory": "အမျိုးအစားရွေးပါ",
+      "allCategories": "အမျိုးအစားအားလုံး"
+    },
+    "unsavedWarning": "သိမ်းမထားသော ပြောင်းလဲမှုများရှိနေပါသည်။ ပိတ်လိုပါသလား?"
   },
   "auth": {
     "login": "ဝင်မည်",
@@ -230,7 +236,17 @@
   "errors": {
     "fetchFailed": "ဒေတာရယ်၍မရပါ",
     "networkError": "အင်တာနက်ချိတ်ဆက်မှုပြဿနာရှိနေပါသည်။",
-    "unknownError": "အမည်မသိအမှားတစ်ခုဖြစ်ပေါ်ခဲ့သည်"
+    "unknownError": "အမည်မသိအမှားတစ်ခုဖြစ်ပေါ်ခဲ့သည်",
+    "transactionsLoadFailed": "ငွေသွင်းငွေထုတ်များကို ဖတ်ရှု၍မရပါ",
+    "categoriesLoadFailed": "အမျိုးအစားများကို ဖတ်ရှု၍မရပါ",
+    "dashboardLoadFailed": "ဒက်ရှ်ဘုတ်ဒေတာကို ဖတ်ရှု၍မရပါ",
+    "transactionSaveFailed": "ငွေသွင်းငွေထုတ်ကို သိမ်း၍မရပါ။ ထပ်မံကြိုးစားပါ။",
+    "transactionDeleteFailed": "ငွေသွင်းငွေထုတ်ကို ဖျက်၍မရပါ",
+    "transactionStatusFailed": "ငွေသွင်းငွေထုတ်အခြေအနေကို ပြောင်း၍မရပါ",
+    "categorySaveFailed": "အမျိုးအစားကို သိမ်း၍မရပါ",
+    "receiptUploadFailed": "ဘောက်ချာတင်၍မရပါ",
+    "invalidFileType": "ဖိုင်အမျိုးအစား မမှန်ပါ။ ဓာတ်ပုံ သို့မဟုတ် PDF ကိုသာ တင်ပါ။",
+    "fileTooLarge": "ဖိုင်အရွယ်အစား ကြီးလွန်းပါသည်။ အများဆုံး 5MB ဖြစ်ပါသည်။"
   },
   "landing": {
     "badge": "ခေတ်မီငွေကြေးစီမံမှု၏ အစပြုခြင်း",
@@ -703,6 +719,7 @@
       "uploading": "တင်နေသည်...",
       "saving": "သိမ်းနေသည်...",
       "save": "ငွေသွင်းထုတ် သိမ်းမည်",
+      "saveAndAddAnother": "သိမ်းပြီး ထပ်ထည့်မည်",
       "createSuccess": "ငွေသွင်းထုတ် ဖန်တီးပြီးပြီ",
       "updateSuccess": "ငွေသွင်းထုတ် ပြင်ဆင်ပြီးပြီ",
       "budgetHintLoading": "ဒီလ ဘတ်ဂျက်ကို စစ်ဆေးနေပါသည်…",

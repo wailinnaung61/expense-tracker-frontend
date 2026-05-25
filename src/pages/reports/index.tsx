@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { format, endOfMonth } from "date-fns";
 import { useTranslation } from "@/hooks/useTranslation";
+import { dateFnsLocaleForLanguage } from "@/lib/budget-period";
 import { formatCurrency } from "@/lib/utils";
 import {
   CHATBOT_REFRESH_EVENT,
@@ -104,7 +105,8 @@ function parseYyyyMmParam(value: string | null): { y: number; m: number } | null
 }
 
 export default function Reports() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = dateFnsLocaleForLanguage(i18n.language);
   const [searchParams] = useSearchParams();
   const appliedUrlPrefillRef = useRef(false);
   const [year, setYear] = useState(new Date().getFullYear());
@@ -889,7 +891,7 @@ export default function Reports() {
                         return (
                           <TableRow key={tx.tranactionId}>
                             <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                              {format(new Date(tx.tranactionDate), "MMM dd")}
+                              {format(new Date(tx.tranactionDate), "MMM dd", { locale: dateLocale })}
                             </TableCell>
                             <TableCell className="min-w-0 max-w-[220px]">
                               <div className="flex items-center gap-1.5 min-w-0">

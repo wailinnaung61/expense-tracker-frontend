@@ -6,6 +6,9 @@ import ClientTransactionStats from "@/components/transactions/client-transaction
 import type { Transaction, TransactionListParams } from "@/types/transaction";
 import type { ExpenseCategory } from "@/types/category";
 import { useEffect, useState, useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useTranslation } from "@/hooks/useTranslation";
 import spinnerGif from "@/assets/Spinner.gif";
 import { transactionService } from "@/services/transactionService";
 import { categoryService } from "@/services/categoryService";
@@ -18,13 +21,8 @@ import { CHATBOT_REFRESH_EVENT, type ChatbotRefreshEventDetail } from "@/lib/cha
 
 export default function Transactions() {
   const { user } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [categories, setCategories] = useState<ExpenseCategory[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [type, setType] = useState<string>("all");
-  const [status, setStatus] = useState<string>("all");
-  const [categoryId, setCategoryId] = useState<string>("all");
-  const [keyword, setKeyword] = useState<string>("");
+  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const currentMonthRange = useMemo(() => {
     const now = new Date();
@@ -34,8 +32,37 @@ export default function Transactions() {
     };
   }, []);
 
-  const [startDate, setStartDate] = useState<string>(currentMonthRange.start);
-  const [endDate, setEndDate] = useState<string>(currentMonthRange.end);
+  // Filters are sourced from URL search params so they survive reload / back-button
+  const type = searchParams.get("type") ?? "all";
+  const status = searchParams.get("status") ?? "all";
+  const categoryId = searchParams.get("categoryId") ?? "all";
+  const keyword = searchParams.get("keyword") ?? "";
+  const startDate = searchParams.get("startDate") ?? currentMonthRange.start;
+  const endDate = searchParams.get("endDate") ?? currentMonthRange.end;
+
+  const updateFilterParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          for (const [key, value] of Object.entries(updates)) {
+            if (value === null || value === "") {
+              next.delete(key);
+            } else {
+              next.set(key, value);
+            }
+          }
+          return next;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
+
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [categories, setCategories] = useState<ExpenseCategory[]>([]);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -75,10 +102,11 @@ export default function Transactions() {
       });
 
       setCategories(Array.from(seen.values()));
-    } catch {
-      // Silent fail - categories remain empty.
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      toast.error(t("errors.categoriesLoadFailed"));
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void fetchCategories();
@@ -137,11 +165,12 @@ export default function Transactions() {
         setHasNextPage(response.hasNextPage);
       } catch (error) {
         console.error("Failed to fetch transactions:", error);
+        toast.error(t("errors.transactionsLoadFailed"));
       } finally {
         setLoading(false);
       }
     },
-    [type, status, categoryId, keyword, startDate, endDate, pageSize]
+    [type, status, categoryId, keyword, startDate, endDate, pageSize, t]
   );
 
   useEffect(() => {
@@ -178,53 +207,42 @@ export default function Transactions() {
     };
   }, []);
 
-  const handleTypeChange = useCallback((newType: string) => {
-    setType(newType);
+  const resetPagination = useCallback(() => {
     setCurrentPage(1);
     setCurrentCursor(null);
     setCurrentCursorId(null);
     setCursorHistory([]);
   }, []);
+
+  const handleTypeChange = useCallback((newType: string) => {
+    updateFilterParams({ type: newType === "all" ? null : newType });
+    resetPagination();
+  }, [updateFilterParams, resetPagination]);
 
   const handleStatusChange = useCallback((newStatus: string) => {
-    setStatus(newStatus);
-    setCurrentPage(1);
-    setCurrentCursor(null);
-    setCurrentCursorId(null);
-    setCursorHistory([]);
-  }, []);
+    updateFilterParams({ status: newStatus === "all" ? null : newStatus });
+    resetPagination();
+  }, [updateFilterParams, resetPagination]);
 
   const handleCategoryChange = useCallback((newCategoryId: string) => {
-    setCategoryId(newCategoryId);
-    setCurrentPage(1);
-    setCurrentCursor(null);
-    setCurrentCursorId(null);
-    setCursorHistory([]);
-  }, []);
+    updateFilterParams({ categoryId: newCategoryId === "all" ? null : newCategoryId });
+    resetPagination();
+  }, [updateFilterParams, resetPagination]);
 
   const handleKeywordChange = useCallback((newKeyword: string) => {
-    setKeyword(newKeyword);
-    setCurrentPage(1);
-    setCurrentCursor(null);
-    setCurrentCursorId(null);
-    setCursorHistory([]);
-  }, []);
+    updateFilterParams({ keyword: newKeyword.trim() || null });
+    resetPagination();
+  }, [updateFilterParams, resetPagination]);
 
   const handleStartDateChange = useCallback((newStartDate: string) => {
-    setStartDate(newStartDate);
-    setCurrentPage(1);
-    setCurrentCursor(null);
-    setCurrentCursorId(null);
-    setCursorHistory([]);
-  }, []);
+    updateFilterParams({ startDate: newStartDate || null });
+    resetPagination();
+  }, [updateFilterParams, resetPagination]);
 
   const handleEndDateChange = useCallback((newEndDate: string) => {
-    setEndDate(newEndDate);
-    setCurrentPage(1);
-    setCurrentCursor(null);
-    setCurrentCursorId(null);
-    setCursorHistory([]);
-  }, []);
+    updateFilterParams({ endDate: newEndDate || null });
+    resetPagination();
+  }, [updateFilterParams, resetPagination]);
 
   const handleNextPage = useCallback(() => {
     if (hasNextPage && nextCursor && nextCursorId) {
@@ -275,17 +293,10 @@ export default function Transactions() {
   }, []);
 
   const handleDialogSuccess = useCallback(() => {
-    setCurrentPage(1);
-    if (startDate === currentMonthRange.start && endDate === currentMonthRange.end) {
-      setStartDate(currentMonthRange.start);
-      setEndDate(currentMonthRange.end);
-    }
-    setCurrentCursor(null);
-    setCurrentCursorId(null);
-    setCursorHistory([]);
+    resetPagination();
     setTransactionsRefreshKey((prev) => prev + 1);
     setSummaryRefreshKey((prev) => prev + 1);
-  }, [currentMonthRange, startDate, endDate]);
+  }, [resetPagination]);
 
   const handleDeleteSuccess = useCallback(() => {
     setTransactionsRefreshKey((prev) => prev + 1);
@@ -293,15 +304,12 @@ export default function Transactions() {
   }, []);
 
   const handleRefreshClick = useCallback(() => {
-    setCurrentPage(1);
-    setCurrentCursor(null);
-    setCurrentCursorId(null);
-    setCursorHistory([]);
+    resetPagination();
     setTransactionsRefreshKey((prev) => prev + 1);
     setSummaryRefreshKey((prev) => prev + 1);
     setCategoriesRefreshKey((prev) => prev + 1);
     setRecurringPaymentsRefreshKey((prev) => prev + 1);
-  }, []);
+  }, [resetPagination]);
 
   return (
     <div className="space-y-4 px-3 pb-2 sm:space-y-6 sm:px-0 sm:pb-0">

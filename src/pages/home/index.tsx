@@ -16,6 +16,7 @@ import type { ExpenseCategory } from "@/types/category";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { format, subMonths, addMonths } from "date-fns";
 import spinnerGif from "@/assets/Spinner.gif";
+import { toast } from "react-toastify";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   CHATBOT_REFRESH_EVENT,
@@ -64,12 +65,13 @@ export default function Home() {
       setData(dashRes);
       if (!cachedProfile) setProfile(profRes);
       if (cachedCategories.length === 0) setCategories(catRes.items);
-    } catch {
-      // silent
+    } catch (error) {
+      console.error("Failed to load dashboard:", error);
+      toast.error(t("errors.dashboardLoadFailed"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const fetchCustomRange = useCallback(async (start: string, end: string) => {
     setLoading(true);
@@ -87,12 +89,13 @@ export default function Home() {
       setData(dashRes);
       if (!cachedProfile) setProfile(profRes);
       if (cachedCategories.length === 0) setCategories(catRes.items);
-    } catch {
-      // silent
+    } catch (error) {
+      console.error("Failed to load dashboard:", error);
+      toast.error(t("errors.dashboardLoadFailed"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const queryRef = useRef({ mode, month, appliedStart, appliedEnd });
   queryRef.current = { mode, month, appliedStart, appliedEnd };

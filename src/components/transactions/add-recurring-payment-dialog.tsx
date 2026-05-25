@@ -23,7 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CategoryCombobox } from "@/components/categories/category-combobox";
 import { categoryService } from "@/services/categoryService";
+import { dateFnsLocaleForLanguage } from "@/lib/budget-period";
 import { recurringPaymentService } from "@/services/recurringPaymentService";
 import type { ExpenseCategory } from "@/types/category";
 import type {
@@ -44,6 +46,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useDirtyDialogGuard } from "@/hooks/useDirtyDialogGuard";
 
 interface AddRecurringPaymentDialogProps {
   open: boolean;
@@ -69,7 +72,8 @@ export function AddRecurringPaymentDialog({
 }: AddRecurringPaymentDialogProps) {
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = dateFnsLocaleForLanguage(i18n.language);
 
   const recurringPaymentSchema = useMemo(() => z.object({
     name: z.string().min(1, t("validation.nameRequired")),
@@ -90,7 +94,7 @@ export function AddRecurringPaymentDialog({
     handleSubmit,
     control,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<RecurringPaymentFormData>({
     resolver: zodResolver(recurringPaymentSchema),
     defaultValues: {
@@ -151,7 +155,7 @@ export function AddRecurringPaymentDialog({
         name: "",
         amount: "",
         categoryId: "",
-        frequency: "",
+        frequency: RecurringFrequency.Monthly.toString(),
         nextDueDate: new Date(),
         autoPay: false,
       });
@@ -198,14 +202,16 @@ export function AddRecurringPaymentDialog({
       reset();
     } catch (error: any) {
       console.error('Failed to save recurring payment:', error);
-      toast.error(error.message || 'Failed to save recurring payment. Please try again.');
+      toast.error(error.message || t("errors.transactionSaveFailed"));
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const guardedOnOpenChange = useDirtyDialogGuard(isDirty, onOpenChange);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={guardedOnOpenChange}>
       <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>
@@ -254,21 +260,14 @@ export function AddRecurringPaymentDialog({
               name="categoryId"
               control={control}
               render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("transactions.recurringDialog.categoryPlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem
-                        key={category.categoryId}
-                        value={category.categoryId}
-                      >
-                        {category.icon} {category.displayName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <CategoryCombobox
+                  id="categoryId"
+                  value={field.value}
+                  onChange={field.onChange}
+                  categories={categories}
+                  placeholder={t("transactions.recurringDialog.categoryPlaceholder")}
+                  invalid={!!errors.categoryId}
+                />
               )}
             />
             {errors.categoryId && (
@@ -324,7 +323,7 @@ export function AddRecurringPaymentDialog({
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {field.value ? (
-                        format(field.value, "PPP")
+                        format(field.value, "PPP", { locale: dateLocale })
                       ) : (
                         <span>{t("transactions.recurringDialog.pickDate")}</span>
                       )}
@@ -369,7 +368,7 @@ export function AddRecurringPaymentDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => guardedOnOpenChange(false)}
               disabled={isSubmitting}
             >
               {t("common.cancel")}

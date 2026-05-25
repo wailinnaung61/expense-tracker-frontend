@@ -25,6 +25,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useDirtyDialogGuard } from "@/hooks/useDirtyDialogGuard";
 
 interface AddCategoryDialogProps {
   open: boolean;
@@ -76,7 +77,7 @@ export function AddCategoryDialog({
     control,
     reset,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
@@ -133,11 +134,14 @@ export function AddCategoryDialog({
       onOpenChange(false);
     } catch (error: any) {
       console.error("Failed to save category:", error);
+      toast.error(error?.message || t("errors.categorySaveFailed"));
     }
   };
 
+  const guardedOnOpenChange = useDirtyDialogGuard(isDirty, onOpenChange);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={guardedOnOpenChange}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
@@ -274,7 +278,7 @@ export function AddCategoryDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => guardedOnOpenChange(false)}
               disabled={isSubmitting}
             >
               {t('common.cancel')}

@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import { transactionService } from "@/services/transactionService";
 import { formatCurrency } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
+import { dateFnsLocaleForLanguage } from "@/lib/budget-period";
 
 interface TransactionsTableProps {
   transactions: Transaction[];
@@ -54,7 +55,8 @@ export default function TransactionsTable({
   currency = "USD",
 }: TransactionsTableProps) {
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dateLocale = dateFnsLocaleForLanguage(i18n.language);
 
   const getCategoryById = (categoryId: string) => {
     return categories.find((cat) => cat.categoryId === categoryId);
@@ -128,6 +130,7 @@ export default function TransactionsTable({
         onDelete();
       } catch (error: any) {
         console.error("Failed to delete transaction:", error);
+        toast.error(error?.message || t("errors.transactionDeleteFailed"));
       }
     }
   };
@@ -148,6 +151,7 @@ export default function TransactionsTable({
       onDelete(); // Refresh the list
     } catch (error: any) {
       console.error("Failed to update status:", error);
+      toast.error(error?.message || t("errors.transactionStatusFailed"));
     }
   };
 
@@ -218,7 +222,7 @@ export default function TransactionsTable({
                       </span>
                     </TableCell>
                     <TableCell className="px-4 py-3 min-w-32">
-                      {format(new Date(transaction.tranactionDate), "MMM dd, yyyy")}
+                      {format(new Date(transaction.tranactionDate), "PP", { locale: dateLocale })}
                     </TableCell>
                     <TableCell
                       className={`px-4 py-3 font-semibold ${
