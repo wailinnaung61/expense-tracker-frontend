@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { AmountFieldCalculatorTrigger } from "@/components/calculator/amount-field-calculator-trigger";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
@@ -385,15 +386,21 @@ export function BulkAddTransactionDialog({
                   {/* Amount */}
                   <td className="p-2">
                     <div>
-                      <Input
-                        ref={(el) => { amountInputRefs.current[row.id] = el; }}
-                        type="number"
-                        placeholder="0.00"
-                        step="0.01"
-                        value={row.amount}
-                        onChange={(e) => updateRow(row.id, "amount", e.target.value)}
-                        className={`h-9 ${rowErrors[row.id]?.amount ? 'border-destructive' : ''}`}
-                      />
+                      <div className="flex gap-1">
+                        <Input
+                          ref={(el) => { amountInputRefs.current[row.id] = el; }}
+                          type="number"
+                          placeholder="0.00"
+                          step="0.01"
+                          value={row.amount}
+                          onChange={(e) => updateRow(row.id, "amount", e.target.value)}
+                          className={`h-9 flex-1 ${rowErrors[row.id]?.amount ? 'border-destructive' : ''}`}
+                        />
+                        <AmountFieldCalculatorTrigger
+                          onApply={(v) => updateRow(row.id, "amount", v)}
+                          className="h-9 w-9 shrink-0"
+                        />
+                      </div>
                       {rowErrors[row.id]?.amount && (
                         <p className="text-xs text-destructive mt-1">{rowErrors[row.id].amount}</p>
                       )}

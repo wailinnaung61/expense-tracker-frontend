@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { AmountFieldCalculatorTrigger } from "@/components/calculator/amount-field-calculator-trigger";
 import {
   Dialog,
   DialogContent,
@@ -81,6 +82,7 @@ export function ContributionDialog({
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ContributionFormData>({
     resolver: zodResolver(contributionSchema),
@@ -321,14 +323,20 @@ export function ContributionDialog({
             <Label htmlFor="amount" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               {t("savings.contribution.amount")} *
             </Label>
-            <Input
-              id="amount"
-              type="number"
-              step="any"
-              placeholder="0.00"
-              className="h-11 text-lg font-semibold"
-              {...register("amount")}
-            />
+            <div className="flex gap-2">
+              <Input
+                id="amount"
+                type="number"
+                step="any"
+                placeholder="0.00"
+                className="h-11 text-lg font-semibold flex-1"
+                {...register("amount")}
+              />
+              <AmountFieldCalculatorTrigger
+                onApply={(v) => setValue("amount", v, { shouldDirty: true })}
+                className="h-11 w-11"
+              />
+            </div>
             {errors.amount && (
               <p className="text-xs text-red-600">{errors.amount.message}</p>
             )}

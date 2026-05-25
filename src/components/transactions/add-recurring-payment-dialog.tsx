@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { AmountFieldCalculatorTrigger } from "@/components/calculator/amount-field-calculator-trigger";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -94,6 +95,7 @@ export function AddRecurringPaymentDialog({
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors, isDirty },
   } = useForm<RecurringPaymentFormData>({
     resolver: zodResolver(recurringPaymentSchema),
@@ -241,13 +243,19 @@ export function AddRecurringPaymentDialog({
           {/* Amount */}
           <div className="space-y-2">
             <Label htmlFor="amount">{t("transactions.recurringDialog.amountLabel")}</Label>
-            <Input
-              id="amount"
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              {...register("amount")}
-            />
+            <div className="flex gap-2">
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                className="flex-1"
+                {...register("amount")}
+              />
+              <AmountFieldCalculatorTrigger
+                onApply={(v) => setValue("amount", v, { shouldDirty: true })}
+              />
+            </div>
             {errors.amount && (
               <p className="text-sm text-red-500">{errors.amount.message}</p>
             )}

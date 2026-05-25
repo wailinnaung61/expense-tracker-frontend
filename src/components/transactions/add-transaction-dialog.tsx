@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { AmountFieldCalculatorTrigger } from "@/components/calculator/amount-field-calculator-trigger";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
@@ -576,22 +577,28 @@ export function AddTransactionDialog({
             {/* Amount */}
             <div>
               <Label htmlFor="amount">{t("transactions.addDialog.amountLabel")}</Label>
-              {(() => {
-                const { ref: rhfRef, ...amountField } = register("amount");
-                return (
-                  <Input
-                    id="amount"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    ref={(el) => {
-                      rhfRef(el);
-                      amountInputRef.current = el;
-                    }}
-                    {...amountField}
-                  />
-                );
-              })()}
+              <div className="flex gap-2">
+                {(() => {
+                  const { ref: rhfRef, ...amountField } = register("amount");
+                  return (
+                    <Input
+                      id="amount"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      className="flex-1"
+                      ref={(el) => {
+                        rhfRef(el);
+                        amountInputRef.current = el;
+                      }}
+                      {...amountField}
+                    />
+                  );
+                })()}
+                <AmountFieldCalculatorTrigger
+                  onApply={(v) => setValue("amount", v, { shouldDirty: true })}
+                />
+              </div>
               {errors.amount && (
                 <p className="text-sm text-red-600">{errors.amount.message}</p>
               )}

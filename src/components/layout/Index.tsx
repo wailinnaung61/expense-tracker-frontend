@@ -7,6 +7,7 @@ import { HorizontalHeader } from "./header/horizontal-header";
 import { VerticalHeader } from "./header/vertical-header";
 import { Sidebar } from "./sidebar";
 import { ChatBot } from "@/components/chatbot/ChatBot";
+import { CalculatorFab } from "@/components/calculator/calculator-fab";
 
 export function Layout() {
   const { layout, direction } = useThemeContext();
@@ -56,6 +57,8 @@ export function Layout() {
         <Footer />
       </div>
 
+      {/* Calculator */}
+      <CalculatorFab />
       {/* AI Chat Bot */}
       <ChatBot />
     </div>

@@ -1319,5 +1319,31 @@
       "deleteFailed": "削除に失敗しました",
       "clearReadFailed": "既読のクリアに失敗しました"
     }
+  },
+  "calculator": {
+    "title": "電卓",
+    "open": "電卓を開く",
+    "close": "電卓を閉じる",
+    "basicTab": "基本",
+    "expenseTab": "費用計算",
+    "useResult": "結果を使用",
+    "clear": "クリア",
+    "equals": "イコール",
+    "invalidExpression": "無効な式",
+    "splitBill": {
+      "title": "割り勘",
+      "total": "合計",
+      "people": "人数"
+    },
+    "tip": {
+      "title": "チップ計算",
+      "bill": "請求金額",
+      "percent": "チップ率 %"
+    },
+    "perDay": {
+      "title": "1日あたり",
+      "amount": "月額",
+      "days": "日数"
+    }
   }
 }

@@ -1318,5 +1318,31 @@
       "deleteFailed": "Failed to delete notification",
       "clearReadFailed": "Failed to clear read notifications"
     }
+  },
+  "calculator": {
+    "title": "Calculator",
+    "open": "Open calculator",
+    "close": "Close calculator",
+    "basicTab": "Basic",
+    "expenseTab": "Expense",
+    "useResult": "Use result",
+    "clear": "Clear",
+    "equals": "Equals",
+    "invalidExpression": "Invalid expression",
+    "splitBill": {
+      "title": "Split bill",
+      "total": "Total",
+      "people": "People"
+    },
+    "tip": {
+      "title": "Tip calculator",
+      "bill": "Bill amount",
+      "percent": "Tip %"
+    },
+    "perDay": {
+      "title": "Per day",
+      "amount": "Monthly amount",
+      "days": "Days in month"
+    }
   }
 }
