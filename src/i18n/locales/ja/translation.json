@@ -500,6 +500,9 @@
       "lockedNoticeTitle": "今月追跡されていないカテゴリがあります",
       "lockedNoticeDescription": "これらのカテゴリは存在しますが、今月の予算に含まれていません。下の「カテゴリを追加」セクションから追加できます。",
       "noCategories": "この予算は存在しますが、管理するカテゴリ配分はまだありません。",
+      "filterLabel": "カテゴリで絞り込み",
+      "filterAll": "すべてのカテゴリ",
+      "noFilterResults": "この条件に一致するカテゴリはありません。",
       "addCategory": "予算にカテゴリを追加",
       "add": "追加"
     },

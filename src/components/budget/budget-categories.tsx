@@ -5,6 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import {
+  CategoryCombobox,
+  CATEGORY_COMBOBOX_ALL_VALUE,
+} from "@/components/categories/category-combobox";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatCurrency } from "@/lib/utils";
 import type { BudgetCategoryDto } from "@/types/budget";
@@ -82,6 +86,7 @@ export function BudgetCategories({
   const { t } = useTranslation();
   const [drafts, setDrafts] = useState<Record<string, CategoryDraft>>({});
   const [addAmounts, setAddAmounts] = useState<Record<string, string>>({});
+  const [categoryFilterId, setCategoryFilterId] = useState(CATEGORY_COMBOBOX_ALL_VALUE);
 
   useEffect(() => {
     setDrafts(
@@ -97,6 +102,7 @@ export function BudgetCategories({
         ])
       )
     );
+    setCategoryFilterId(CATEGORY_COMBOBOX_ALL_VALUE);
   }, [categories]);
 
   const totalAllocated = useMemo(() => {
@@ -124,6 +130,20 @@ export function BudgetCategories({
 
   const sortedCategories = [...categories].sort((a, b) => a.sortOrder - b.sortOrder);
 
+  const filterableCategories = useMemo(() => {
+    const byId = new Map(availableCategories.map((c) => [c.categoryId, c]));
+    return sortedCategories
+      .map((bc) => byId.get(bc.categoryId))
+      .filter((c): c is ExpenseCategory => c !== undefined);
+  }, [sortedCategories, availableCategories]);
+
+  const displayedCategories = useMemo(() => {
+    if (categoryFilterId === CATEGORY_COMBOBOX_ALL_VALUE) {
+      return sortedCategories;
+    }
+    return sortedCategories.filter((c) => c.categoryId === categoryFilterId);
+  }, [sortedCategories, categoryFilterId]);
+
   // Categories not yet tracked in this budget
   const trackedCategoryIds = new Set(categories.map((c) => c.categoryId));
   const untrackedCategories = availableCategories.filter(
@@ -133,10 +153,31 @@ export function BudgetCategories({
   return (
     <Card className="overflow-hidden rounded-3xl border bg-card shadow-sm">
       <CardHeader className="border-b bg-card pb-4">
-        <CardTitle className="text-foreground">{t("budget.categories.title")}</CardTitle>
-        <CardDescription className="text-muted-foreground">
-          {t("budget.categories.description")}
-        </CardDescription>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-foreground">{t("budget.categories.title")}</CardTitle>
+            <CardDescription className="text-muted-foreground">
+              {t("budget.categories.description")}
+            </CardDescription>
+          </div>
+          {sortedCategories.length > 0 && (
+            <div className="w-full shrink-0 sm:w-52">
+              <Label htmlFor="budget-category-filter" className="sr-only">
+                {t("budget.categories.filterLabel")}
+              </Label>
+              <CategoryCombobox
+                id="budget-category-filter"
+                value={categoryFilterId}
+                onChange={setCategoryFilterId}
+                categories={filterableCategories}
+                includeAllOption
+                allLabel={t("budget.categories.filterAll")}
+                placeholder={t("budget.categories.filterAll")}
+                triggerClassName="h-10"
+              />
+            </div>
+          )}
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-5 pt-6">
@@ -204,9 +245,13 @@ export function BudgetCategories({
           <div className="rounded-2xl border border-dashed bg-muted/40 p-10 text-center text-sm text-muted-foreground">
             {t("budget.categories.noCategories")}
           </div>
+        ) : displayedCategories.length === 0 ? (
+          <div className="rounded-2xl border border-dashed bg-muted/40 p-10 text-center text-sm text-muted-foreground">
+            {t("budget.categories.noFilterResults")}
+          </div>
         ) : (
           <div className="space-y-4">
-            {sortedCategories.map((category) => {
+            {displayedCategories.map((category) => {
               const draft = drafts[category.budgetCategoryId] ?? {
                 allocatedAmount: String(category.allocated),
                 alertThresholdPercent: String(

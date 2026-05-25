@@ -500,6 +500,9 @@
       "lockedNoticeTitle": "ဒီလမှာ မပါဝင်သော expense category များ ရှိနေသည်",
       "lockedNoticeDescription": "ဤ categories များ ရှိသော်လည်း ဒီလ budget တွင် မပါဝင်သေးပါ။ အောက်ရှိ Add Category မှ ထည့်သွင်းနိုင်သည်။",
       "noCategories": "ဒီ budget ရှိပေမယ့် စီမံရန် category allocation မရှိသေးပါ။",
+      "filterLabel": "အမျိုးအစားဖြင့် စစ်ထုတ်ပါ",
+      "filterAll": "အမျိုးအစားအားလုံး",
+      "noFilterResults": "ဒီစစ်ထုတ်မှုနှင့် ကိုက်ညီသော အမျိုးအစား မရှိပါ။",
       "addCategory": "Budget သို့ Category ထည့်မည်",
       "add": "ထည့်မည်"
     },

@@ -500,6 +500,9 @@
       "lockedNoticeTitle": "Some expense categories are not tracked this month",
       "lockedNoticeDescription": "These categories exist but are not part of this month's budget. Use the Add Category section below to include them.",
       "noCategories": "This budget exists, but there are no category allocations to manage yet.",
+      "filterLabel": "Filter by category",
+      "filterAll": "All categories",
+      "noFilterResults": "No category matches this filter.",
       "addCategory": "Add Category to Budget",
       "add": "Add"
     },
