@@ -116,11 +116,10 @@ export const authService = {
   },
 
   // Change password
-  async changePassword(data: { currentPassword: string; newPassword: string; confirmPassword: string }): Promise<{ message: string }> {
+  async changePassword(data: { currentPassword: string; newPassword: string }): Promise<{ message: string }> {
     const changeRequest: UserChangePasswordRequest = {
-      currentPassword: data.currentPassword,
+      oldPassword: data.currentPassword,
       newPassword: data.newPassword,
-      confirmPassword: data.confirmPassword
     }
     return apiClient.post('/api/Auth/change-password', changeRequest)
   },

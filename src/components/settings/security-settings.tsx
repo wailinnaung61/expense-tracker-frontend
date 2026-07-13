@@ -110,7 +110,6 @@ export function SecuritySettings() {
       const response = await authService.changePassword({
         currentPassword: data.currentPassword,
         newPassword: data.newPassword,
-        confirmPassword: data.confirmPassword,
       });
       toast.success(
         response.message || t("settings.security.changePasswordSuccess")

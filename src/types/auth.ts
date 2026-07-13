@@ -76,11 +76,10 @@ export interface UserResetPasswordRequest {
   newPassword: string
 }
 
-// Change Password
+// Change Password (matches backend UserChangePasswordRequest)
 export interface UserChangePasswordRequest {
-  currentPassword: string
+  oldPassword: string
   newPassword: string
-  confirmPassword: string
 }
 
 // User Profile
