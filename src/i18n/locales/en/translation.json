@@ -866,6 +866,18 @@
       "verifyEmail": "Verify Email"
     },
     "security": {
+      "changePasswordTitle": "Password",
+      "changePasswordDescription": "Update your account password",
+      "passwordLabel": "Account password",
+      "passwordHelp": "Use a strong password you don't reuse elsewhere",
+      "changePassword": "Change Password",
+      "changePasswordDialogDescription": "Enter your current password and choose a new one.",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "changingPassword": "Changing...",
+      "changePasswordSuccess": "Password changed successfully",
+      "changePasswordFailed": "Failed to change password",
       "mfaTitle": "Two-Factor Authentication",
       "mfaDescription": "Add an extra layer of security to your account",
       "enableMfa": "Enable 2FA",

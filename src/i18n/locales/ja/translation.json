@@ -866,6 +866,18 @@
       "verifyEmail": "メールを確認"
     },
     "security": {
+      "changePasswordTitle": "パスワード",
+      "changePasswordDescription": "アカウントのパスワードを更新します",
+      "passwordLabel": "アカウントパスワード",
+      "passwordHelp": "他で使っていない強力なパスワードを使用してください",
+      "changePassword": "パスワードを変更",
+      "changePasswordDialogDescription": "現在のパスワードを入力し、新しいパスワードを設定してください。",
+      "currentPassword": "現在のパスワード",
+      "newPassword": "新しいパスワード",
+      "confirmPassword": "新しいパスワード（確認）",
+      "changingPassword": "変更中...",
+      "changePasswordSuccess": "パスワードを変更しました",
+      "changePasswordFailed": "パスワードの変更に失敗しました",
       "mfaTitle": "二要素認証",
       "mfaDescription": "アカウントにセキュリティレイヤーを追加します",
       "enableMfa": "2FAを有効にする",

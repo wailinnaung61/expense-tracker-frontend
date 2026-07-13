@@ -866,6 +866,18 @@
       "verifyEmail": "အီးမေးလ် အတည်ပြုပါ"
     },
     "security": {
+      "changePasswordTitle": "စကားဝှက်",
+      "changePasswordDescription": "သင့်အကောင့် စကားဝှက်ကို အပ်ဒိတ်လုပ်ပါ",
+      "passwordLabel": "အကောင့် စကားဝှက်",
+      "passwordHelp": "အခြားနေရာတွင် မသုံးသော ခိုင်မာသော စကားဝှက်ကို သုံးပါ",
+      "changePassword": "စကားဝှက် ပြောင်းရန်",
+      "changePasswordDialogDescription": "လက်ရှိ စကားဝှက်ကို ထည့်ပြီး စကားဝှက်အသစ် ရွေးချယ်ပါ။",
+      "currentPassword": "လက်ရှိ စကားဝှက်",
+      "newPassword": "စကားဝှက်အသစ်",
+      "confirmPassword": "စကားဝှက်အသစ် အတည်ပြုရန်",
+      "changingPassword": "ပြောင်းနေသည်...",
+      "changePasswordSuccess": "စကားဝှက်ကို အောင်မြင်စွာ ပြောင်းပြီးပြီ",
+      "changePasswordFailed": "စကားဝှက် ပြောင်းခြင်း မအောင်မြင်ပါ",
       "mfaTitle": "နှစ်ဆင့် အတည်ပြုချက်",
       "mfaDescription": "သင့်အကောင့်အတွက် လုံခြုံမှု အလွှာထပ်တိုး ထည့်ပါ",
       "enableMfa": "2FA ဖွင့်ပါ",
