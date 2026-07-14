@@ -71,6 +71,7 @@ const FUNCTION_REFRESH_MAP: Record<string, ChatRefreshTarget> = {
   update_recurring_payment: "recurring_payments",
   delete_recurring_payment: "recurring_payments",
   mark_recurring_paid: "recurring_payments",
+  acknowledge_recurring_paid: "recurring_payments",
 
   list_saving_goals: "savings",
   create_saving_goal: "savings",

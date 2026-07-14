@@ -169,6 +169,33 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
     }
   };
 
+  const handleAcknowledgePaid = async (payment: RecurringPayment) => {
+    const result = await Swal.fire({
+      title: t("transactions.upcoming.acknowledgeConfirmTitle"),
+      text: t("transactions.upcoming.acknowledgeConfirmText", { name: payment.name }),
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3b82f6",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: t("transactions.upcoming.acknowledgeConfirmButton"),
+      cancelButtonText: t("common.cancel"),
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await recurringPaymentService.acknowledgePaid(payment.recurringId);
+        Swal.close();
+        toast.success(t("transactions.upcoming.acknowledgeSuccess"));
+        setLocalRefreshKey((prev) => prev + 1);
+      } catch (error: any) {
+        console.error("Failed to acknowledge payment:", error);
+        toast.error(
+          error?.message || t("transactions.upcoming.acknowledgeFailed")
+        );
+      }
+    }
+  };
+
   const handleEdit = (payment: RecurringPayment) => {
     setSelectedPayment(payment);
     setDialogOpen(true);
@@ -345,6 +372,11 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => handleEdit(payment)}>
                             {t("transactions.upcoming.edit")}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleAcknowledgePaid(payment)}
+                          >
+                            {t("transactions.upcoming.acknowledgePaid")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDelete(payment)}

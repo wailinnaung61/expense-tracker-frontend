@@ -62,8 +62,15 @@ export const recurringPaymentService = {
     return apiClient.delete(`/api/RecurringPayment/${recurringId}`);
   },
 
-  // Mark a recurring payment as paid
+  // Mark a recurring payment as paid (advances schedule; caller may also create a transaction)
   async markAsPaid(recurringId: string): Promise<RecurringPayment> {
     return apiClient.post<RecurringPayment>(`/api/RecurringPayment/${recurringId}/mark-paid`);
+  },
+
+  // Acknowledge paid externally (clears MissedCount without creating a transaction)
+  async acknowledgePaid(recurringId: string): Promise<RecurringPayment> {
+    return apiClient.post<RecurringPayment>(
+      `/api/RecurringPayment/${recurringId}/acknowledge-paid`
+    );
   },
 };
