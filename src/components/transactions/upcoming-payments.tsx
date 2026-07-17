@@ -28,6 +28,7 @@ import { AddRecurringPaymentDialog } from "./add-recurring-payment-dialog";
 import spinnerGif from "@/assets/Spinner.gif";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatCurrency } from "@/lib/utils";
 
 interface UpcomingPaymentsProps {
   startDate?: string;
@@ -234,24 +235,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
     setLocalRefreshKey((prev) => prev + 1);
   };
 
-  const formatCurrency = (amount: number) => {
-    const currency = user?.currency || "USD";
-    const localeMap: Record<string, string> = {
-      'USD': 'en-US',
-      'EUR': 'de-DE',
-      'GBP': 'en-GB',
-      'JPY': 'ja-JP',
-      'SGD': 'en-SG',
-      'THB': 'th-TH',
-      'MMK': 'my-MM',
-    };
-    const locale = localeMap[currency] || 'en-US';
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: currency,
-      currencyDisplay: 'symbol', // Force symbol display
-    }).format(amount);
-  };
+  const currency = user?.currency || "USD";
 
   return (
     <>
@@ -353,7 +337,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
                           daysLeft
                         )}`}
                       >
-                        {formatCurrency(payment.amount)}
+                        {formatCurrency(payment.amount, currency)}
                       </div>
                       <Button
                         variant="outline"
@@ -396,7 +380,7 @@ export function UpcomingPayments({ startDate, endDate, onTransactionCreated, ref
                 <div className="text-sm text-muted-foreground pt-2">
                   {t("transactions.upcoming.totalUpcoming")}{" "}
                   <span className="font-medium text-foreground">
-                    {formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0))}
+                    {formatCurrency(payments.reduce((sum, p) => sum + p.amount, 0), currency)}
                   </span>
                 </div>
                 {!showAll && payments.length > 5 && (
