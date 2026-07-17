@@ -273,21 +273,20 @@ export function BulkAddTransactionDialog({
 
     setIsSubmitting(true);
     try {
-      // Create all transactions in parallel
-      await Promise.all(
-        rows.map((row) =>
-          transactionService.createTransaction({
-            type: row.type as TransactionType,
-            categoryId: row.categoryId,
-            amount: Number(row.amount),
-            tranactionDate: format(row.date, "yyyy-MM-dd"),
-            status: row.status as PaymentStatus,
-            description: row.description?.trim() || "",
-            note: row.note?.trim() || "",
-            imageUrl: "",
-          })
-        )
-      );
+      // Create in row order (top → bottom) so list order matches what the user entered.
+      // Parallel create races and can insert in random order.
+      for (const row of rows) {
+        await transactionService.createTransaction({
+          type: row.type as TransactionType,
+          categoryId: row.categoryId,
+          amount: Number(row.amount),
+          tranactionDate: format(row.date, "yyyy-MM-dd"),
+          status: row.status as PaymentStatus,
+          description: row.description?.trim() || "",
+          note: row.note?.trim() || "",
+          imageUrl: "",
+        });
+      }
 
       toast.success(t("transactions.bulkAdd.createSuccess", { count: rows.length }));
       onSuccess();
