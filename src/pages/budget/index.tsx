@@ -23,6 +23,7 @@ import { budgetService } from "@/services/budgetService";
 import { categoryService } from "@/services/categoryService";
 import { profileService } from "@/services/profileService";
 import {
+  normalizeAlertThresholdPercent,
   toAlertThresholdRatio,
   type BudgetDto,
   type BudgetMonthlyResponse,
@@ -340,13 +341,14 @@ export default function Budget() {
 
   const handleSaveCategory = async (
     budgetCategoryId: string,
-    values: { allocatedAmount: number; alertThresholdPercent: number }
+    values: { allocatedAmount: number; alertThresholdPercent: number; isReserved: boolean }
   ) => {
     setSavingCategoryId(budgetCategoryId);
     try {
       await budgetService.updateBudgetCategory(budgetCategoryId, {
         allocatedAmount: values.allocatedAmount,
         alertThreshold: toAlertThresholdRatio(values.alertThresholdPercent),
+        isReserved: values.isReserved,
       });
       await loadBudget();
       toast.success(t("budget.feedback.categoryUpdated"));
@@ -359,7 +361,36 @@ export default function Budget() {
     }
   };
 
-  const handleAddCategory = async (categoryId: string, allocatedAmount: number) => {
+  const handleToggleReserved = async (budgetCategoryId: string, isReserved: boolean) => {
+    const category = budget?.categories.find((c) => c.budgetCategoryId === budgetCategoryId);
+    if (!category) return;
+
+    setSavingCategoryId(budgetCategoryId);
+    try {
+      // Keep allocatedAmount + alertThreshold in the same shape as Save Category (ratio 0–1).
+      await budgetService.updateBudgetCategory(budgetCategoryId, {
+        allocatedAmount: category.allocated,
+        alertThreshold: toAlertThresholdRatio(
+          normalizeAlertThresholdPercent(category.alertThreshold, category.allocated)
+        ),
+        isReserved,
+      });
+      await loadBudget();
+      toast.success(t("budget.feedback.categoryUpdated"));
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : t("budget.feedback.categoryUpdateFailed")
+      );
+    } finally {
+      setSavingCategoryId(null);
+    }
+  };
+
+  const handleAddCategory = async (
+    categoryId: string,
+    allocatedAmount: number,
+    isReserved = false
+  ) => {
     if (!budget?.budgetId) return false;
     try {
       await budgetService.addBudgetCategory(budget.budgetId, {
@@ -367,6 +398,7 @@ export default function Budget() {
         allocatedAmount,
         alertThreshold: 0.8,
         sortOrder: 0,
+        isReserved,
       });
       await loadBudget();
       toast.success(t("budget.feedback.categoryAdded"));
@@ -571,6 +603,7 @@ export default function Budget() {
               removingCategoryId={removingCategoryId}
               hasHiddenCategories={hasHiddenCategories}
               onSaveCategory={handleSaveCategory}
+              onToggleReserved={handleToggleReserved}
               onAddCategory={handleAddCategory}
               onRemoveCategory={handleRemoveCategory}
             />

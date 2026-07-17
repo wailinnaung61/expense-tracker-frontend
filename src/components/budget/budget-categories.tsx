@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import {
   CategoryCombobox,
   CATEGORY_COMBOBOX_ALL_VALUE,
@@ -28,9 +29,14 @@ interface BudgetCategoriesProps {
   hasHiddenCategories: boolean;
   onSaveCategory: (
     budgetCategoryId: string,
-    values: { allocatedAmount: number; alertThresholdPercent: number }
+    values: { allocatedAmount: number; alertThresholdPercent: number; isReserved: boolean }
   ) => Promise<void>;
-  onAddCategory: (categoryId: string, allocatedAmount: number) => Promise<boolean>;
+  onToggleReserved: (budgetCategoryId: string, isReserved: boolean) => Promise<void>;
+  onAddCategory: (
+    categoryId: string,
+    allocatedAmount: number,
+    isReserved: boolean
+  ) => Promise<boolean>;
   onRemoveCategory: (budgetCategoryId: string) => Promise<void>;
 }
 
@@ -80,12 +86,14 @@ export function BudgetCategories({
   removingCategoryId,
   hasHiddenCategories,
   onSaveCategory,
+  onToggleReserved,
   onAddCategory,
   onRemoveCategory,
 }: BudgetCategoriesProps) {
   const { t } = useTranslation();
   const [drafts, setDrafts] = useState<Record<string, CategoryDraft>>({});
   const [addAmounts, setAddAmounts] = useState<Record<string, string>>({});
+  const [addReserved, setAddReserved] = useState<Record<string, boolean>>({});
   const [categoryFilterId, setCategoryFilterId] = useState(CATEGORY_COMBOBOX_ALL_VALUE);
 
   useEffect(() => {
@@ -144,7 +152,6 @@ export function BudgetCategories({
     return sortedCategories.filter((c) => c.categoryId === categoryFilterId);
   }, [sortedCategories, categoryFilterId]);
 
-  // Categories not yet tracked in this budget
   const trackedCategoryIds = new Set(categories.map((c) => c.categoryId));
   const untrackedCategories = availableCategories.filter(
     (c) => !trackedCategoryIds.has(c.categoryId)
@@ -182,7 +189,6 @@ export function BudgetCategories({
 
       <CardContent className="space-y-5 pt-6">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {/* Allocated Total */}
           <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-500/10 via-cyan-500/5 to-transparent dark:from-blue-500/20 dark:via-cyan-500/10 p-5 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-blue-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
             <div className="relative">
@@ -197,8 +203,7 @@ export function BudgetCategories({
               </div>
             </div>
           </div>
-          
-          {/* Total Budget */}
+
           <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500/10 via-green-500/5 to-transparent dark:from-emerald-500/20 dark:via-green-500/10 p-5 hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-emerald-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
             <div className="relative">
@@ -213,8 +218,7 @@ export function BudgetCategories({
               </div>
             </div>
           </div>
-          
-          {/* Unassigned */}
+
           <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-amber-500/10 via-orange-500/5 to-transparent dark:from-amber-500/20 dark:via-orange-500/10 p-5 hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-amber-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
             <div className="relative">
@@ -271,7 +275,7 @@ export function BudgetCategories({
                       category.alertThreshold,
                       category.allocated
                     ));
-              
+
               const isInvalid =
                 !Number.isFinite(allocatedAmount) ||
                 allocatedAmount < 0 ||
@@ -301,6 +305,14 @@ export function BudgetCategories({
                           <Badge variant="outline" className={statusStyles.badgeClassName}>
                             {t(statusStyles.translationKey)}
                           </Badge>
+                          {category.isReserved && (
+                            <Badge
+                              variant="outline"
+                              className="border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300"
+                            >
+                              {t("budget.categories.reservedBadge")}
+                            </Badge>
+                          )}
                         </div>
                         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                           <span>
@@ -337,6 +349,28 @@ export function BudgetCategories({
                         )}
                       </Button>
                     </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border bg-muted/20 px-4 py-3">
+                    <div>
+                      <Label
+                        htmlFor={`reserved-${category.budgetCategoryId}`}
+                        className="text-sm font-medium text-foreground"
+                      >
+                        {t("budget.categories.reserveFixed")}
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        {t("budget.categories.reserveFixedHint")}
+                      </p>
+                    </div>
+                    <Switch
+                      id={`reserved-${category.budgetCategoryId}`}
+                      checked={category.isReserved}
+                      disabled={savingCategoryId === category.budgetCategoryId}
+                      onCheckedChange={(checked) =>
+                        onToggleReserved(category.budgetCategoryId, checked)
+                      }
+                    />
                   </div>
 
                   <div className="mt-4 space-y-2">
@@ -409,6 +443,7 @@ export function BudgetCategories({
                         onSaveCategory(category.budgetCategoryId, {
                           allocatedAmount: Number(draft.allocatedAmount),
                           alertThresholdPercent: Number(draft.alertThresholdPercent),
+                          isReserved: category.isReserved,
                         })
                       }
                       disabled={!hasChanges || isInvalid || savingCategoryId === category.budgetCategoryId}
@@ -448,10 +483,11 @@ export function BudgetCategories({
               {untrackedCategories.map((cat) => {
                 const addAmount = Number(addAmounts[cat.categoryId] ?? 0);
                 const isInvalidAmount = !addAmounts[cat.categoryId] || addAmount <= 0;
-                
+                const isReserved = addReserved[cat.categoryId] ?? false;
+
                 return (
                   <div key={cat.categoryId} className="space-y-2">
-                    <div className="flex items-center gap-3 rounded-xl border bg-card p-3">
+                    <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card p-3">
                       <div
                         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-lg"
                         style={{
@@ -463,11 +499,29 @@ export function BudgetCategories({
                         {cat.icon}
                       </div>
                       <span
-                        className="flex-1 text-sm font-medium"
+                        className="min-w-24 flex-1 text-sm font-medium"
                         style={{ color: cat.color }}
                       >
                         {cat.displayName}
                       </span>
+                      <div className="flex items-center gap-2">
+                        <Label
+                          htmlFor={`add-reserved-${cat.categoryId}`}
+                          className="text-xs text-muted-foreground whitespace-nowrap"
+                        >
+                          {t("budget.categories.reserveFixed")}
+                        </Label>
+                        <Switch
+                          id={`add-reserved-${cat.categoryId}`}
+                          checked={isReserved}
+                          onCheckedChange={(checked) =>
+                            setAddReserved((prev) => ({
+                              ...prev,
+                              [cat.categoryId]: checked,
+                            }))
+                          }
+                        />
+                      </div>
                       <Input
                         type="number"
                         inputMode="decimal"
@@ -486,10 +540,12 @@ export function BudgetCategories({
                         onClick={async () => {
                           const wasAdded = await onAddCategory(
                             cat.categoryId,
-                            Number(addAmounts[cat.categoryId] ?? 0)
+                            Number(addAmounts[cat.categoryId] ?? 0),
+                            isReserved
                           );
                           if (wasAdded) {
                             setAddAmounts((prev) => ({ ...prev, [cat.categoryId]: "" }));
+                            setAddReserved((prev) => ({ ...prev, [cat.categoryId]: false }));
                           }
                         }}
                       >

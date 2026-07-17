@@ -3,7 +3,7 @@ import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatCurrency } from "@/lib/utils";
 import type { BudgetSummaryDto, TopSpendingDto } from "@/types/budget";
-import { Target, TrendingUp, Wallet, WalletCards } from "lucide-react";
+import { Lock, PiggyBank, Target, TrendingUp, WalletCards } from "lucide-react";
 
 interface BudgetSummaryProps {
   summary: BudgetSummaryDto;
@@ -34,7 +34,7 @@ export function BudgetSummary({
       : "bg-emerald-500";
 
   const paceMessage =
-    summary.remaining < 0
+    summary.spendableRemaining < 0
       ? t("budget.summary.paceOver")
       : summary.usagePercent >= 85
       ? t("budget.summary.paceWarning")
@@ -42,36 +42,68 @@ export function BudgetSummary({
 
   const overviewCards = [
     {
-      key: "budget",
-      label: t("budget.summary.totalBudget"),
-      value: formatCurrency(summary.totalBudget, currency),
-      tone: "border-emerald-200 dark:border-emerald-800 bg-linear-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 text-emerald-700 dark:text-emerald-300",
-      iconBg: "bg-emerald-500",
-      icon: WalletCards,
-    },
-    {
-      key: "spent",
-      label: t("budget.summary.totalSpent"),
-      value: formatCurrency(summary.totalSpent, currency),
-      tone: "border-red-200 dark:border-red-800 bg-linear-to-br from-red-50 to-rose-100 dark:from-red-950 dark:to-rose-900 text-red-700 dark:text-red-300",
-      iconBg: "bg-red-500",
-      icon: Wallet,
-    },
-    {
       key: "remaining",
-      label: t("budget.summary.remaining"),
+      label: t("budget.summary.totalRemaining"),
       value: formatCurrency(summary.remaining, currency),
-      tone: "border-blue-200 dark:border-blue-800 bg-linear-to-br from-blue-50 to-cyan-100 dark:from-blue-950 dark:to-cyan-900 text-blue-700 dark:text-blue-300",
-      iconBg: "bg-blue-500",
+      colors: {
+        from: "from-blue-500/10",
+        via: "via-cyan-500/5",
+        orb: "from-blue-400/20",
+        iconFrom: "from-blue-500",
+        iconTo: "to-cyan-600",
+        text: "text-blue-600 dark:text-blue-400",
+        label: "text-blue-700 dark:text-blue-300",
+        shadow: "blue",
+      },
       icon: Target,
     },
     {
-      key: "usage",
-      label: t("budget.summary.budgetUsed"),
-      value: `${summary.usagePercent}%`,
-      tone: "border-violet-200 dark:border-violet-800 bg-linear-to-br from-violet-50 to-fuchsia-100 dark:from-violet-950 dark:to-fuchsia-900 text-violet-700 dark:text-violet-300",
-      iconBg: "bg-violet-500",
-      icon: TrendingUp,
+      key: "reserved",
+      label: t("budget.summary.reserved"),
+      value: formatCurrency(summary.reservedRemaining, currency),
+      colors: {
+        from: "from-amber-500/10",
+        via: "via-orange-500/5",
+        orb: "from-amber-400/20",
+        iconFrom: "from-amber-500",
+        iconTo: "to-orange-600",
+        text: "text-amber-600 dark:text-amber-400",
+        label: "text-amber-700 dark:text-amber-300",
+        shadow: "amber",
+      },
+      icon: Lock,
+    },
+    {
+      key: "spendable",
+      label: t("budget.summary.spendableRemaining"),
+      value: formatCurrency(summary.spendableRemaining, currency),
+      colors: {
+        from: "from-emerald-500/10",
+        via: "via-green-500/5",
+        orb: "from-emerald-400/20",
+        iconFrom: "from-emerald-500",
+        iconTo: "to-green-600",
+        text: "text-emerald-600 dark:text-emerald-400",
+        label: "text-emerald-700 dark:text-emerald-300",
+        shadow: "emerald",
+      },
+      icon: PiggyBank,
+    },
+    {
+      key: "daily",
+      label: t("budget.summary.dailyBudget"),
+      value: formatCurrency(summary.dailyBudget, currency),
+      colors: {
+        from: "from-sky-500/10",
+        via: "via-blue-500/5",
+        orb: "from-sky-400/20",
+        iconFrom: "from-sky-500",
+        iconTo: "to-blue-600",
+        text: "text-sky-600 dark:text-sky-400",
+        label: "text-sky-700 dark:text-sky-300",
+        shadow: "sky",
+      },
+      icon: WalletCards,
     },
   ];
 
@@ -86,30 +118,44 @@ export function BudgetSummary({
 
       <CardContent className="space-y-5 pt-5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {overviewCards.map((card) => {
-            const colorMap: Record<string, { from: string; via: string; orb: string; iconFrom: string; iconTo: string; text: string }> = {
-              'budget': { from: 'from-emerald-500/10', via: 'via-green-500/5', orb: 'from-emerald-400/20', iconFrom: 'from-emerald-500', iconTo: 'to-green-600', text: 'text-emerald-600 dark:text-emerald-400' },
-              'spent': { from: 'from-rose-500/10', via: 'via-red-500/5', orb: 'from-rose-400/20', iconFrom: 'from-rose-500', iconTo: 'to-red-600', text: 'text-rose-600 dark:text-rose-400' },
-              'remaining': { from: 'from-blue-500/10', via: 'via-cyan-500/5', orb: 'from-blue-400/20', iconFrom: 'from-blue-500', iconTo: 'to-cyan-600', text: 'text-blue-600 dark:text-blue-400' },
-              'usage': { from: 'from-purple-500/10', via: 'via-violet-500/5', orb: 'from-purple-400/20', iconFrom: 'from-purple-500', iconTo: 'to-violet-600', text: 'text-purple-600 dark:text-purple-400' },
-            };
-            const colors = colorMap[card.key];
-            return (
+          {overviewCards.map((card) => (
+            <div
+              key={card.key}
+              className={`group relative overflow-hidden rounded-2xl bg-linear-to-br ${card.colors.from} ${card.colors.via} to-transparent p-5 hover:shadow-lg transition-all duration-300`}
+            >
               <div
-                key={card.key}
-                className={`group relative overflow-hidden rounded-2xl bg-linear-to-br ${colors.from} ${colors.via} to-transparent dark:${colors.from.replace('/10', '/20')} dark:${colors.via.replace('/5', '/10')} p-5 hover:shadow-lg hover:shadow-${card.key === 'budget' ? 'emerald' : card.key === 'spent' ? 'rose' : card.key === 'remaining' ? 'blue' : 'purple'}-500/20 transition-all duration-300`}
-              >
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-linear-to-br ${colors.orb} to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`} />
-                <div className="relative">
-                  <div className={`w-11 h-11 rounded-xl bg-linear-to-br ${colors.iconFrom} ${colors.iconTo} shadow-lg shadow-${card.key === 'budget' ? 'emerald' : card.key === 'spent' ? 'rose' : card.key === 'remaining' ? 'blue' : 'purple'}-500/30 flex items-center justify-center mb-3`}>
-                    <card.icon className="h-5 w-5 text-white" />
-                  </div>
-                  <div className={`text-xs uppercase tracking-[0.15em] font-medium ${card.key === 'budget' ? 'text-emerald-700 dark:text-emerald-300' : card.key === 'spent' ? 'text-rose-700 dark:text-rose-300' : card.key === 'remaining' ? 'text-blue-700 dark:text-blue-300' : 'text-purple-700 dark:text-purple-300'} mb-2`}>{card.label}</div>
-                  <div className={`text-xl font-bold ${colors.text}`}>{card.value}</div>
+                className={`absolute top-0 right-0 w-32 h-32 bg-linear-to-br ${card.colors.orb} to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`}
+              />
+              <div className="relative">
+                <div
+                  className={`w-11 h-11 rounded-xl bg-linear-to-br ${card.colors.iconFrom} ${card.colors.iconTo} shadow-lg flex items-center justify-center mb-3`}
+                >
+                  <card.icon className="h-5 w-5 text-white" />
                 </div>
+                <div
+                  className={`text-xs uppercase tracking-[0.15em] font-medium ${card.colors.label} mb-2`}
+                >
+                  {card.label}
+                </div>
+                <div className={`text-xl font-bold ${card.colors.text}`}>{card.value}</div>
               </div>
-            );
-          })}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="rounded-xl border bg-muted/40 px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("budget.summary.totalBudget")}</div>
+            <div className="font-semibold text-foreground">
+              {formatCurrency(summary.totalBudget, currency)}
+            </div>
+          </div>
+          <div className="rounded-xl border bg-muted/40 px-3 py-2">
+            <div className="text-xs text-muted-foreground">{t("budget.summary.totalSpent")}</div>
+            <div className="font-semibold text-foreground">
+              {formatCurrency(summary.totalSpent, currency)}
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2 rounded-2xl border bg-muted/50 p-4">
@@ -138,6 +184,9 @@ export function BudgetSummary({
                 <div className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                   {formatCurrency(summary.dailyBudget, currency)}
                 </div>
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                  {t("budget.summary.dailyBudgetHint")}
+                </p>
               </div>
             </div>
           </div>

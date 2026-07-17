@@ -92,8 +92,13 @@ export function BudgetSnapshot({ budget, currency }: BudgetSnapshotProps) {
                 <div key={cat.budgetCategoryId} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <span>{cat.icon}</span>
+                      {cat.icon}
                       <span className="font-medium">{cat.name}</span>
+                      {cat.isReserved && (
+                        <span className="rounded px-1 py-0.5 text-[10px] bg-amber-500/10 text-amber-700 dark:text-amber-300">
+                          {t("budget.categories.reservedBadge")}
+                        </span>
+                      )}
                       {isOver && (
                         <AlertTriangle className="h-3 w-3 text-red-500" />
                       )}

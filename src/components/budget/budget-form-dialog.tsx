@@ -57,6 +57,7 @@ import {
   Plus,
   Target,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 function dateFromYyyyMmDd(value: string): Date | undefined {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
@@ -72,6 +73,7 @@ function parseAmountString(raw: string): number {
 type CategoryDraft = {
   allocatedAmount: string;
   alertThresholdPercent: string;
+  isReserved: boolean;
 };
 
 interface BudgetFormDialogProps {
@@ -92,7 +94,11 @@ interface SortableCategoryItemProps {
   isSelected: boolean;
   draft: CategoryDraft;
   onToggle: (categoryId: string, checked: boolean) => void;
-  onUpdateDraft: (categoryId: string, field: keyof CategoryDraft, value: string) => void;
+  onUpdateDraft: (
+    categoryId: string,
+    field: keyof CategoryDraft,
+    value: string | boolean
+  ) => void;
   t: any;
 }
 
@@ -157,52 +163,74 @@ function SortableCategoryItem({
       </div>
 
       {isSelected && (
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor={`allocation-${category.categoryId}`}>
-              {t("budget.dialog.allocation")}
-            </Label>
-            <Input
-              id={`allocation-${category.categoryId}`}
-              type="number"
-              inputMode="decimal"
-              min="0"
-              step="0.01"
-              value={draft.allocatedAmount}
-              onChange={(event) =>
-                onUpdateDraft(
-                  category.categoryId,
-                  "allocatedAmount",
-                  event.target.value
-                )
-              }
-              placeholder="0.00"
-            />
+        <div className="mt-4 space-y-3">
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor={`allocation-${category.categoryId}`}>
+                {t("budget.dialog.allocation")}
+              </Label>
+              <Input
+                id={`allocation-${category.categoryId}`}
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.01"
+                value={draft.allocatedAmount}
+                onChange={(event) =>
+                  onUpdateDraft(
+                    category.categoryId,
+                    "allocatedAmount",
+                    event.target.value
+                  )
+                }
+                placeholder="0.00"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor={`threshold-${category.categoryId}`}>
+                {t("budget.categories.threshold")}
+              </Label>
+              <Input
+                id={`threshold-${category.categoryId}`}
+                type="number"
+                inputMode="decimal"
+                min="0"
+                max="100"
+                step="1"
+                value={draft.alertThresholdPercent}
+                onChange={(event) =>
+                  onUpdateDraft(
+                    category.categoryId,
+                    "alertThresholdPercent",
+                    event.target.value
+                  )
+                }
+                placeholder="80"
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("budget.dialog.categoryThresholdHint")}
+              </p>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor={`threshold-${category.categoryId}`}>
-              {t("budget.categories.threshold")}
-            </Label>
-            <Input
-              id={`threshold-${category.categoryId}`}
-              type="number"
-              inputMode="decimal"
-              min="0"
-              max="100"
-              step="1"
-              value={draft.alertThresholdPercent}
-              onChange={(event) =>
-                onUpdateDraft(
-                  category.categoryId,
-                  "alertThresholdPercent",
-                  event.target.value
-                )
+          <div className="flex items-center justify-between gap-3 rounded-xl border bg-muted/20 px-3 py-2">
+            <div>
+              <Label
+                htmlFor={`reserved-${category.categoryId}`}
+                className="text-sm font-medium"
+              >
+                {t("budget.categories.reserveFixed")}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t("budget.categories.reserveFixedHint")}
+              </p>
+            </div>
+            <Switch
+              id={`reserved-${category.categoryId}`}
+              checked={draft.isReserved}
+              onCheckedChange={(checked) =>
+                onUpdateDraft(category.categoryId, "isReserved", checked)
               }
-              placeholder="80"
             />
-            <p className="text-xs text-muted-foreground">
-              {t("budget.dialog.categoryThresholdHint")}
-            </p>
           </div>
         </div>
       )}
@@ -315,11 +343,13 @@ export function BudgetFormDialog({
               drafts[category.categoryId] = {
                 allocatedAmount: String(prevCategory.allocated),
                 alertThresholdPercent: String((prevCategory.alertThreshold * 100).toFixed(0)),
+                isReserved: prevCategory.isReserved ?? false,
               };
             } else {
               drafts[category.categoryId] = {
                 allocatedAmount: "",
                 alertThresholdPercent: "80",
+                isReserved: false,
               };
             }
           });
@@ -335,6 +365,7 @@ export function BudgetFormDialog({
                 {
                   allocatedAmount: "",
                   alertThresholdPercent: "80",
+                  isReserved: false,
                 },
               ])
             )
@@ -352,6 +383,7 @@ export function BudgetFormDialog({
               {
                 allocatedAmount: "",
                 alertThresholdPercent: "80",
+                isReserved: false,
               },
             ])
           )
@@ -415,6 +447,7 @@ export function BudgetFormDialog({
       [categoryId]: current[categoryId] ?? {
         allocatedAmount: "",
         alertThresholdPercent: "80",
+        isReserved: false,
       },
     }));
   };
@@ -434,7 +467,7 @@ export function BudgetFormDialog({
   const updateCategoryDraft = (
     categoryId: string,
     field: keyof CategoryDraft,
-    value: string
+    value: string | boolean
   ) => {
     setCategoryDrafts((current) => ({
       ...current,
@@ -442,6 +475,7 @@ export function BudgetFormDialog({
         ...(current[categoryId] ?? {
           allocatedAmount: "",
           alertThresholdPercent: "80",
+          isReserved: false,
         }),
         [field]: value,
       },
@@ -468,6 +502,7 @@ export function BudgetFormDialog({
             ).toFixed(2)
           ),
           sortOrder: index + 1,
+          isReserved: categoryDrafts[categoryId]?.isReserved ?? false,
         })),
       };
       if (useCustomPeriod && customStart && customEnd && customEnd >= customStart) {
@@ -762,6 +797,7 @@ export function BudgetFormDialog({
                         const draft = categoryDrafts[category.categoryId] ?? {
                           allocatedAmount: "",
                           alertThresholdPercent: "80",
+                          isReserved: false,
                         };
 
                         return (

@@ -13,6 +13,11 @@ export interface BudgetSummaryDto {
   totalBudget: number;
   totalSpent: number;
   remaining: number;
+  /** Unspent amount held for reserved (fixed) categories. */
+  reservedRemaining: number;
+  /** Freely spendable money after reserved unspent is held back. */
+  spendableRemaining: number;
+  /** Backend: spendableRemaining / remainingDays — do not recalculate client-side. */
   dailyBudget: number;
   usagePercent: number;
 }
@@ -30,6 +35,8 @@ export interface BudgetCategoryDto {
   status: string;
   alertThreshold: number;
   sortOrder: number;
+  /** When true, unspent allocation is reserved and excluded from daily/spendable. */
+  isReserved: boolean;
 }
 
 export interface TopSpendingDto {
@@ -52,6 +59,7 @@ export interface CreateBudgetCategoryRequest {
   allocatedAmount: number;
   alertThreshold: number;
   sortOrder: number;
+  isReserved?: boolean;
 }
 
 export interface CreateBudgetRequest {
@@ -71,6 +79,7 @@ export interface UpdateBudgetRequest {
 export interface UpdateBudgetCategoryRequest {
   allocatedAmount: number;
   alertThreshold?: number;
+  isReserved?: boolean;
 }
 
 export interface MessageResponse {
