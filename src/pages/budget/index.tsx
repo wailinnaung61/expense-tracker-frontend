@@ -180,8 +180,15 @@ export default function Budget() {
     }
   }, [t]);
 
-  const loadBudgetForMonth = useCallback(async (ym: string, asOfDate: string) => {
-    setIsBudgetLoading(true);
+  const loadBudgetForMonth = useCallback(async (
+    ym: string,
+    asOfDate: string,
+    options?: { silent?: boolean }
+  ) => {
+    const silent = options?.silent === true;
+    if (!silent) {
+      setIsBudgetLoading(true);
+    }
     setBudgetError(null);
     const locale = dateFnsLocaleForLanguage(i18n.language);
     try {
@@ -261,13 +268,22 @@ export default function Budget() {
         setBudgetError(message);
       }
     } finally {
-      setIsBudgetLoading(false);
+      if (!silent) {
+        setIsBudgetLoading(false);
+      }
     }
   }, [t, i18n.language]);
 
   const loadBudget = useCallback(
-    () => loadBudgetForMonth(selectedMonth, budgetAsOfDate),
+    (options?: { silent?: boolean }) =>
+      loadBudgetForMonth(selectedMonth, budgetAsOfDate, options),
     [loadBudgetForMonth, selectedMonth, budgetAsOfDate]
+  );
+
+  /** Refresh budget data without blanking the screen. */
+  const refreshBudgetQuietly = useCallback(
+    () => loadBudget({ silent: true }),
+    [loadBudget]
   );
 
   const handleMonthChange = useCallback((ym: string) => {
@@ -287,7 +303,7 @@ export default function Budget() {
     const onChatbotRefresh = (event: Event) => {
       const { target } = (event as CustomEvent<ChatbotRefreshEventDetail>).detail;
       if (target === "budget") {
-        void loadBudget();
+        void refreshBudgetQuietly();
       }
     };
 
@@ -295,7 +311,7 @@ export default function Budget() {
     return () => {
       window.removeEventListener(CHATBOT_REFRESH_EVENT, onChatbotRefresh as EventListener);
     };
-  }, [loadBudget]);
+  }, [refreshBudgetQuietly]);
 
   const handleCreate = async (request: Parameters<typeof budgetService.createBudget>[0]) => {
     setIsDialogSubmitting(true);
@@ -350,7 +366,7 @@ export default function Budget() {
         alertThreshold: toAlertThresholdRatio(values.alertThresholdPercent),
         isReserved: values.isReserved,
       });
-      await loadBudget();
+      await refreshBudgetQuietly();
       toast.success(t("budget.feedback.categoryUpdated"));
     } catch (error) {
       toast.error(
@@ -365,6 +381,17 @@ export default function Budget() {
     const category = budget?.categories.find((c) => c.budgetCategoryId === budgetCategoryId);
     if (!category) return;
 
+    // Optimistic UI: flip the switch immediately so the screen doesn't feel stuck.
+    setBudget((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        categories: prev.categories.map((c) =>
+          c.budgetCategoryId === budgetCategoryId ? { ...c, isReserved } : c
+        ),
+      };
+    });
+
     setSavingCategoryId(budgetCategoryId);
     try {
       // Keep allocatedAmount + alertThreshold in the same shape as Save Category (ratio 0–1).
@@ -375,9 +402,21 @@ export default function Budget() {
         ),
         isReserved,
       });
-      await loadBudget();
+      await refreshBudgetQuietly();
       toast.success(t("budget.feedback.categoryUpdated"));
     } catch (error) {
+      // Roll back optimistic toggle on failure.
+      setBudget((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          categories: prev.categories.map((c) =>
+            c.budgetCategoryId === budgetCategoryId
+              ? { ...c, isReserved: category.isReserved }
+              : c
+          ),
+        };
+      });
       toast.error(
         error instanceof Error ? error.message : t("budget.feedback.categoryUpdateFailed")
       );
@@ -400,7 +439,7 @@ export default function Budget() {
         sortOrder: 0,
         isReserved,
       });
-      await loadBudget();
+      await refreshBudgetQuietly();
       toast.success(t("budget.feedback.categoryAdded"));
       return true;
     } catch (error) {
@@ -427,7 +466,7 @@ export default function Budget() {
     setRemovingCategoryId(budgetCategoryId);
     try {
       await budgetService.removeBudgetCategory(budgetCategoryId);
-      await loadBudget();
+      await refreshBudgetQuietly();
       toast.success(t("budget.feedback.categoryRemoved"));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("budget.feedback.categoryRemoveFailed"));
