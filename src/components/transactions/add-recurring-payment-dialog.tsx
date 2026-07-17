@@ -150,7 +150,7 @@ export function AddRecurringPaymentDialog({
         categoryId: recurringPayment.categoryId,
         frequency: getFrequencyValue(recurringPayment.frequency),
         nextDueDate: new Date(recurringPayment.nextDueDate),
-        autoPay: false,
+        autoPay: recurringPayment.autoPay ?? false,
       });
     } else if (open) {
       reset({
@@ -178,6 +178,7 @@ export function AddRecurringPaymentDialog({
           frequency: Number(data.frequency) as UpdateRecurringPaymentRequest["frequency"],
           nextDueDate: format(data.nextDueDate, "yyyy-MM-dd"),
           status: getRecurringStatusValue(recurringPayment.status),
+          autoPay: data.autoPay ?? false,
         };
         
         await recurringPaymentService.updateRecurringPayment(
@@ -192,7 +193,7 @@ export function AddRecurringPaymentDialog({
           categoryId: data.categoryId,
           frequency: Number(data.frequency) as CreateRecurringPaymentRequest["frequency"],
           nextDueDate: format(data.nextDueDate, "yyyy-MM-dd"),
-          autoPay: data.autoPay || false,
+          autoPay: data.autoPay ?? false,
         };
         
         await recurringPaymentService.createRecurringPayment(createPayload);
@@ -362,7 +363,7 @@ export function AddRecurringPaymentDialog({
               render={({ field }) => (
                 <Checkbox
                   checked={field.value}
-                  onCheckedChange={field.onChange}
+                  onCheckedChange={(checked) => field.onChange(checked === true)}
                   id="autoPay"
                 />
               )}

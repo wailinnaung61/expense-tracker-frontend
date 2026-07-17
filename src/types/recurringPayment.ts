@@ -57,6 +57,7 @@ export interface RecurringPayment {
   status: RecurringStatusLabel;
   createdAt: string;
   updatedAt: string;
+  autoPay: boolean;
 }
 
 // Backend: CreateRecurringPaymentRequest
@@ -77,6 +78,7 @@ export interface UpdateRecurringPaymentRequest {
   frequency: RecurringFrequencyType; // Backend: AppConstants.RecurringFrequency enum
   nextDueDate: string; // Backend expects yyyy-MM-dd format
   status: RecurringStatusType; // Backend: AppConstants.RecurringStatus enum
+  autoPay?: boolean; // Optional: default false on backend
 }
 
 export interface RecurringPaymentListParams {

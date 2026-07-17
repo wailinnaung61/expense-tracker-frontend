@@ -39,6 +39,7 @@ export const recurringPaymentService = {
       categoryId: data.categoryId,
       frequency: data.frequency,
       nextDueDate: data.nextDueDate,
+      autoPay: data.autoPay ?? false,
     });
   },
 
@@ -54,6 +55,7 @@ export const recurringPaymentService = {
       frequency: data.frequency,
       nextDueDate: data.nextDueDate,
       status: data.status,
+      autoPay: data.autoPay ?? false,
     });
   },
 
