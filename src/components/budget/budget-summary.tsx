@@ -3,7 +3,7 @@ import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatCurrency } from "@/lib/utils";
 import type { BudgetSummaryDto, TopSpendingDto } from "@/types/budget";
-import { Lock, PiggyBank, Target, TrendingUp, WalletCards } from "lucide-react";
+import { Lock, PiggyBank, Target, TrendingUp, Wallet, WalletCards } from "lucide-react";
 
 interface BudgetSummaryProps {
   summary: BudgetSummaryDto;
@@ -86,6 +86,21 @@ export function BudgetSummary({
       },
       icon: PiggyBank,
     },
+    {
+      key: "spent",
+      label: t("budget.summary.totalSpent"),
+      value: formatCurrency(summary.totalSpent, currency),
+      colors: {
+        from: "from-rose-500/10",
+        via: "via-red-500/5",
+        orb: "from-rose-400/20",
+        iconFrom: "from-rose-500",
+        iconTo: "to-red-600",
+        text: "text-rose-600 dark:text-rose-400",
+        label: "text-rose-700 dark:text-rose-300",
+      },
+      icon: Wallet,
+    },
   ];
 
   return (
@@ -122,21 +137,6 @@ export function BudgetSummary({
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="rounded-xl border bg-muted/40 px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("budget.summary.totalBudget")}</div>
-            <div className="font-semibold text-foreground">
-              {formatCurrency(summary.totalBudget, currency)}
-            </div>
-          </div>
-          <div className="rounded-xl border bg-muted/40 px-3 py-2">
-            <div className="text-xs text-muted-foreground">{t("budget.summary.totalSpent")}</div>
-            <div className="font-semibold text-foreground">
-              {formatCurrency(summary.totalSpent, currency)}
-            </div>
-          </div>
         </div>
 
         <div className="space-y-2 rounded-2xl border bg-muted/50 p-4">
