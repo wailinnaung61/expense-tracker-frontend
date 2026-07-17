@@ -786,6 +786,8 @@
       "notePlaceholder": "မှတ်ချက်",
       "noCategories": "အမျိုးအစား မရှိပါ",
       "copyFromAbove": "အပေါ်မှ ကူးမည်",
+      "moveUp": "အတန်းကို အပေါ်ရွှေ့မည်",
+      "moveDown": "အတန်းကို အောက်ရွှေ့မည်",
       "deleteRow": "အတန်း ဖျက်ပါ",
       "addRow": "အတန်း ထည့်ပါ",
       "duplicateLast": "နောက်ဆုံးကို ကူးပါ",

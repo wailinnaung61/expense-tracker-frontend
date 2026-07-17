@@ -786,6 +786,8 @@
       "notePlaceholder": "Note",
       "noCategories": "No categories available",
       "copyFromAbove": "Copy from above",
+      "moveUp": "Move row up",
+      "moveDown": "Move row down",
       "deleteRow": "Delete row",
       "addRow": "Add Row",
       "duplicateLast": "Duplicate Last",

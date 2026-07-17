@@ -27,7 +27,15 @@ import { transactionService } from "@/services/transactionService";
 import type { ExpenseCategory } from "@/types/category";
 import { TransactionType, PaymentStatus } from "@/types/transaction";
 import { format } from "date-fns";
-import { CalendarIcon, Plus, Trash2, Copy, CopyPlus } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  CalendarIcon,
+  Plus,
+  Trash2,
+  Copy,
+  CopyPlus,
+} from "lucide-react";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { toast } from "react-toastify";
 import { z } from "zod";
@@ -205,6 +213,20 @@ export function BulkAddTransactionDialog({
     }
   };
 
+  const moveRow = (index: number, direction: -1 | 1) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= rows.length) return;
+
+    setRows((currentRows) => {
+      const nextRows = [...currentRows];
+      [nextRows[index], nextRows[targetIndex]] = [
+        nextRows[targetIndex],
+        nextRows[index],
+      ];
+      return nextRows;
+    });
+  };
+
   const clearFieldErrors = (id: string, fields: (keyof RowErrors)[]) => {
     setRowErrors((prev) => {
       const newErrors = { ...prev };
@@ -321,7 +343,7 @@ export function BulkAddTransactionDialog({
                 <th className="text-left p-2 text-sm font-semibold w-32">{t("transactions.bulkAdd.colStatus")}</th>
                 <th className="text-left p-2 text-sm font-semibold w-48">{t("transactions.bulkAdd.colDescription")}</th>
                 <th className="text-left p-2 text-sm font-semibold w-48">{t("transactions.bulkAdd.colNote")}</th>
-                <th className="text-center p-2 text-sm font-semibold w-32">{t("transactions.bulkAdd.colActions")}</th>
+                <th className="text-center p-2 text-sm font-semibold w-40">{t("transactions.bulkAdd.colActions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -469,6 +491,28 @@ export function BulkAddTransactionDialog({
                   {/* Actions */}
                   <td className="p-2">
                     <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => moveRow(index, -1)}
+                        disabled={index === 0}
+                        className="h-8 w-8"
+                        title={t("transactions.bulkAdd.moveUp")}
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => moveRow(index, 1)}
+                        disabled={index === rows.length - 1}
+                        className="h-8 w-8"
+                        title={t("transactions.bulkAdd.moveDown")}
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
                       {index > 0 && (
                         <Button
                           type="button"

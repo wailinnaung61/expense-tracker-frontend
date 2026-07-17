@@ -786,6 +786,8 @@
       "notePlaceholder": "メモ",
       "noCategories": "カテゴリがありません",
       "copyFromAbove": "上からコピー",
+      "moveUp": "行を上へ移動",
+      "moveDown": "行を下へ移動",
       "deleteRow": "行を削除",
       "addRow": "行を追加",
       "duplicateLast": "最後の行を複製",
