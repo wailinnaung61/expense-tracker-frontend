@@ -45,6 +45,7 @@ function normalizeCategory(raw: BudgetCategoryDto): BudgetCategoryDto {
   return {
     ...raw,
     isReserved: asBoolean(raw.isReserved ?? r.IsReserved, false),
+    alertsEnabled: asBoolean(raw.alertsEnabled ?? r.AlertsEnabled, true),
   };
 }
 

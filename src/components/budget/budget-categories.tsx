@@ -15,7 +15,7 @@ import { formatCurrency } from "@/lib/utils";
 import type { BudgetCategoryDto } from "@/types/budget";
 import { normalizeAlertThresholdPercent } from "@/types/budget";
 import type { ExpenseCategory } from "@/types/category";
-import { AlertTriangle, Info, Loader2, Plus, Save, Trash2, WalletCards, Wallet, Target } from "lucide-react";
+import { AlertTriangle, Bell, Info, Loader2, Plus, Save, Trash2, WalletCards, Wallet, Target } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 interface BudgetCategoriesProps {
@@ -29,13 +29,19 @@ interface BudgetCategoriesProps {
   hasHiddenCategories: boolean;
   onSaveCategory: (
     budgetCategoryId: string,
-    values: { allocatedAmount: number; alertThresholdPercent: number; isReserved: boolean }
+    values: {
+      allocatedAmount: number;
+      alertThresholdPercent: number;
+      isReserved: boolean;
+      alertsEnabled: boolean;
+    }
   ) => Promise<void>;
   onToggleReserved: (budgetCategoryId: string, isReserved: boolean) => Promise<void>;
+  onToggleAlertsEnabled: (budgetCategoryId: string, alertsEnabled: boolean) => Promise<void>;
   onAddCategory: (
     categoryId: string,
     allocatedAmount: number,
-    isReserved: boolean
+    options: { isReserved: boolean; alertsEnabled: boolean }
   ) => Promise<boolean>;
   onRemoveCategory: (budgetCategoryId: string) => Promise<void>;
 }
@@ -87,6 +93,7 @@ export function BudgetCategories({
   hasHiddenCategories,
   onSaveCategory,
   onToggleReserved,
+  onToggleAlertsEnabled,
   onAddCategory,
   onRemoveCategory,
 }: BudgetCategoriesProps) {
@@ -94,7 +101,17 @@ export function BudgetCategories({
   const [drafts, setDrafts] = useState<Record<string, CategoryDraft>>({});
   const [addAmounts, setAddAmounts] = useState<Record<string, string>>({});
   const [addReserved, setAddReserved] = useState<Record<string, boolean>>({});
+  const [addAlertsEnabled, setAddAlertsEnabled] = useState<Record<string, boolean>>({});
   const [categoryFilterId, setCategoryFilterId] = useState(CATEGORY_COMBOBOX_ALL_VALUE);
+
+  // Only re-sync amount drafts when allocation/threshold data changes — not when
+  // isReserved / alertsEnabled toggles (those would wipe unsaved edits).
+  const draftSyncKey = categories
+    .map(
+      (c) =>
+        `${c.budgetCategoryId}:${c.allocated}:${c.alertThreshold}`
+    )
+    .join("|");
 
   useEffect(() => {
     setDrafts(
@@ -110,8 +127,12 @@ export function BudgetCategories({
         ])
       )
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: draftSyncKey
+  }, [draftSyncKey]);
+
+  useEffect(() => {
     setCategoryFilterId(CATEGORY_COMBOBOX_ALL_VALUE);
-  }, [categories]);
+  }, [_budgetId]);
 
   const totalAllocated = useMemo(() => {
     return categories.reduce((sum, category) => sum + category.allocated, 0);
@@ -313,6 +334,14 @@ export function BudgetCategories({
                               {t("budget.categories.reservedBadge")}
                             </Badge>
                           )}
+                          {!category.alertsEnabled && (
+                            <Badge
+                              variant="outline"
+                              className="border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400"
+                            >
+                              {t("budget.categories.alertsOffBadge")}
+                            </Badge>
+                          )}
                         </div>
                         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                           <span>
@@ -369,6 +398,28 @@ export function BudgetCategories({
                       disabled={savingCategoryId === category.budgetCategoryId}
                       onCheckedChange={(checked) =>
                         onToggleReserved(category.budgetCategoryId, checked)
+                      }
+                    />
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border bg-muted/20 px-4 py-3">
+                    <div>
+                      <Label
+                        htmlFor={`alerts-${category.budgetCategoryId}`}
+                        className="text-sm font-medium text-foreground"
+                      >
+                        {t("budget.categories.budgetAlerts")}
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        {t("budget.categories.budgetAlertsHint")}
+                      </p>
+                    </div>
+                    <Switch
+                      id={`alerts-${category.budgetCategoryId}`}
+                      checked={category.alertsEnabled}
+                      disabled={savingCategoryId === category.budgetCategoryId}
+                      onCheckedChange={(checked) =>
+                        onToggleAlertsEnabled(category.budgetCategoryId, checked)
                       }
                     />
                   </div>
@@ -444,6 +495,7 @@ export function BudgetCategories({
                           allocatedAmount: Number(draft.allocatedAmount),
                           alertThresholdPercent: Number(draft.alertThresholdPercent),
                           isReserved: category.isReserved,
+                          alertsEnabled: category.alertsEnabled,
                         })
                       }
                       disabled={!hasChanges || isInvalid || savingCategoryId === category.budgetCategoryId}
@@ -484,6 +536,7 @@ export function BudgetCategories({
                 const addAmount = Number(addAmounts[cat.categoryId] ?? 0);
                 const isInvalidAmount = !addAmounts[cat.categoryId] || addAmount <= 0;
                 const isReserved = addReserved[cat.categoryId] ?? false;
+                const alertsEnabled = addAlertsEnabled[cat.categoryId] ?? true;
 
                 return (
                   <div key={cat.categoryId} className="space-y-2">
@@ -522,6 +575,25 @@ export function BudgetCategories({
                           }
                         />
                       </div>
+                      <div className="flex items-center gap-2">
+                        <Bell className="h-3.5 w-3.5 text-muted-foreground" />
+                        <Label
+                          htmlFor={`add-alerts-${cat.categoryId}`}
+                          className="text-xs text-muted-foreground whitespace-nowrap"
+                        >
+                          {t("budget.categories.budgetAlerts")}
+                        </Label>
+                        <Switch
+                          id={`add-alerts-${cat.categoryId}`}
+                          checked={alertsEnabled}
+                          onCheckedChange={(checked) =>
+                            setAddAlertsEnabled((prev) => ({
+                              ...prev,
+                              [cat.categoryId]: checked,
+                            }))
+                          }
+                        />
+                      </div>
                       <Input
                         type="number"
                         inputMode="decimal"
@@ -541,11 +613,12 @@ export function BudgetCategories({
                           const wasAdded = await onAddCategory(
                             cat.categoryId,
                             Number(addAmounts[cat.categoryId] ?? 0),
-                            isReserved
+                            { isReserved, alertsEnabled }
                           );
                           if (wasAdded) {
                             setAddAmounts((prev) => ({ ...prev, [cat.categoryId]: "" }));
                             setAddReserved((prev) => ({ ...prev, [cat.categoryId]: false }));
+                            setAddAlertsEnabled((prev) => ({ ...prev, [cat.categoryId]: true }));
                           }
                         }}
                       >

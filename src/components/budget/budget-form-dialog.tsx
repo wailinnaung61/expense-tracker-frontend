@@ -74,6 +74,7 @@ type CategoryDraft = {
   allocatedAmount: string;
   alertThresholdPercent: string;
   isReserved: boolean;
+  alertsEnabled: boolean;
 };
 
 interface BudgetFormDialogProps {
@@ -232,6 +233,26 @@ function SortableCategoryItem({
               }
             />
           </div>
+          <div className="flex items-center justify-between gap-3 rounded-xl border bg-muted/20 px-3 py-2">
+            <div>
+              <Label
+                htmlFor={`alerts-${category.categoryId}`}
+                className="text-sm font-medium"
+              >
+                {t("budget.categories.budgetAlerts")}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t("budget.categories.budgetAlertsHint")}
+              </p>
+            </div>
+            <Switch
+              id={`alerts-${category.categoryId}`}
+              checked={draft.alertsEnabled}
+              onCheckedChange={(checked) =>
+                onUpdateDraft(category.categoryId, "alertsEnabled", checked)
+              }
+            />
+          </div>
         </div>
       )}
     </div>
@@ -344,12 +365,14 @@ export function BudgetFormDialog({
                 allocatedAmount: String(prevCategory.allocated),
                 alertThresholdPercent: String((prevCategory.alertThreshold * 100).toFixed(0)),
                 isReserved: prevCategory.isReserved ?? false,
+                alertsEnabled: prevCategory.alertsEnabled ?? true,
               };
             } else {
               drafts[category.categoryId] = {
                 allocatedAmount: "",
                 alertThresholdPercent: "80",
                 isReserved: false,
+                alertsEnabled: true,
               };
             }
           });
@@ -366,6 +389,7 @@ export function BudgetFormDialog({
                   allocatedAmount: "",
                   alertThresholdPercent: "80",
                   isReserved: false,
+                  alertsEnabled: true,
                 },
               ])
             )
@@ -384,6 +408,7 @@ export function BudgetFormDialog({
                 allocatedAmount: "",
                 alertThresholdPercent: "80",
                 isReserved: false,
+                alertsEnabled: true,
               },
             ])
           )
@@ -448,6 +473,7 @@ export function BudgetFormDialog({
         allocatedAmount: "",
         alertThresholdPercent: "80",
         isReserved: false,
+        alertsEnabled: true,
       },
     }));
   };
@@ -476,6 +502,7 @@ export function BudgetFormDialog({
           allocatedAmount: "",
           alertThresholdPercent: "80",
           isReserved: false,
+          alertsEnabled: true,
         }),
         [field]: value,
       },
@@ -503,6 +530,7 @@ export function BudgetFormDialog({
           ),
           sortOrder: index + 1,
           isReserved: categoryDrafts[categoryId]?.isReserved ?? false,
+          alertsEnabled: categoryDrafts[categoryId]?.alertsEnabled ?? true,
         })),
       };
       if (useCustomPeriod && customStart && customEnd && customEnd >= customStart) {
@@ -798,6 +826,7 @@ export function BudgetFormDialog({
                           allocatedAmount: "",
                           alertThresholdPercent: "80",
                           isReserved: false,
+                          alertsEnabled: true,
                         };
 
                         return (

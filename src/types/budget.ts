@@ -37,6 +37,8 @@ export interface BudgetCategoryDto {
   sortOrder: number;
   /** When true, unspent allocation is reserved and excluded from daily/spendable. */
   isReserved: boolean;
+  /** When false, skip budget threshold/exceeded notifications for this category. */
+  alertsEnabled: boolean;
 }
 
 export interface TopSpendingDto {
@@ -60,6 +62,7 @@ export interface CreateBudgetCategoryRequest {
   alertThreshold: number;
   sortOrder: number;
   isReserved?: boolean;
+  alertsEnabled?: boolean;
 }
 
 export interface CreateBudgetRequest {
@@ -80,6 +83,7 @@ export interface UpdateBudgetCategoryRequest {
   allocatedAmount: number;
   alertThreshold?: number;
   isReserved?: boolean;
+  alertsEnabled?: boolean;
 }
 
 export interface MessageResponse {

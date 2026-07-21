@@ -357,7 +357,12 @@ export default function Budget() {
 
   const handleSaveCategory = async (
     budgetCategoryId: string,
-    values: { allocatedAmount: number; alertThresholdPercent: number; isReserved: boolean }
+    values: {
+      allocatedAmount: number;
+      alertThresholdPercent: number;
+      isReserved: boolean;
+      alertsEnabled: boolean;
+    }
   ) => {
     setSavingCategoryId(budgetCategoryId);
     try {
@@ -365,6 +370,7 @@ export default function Budget() {
         allocatedAmount: values.allocatedAmount,
         alertThreshold: toAlertThresholdRatio(values.alertThresholdPercent),
         isReserved: values.isReserved,
+        alertsEnabled: values.alertsEnabled,
       });
       await refreshBudgetQuietly();
       toast.success(t("budget.feedback.categoryUpdated"));
@@ -401,6 +407,7 @@ export default function Budget() {
           normalizeAlertThresholdPercent(category.alertThreshold, category.allocated)
         ),
         isReserved,
+        alertsEnabled: category.alertsEnabled,
       });
       await refreshBudgetQuietly();
       toast.success(t("budget.feedback.categoryUpdated"));
@@ -425,10 +432,61 @@ export default function Budget() {
     }
   };
 
+  const handleToggleAlertsEnabled = async (
+    budgetCategoryId: string,
+    alertsEnabled: boolean
+  ) => {
+    const category = budget?.categories.find((c) => c.budgetCategoryId === budgetCategoryId);
+    if (!category) return;
+
+    // Optimistic + no full budget reload — alerts flag does not change summary cards.
+    setBudget((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        categories: prev.categories.map((c) =>
+          c.budgetCategoryId === budgetCategoryId ? { ...c, alertsEnabled } : c
+        ),
+      };
+    });
+
+    setSavingCategoryId(budgetCategoryId);
+    try {
+      await budgetService.updateBudgetCategory(budgetCategoryId, {
+        allocatedAmount: category.allocated,
+        alertThreshold: toAlertThresholdRatio(
+          normalizeAlertThresholdPercent(category.alertThreshold, category.allocated)
+        ),
+        isReserved: category.isReserved,
+        alertsEnabled,
+      });
+    } catch (error) {
+      setBudget((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          categories: prev.categories.map((c) =>
+            c.budgetCategoryId === budgetCategoryId
+              ? { ...c, alertsEnabled: category.alertsEnabled }
+              : c
+          ),
+        };
+      });
+      toast.error(
+        error instanceof Error ? error.message : t("budget.feedback.categoryUpdateFailed")
+      );
+    } finally {
+      setSavingCategoryId(null);
+    }
+  };
+
   const handleAddCategory = async (
     categoryId: string,
     allocatedAmount: number,
-    isReserved = false
+    options: { isReserved: boolean; alertsEnabled: boolean } = {
+      isReserved: false,
+      alertsEnabled: true,
+    }
   ) => {
     if (!budget?.budgetId) return false;
     try {
@@ -437,7 +495,8 @@ export default function Budget() {
         allocatedAmount,
         alertThreshold: 0.8,
         sortOrder: 0,
-        isReserved,
+        isReserved: options.isReserved,
+        alertsEnabled: options.alertsEnabled,
       });
       await refreshBudgetQuietly();
       toast.success(t("budget.feedback.categoryAdded"));
@@ -643,6 +702,7 @@ export default function Budget() {
               hasHiddenCategories={hasHiddenCategories}
               onSaveCategory={handleSaveCategory}
               onToggleReserved={handleToggleReserved}
+              onToggleAlertsEnabled={handleToggleAlertsEnabled}
               onAddCategory={handleAddCategory}
               onRemoveCategory={handleRemoveCategory}
             />
