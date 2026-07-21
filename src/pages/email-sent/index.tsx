@@ -33,7 +33,6 @@ import {
   Info,
   Loader2,
   Mail,
-  Receipt,
   Target,
   Wallet,
 } from "lucide-react";
@@ -43,6 +42,19 @@ import { toast } from "react-toastify";
 
 type PrefKey = keyof NotificationPreferences;
 type StatusFilter = "all" | "Pending" | "Sent" | "Failed" | "Skipped";
+
+/** Email types still supported after export emails were removed. */
+const VISIBLE_EMAIL_TYPES = [
+  "BUDGET_THRESHOLD_REACHED",
+  "BUDGET_EXCEEDED",
+  "LARGE_TRANSACTION",
+  "PAYMENT_FAILED",
+  "RECURRING_PAYMENT_DUE",
+  "RECURRING_PAYMENT_OVERDUE",
+  "RECURRING_PAYMENT_AUTO_PAID",
+  "SAVING_GOAL_DEADLINE_NEAR",
+  "SAVING_GOAL_REACHED",
+] as const;
 
 const PREF_ROWS: {
   key: PrefKey;
@@ -85,12 +97,6 @@ const PREF_ROWS: {
     icon: AlertTriangle,
     titleKey: "emailSent.prefs.paymentFailures",
     hintKey: "emailSent.prefs.paymentFailuresHint",
-  },
-  {
-    key: "exports",
-    icon: Receipt,
-    titleKey: "emailSent.prefs.exports",
-    hintKey: "emailSent.prefs.exportsHint",
   },
 ];
 
@@ -395,18 +401,14 @@ export default function EmailSentPage() {
                 {t("emailSent.billOverdue")}
               </div>
               <p className="mt-1 text-sm font-medium leading-relaxed">
-                {settings.timings.recurringOverdueDaysAfter.length > 0
-                  ? t("emailSent.billOverdueValue", {
-                      days: settings.timings.recurringOverdueDaysAfter.join(", "),
-                    })
-                  : t("emailSent.notConfigured")}
+                {t("emailSent.billOverdueValue")}
               </p>
             </div>
             <div className="rounded-xl border bg-card px-4 py-3">
               <div className="text-xs uppercase tracking-wide text-muted-foreground">
                 {t("emailSent.goalDeadline")}
               </div>
-              <p className="mt-1 text-sm font-medium">
+              <p className="mt-1 text-sm font-medium leading-relaxed">
                 {t("emailSent.goalDeadlineValue", {
                   days: settings.timings.savingGoalDeadlineDaysBefore,
                 })}
@@ -416,27 +418,25 @@ export default function EmailSentPage() {
               <div className="text-xs uppercase tracking-wide text-muted-foreground">
                 {t("emailSent.quietHours")}
               </div>
-              <p className="mt-1 text-sm font-medium">
+              <p className="mt-1 text-sm font-medium leading-relaxed">
                 {t("emailSent.quietHoursValue", {
                   start: String(settings.quietHours.startHour).padStart(2, "0"),
                   end: String(settings.quietHours.endHour).padStart(2, "0"),
                 })}
               </p>
             </div>
-            {settings.templateTypes.length > 0 && (
-              <div className="sm:col-span-2">
-                <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
-                  {t("emailSent.templateTypes")}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {settings.templateTypes.map((type) => (
-                    <Badge key={type} variant="outline" className="font-mono text-xs">
-                      {type}
-                    </Badge>
-                  ))}
-                </div>
+            <div className="sm:col-span-2">
+              <div className="mb-2 text-xs uppercase tracking-wide text-muted-foreground">
+                {t("emailSent.templateTypes")}
               </div>
-            )}
+              <div className="flex flex-wrap gap-2">
+                {VISIBLE_EMAIL_TYPES.map((type) => (
+                  <Badge key={type} variant="outline" className="font-mono text-xs">
+                    {type}
+                  </Badge>
+                ))}
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}
