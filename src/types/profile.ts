@@ -22,6 +22,8 @@ export interface ProfileResponse {
   status: string
   mfaEnabled: boolean
   mfaMethod: string | null
+  /** Master opt-in for SMTP email channel (also on GET/PUT /api/email-settings). */
+  notifyEmailEnabled: boolean
   notificationPreferences: NotificationPreferences
   createdAt: string
   updatedAt: string | null
@@ -33,6 +35,7 @@ export interface UpdateProfileRequest {
   currency?: string
   locale?: string
   dailyLimit?: number
+  notifyEmailEnabled?: boolean
   notificationPreferences?: NotificationPreferences
 }
 

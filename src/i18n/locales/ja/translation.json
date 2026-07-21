@@ -1375,5 +1375,55 @@
       "amount": "月額",
       "days": "日数"
     }
+  },
+  "emailSent": {
+    "title": "送信メール",
+    "subtitle": "メール通知の受信設定と、送信済みメールの履歴を確認できます。",
+    "settingsTitle": "メールチャネル",
+    "settingsDescription": "メールは任意です。カテゴリ切替はベル通知とメールの両方に適用されます。",
+    "masterToggle": "メールを受け取る",
+    "masterToggleHint": "マスタースイッチ — オプトインするまでデフォルトはオフです",
+    "categoriesTitle": "通知する内容",
+    "categoriesHint": "設定 → 通知と同じ設定（ベル + メール）",
+    "largeTxNoteTitle": "大口取引のしきい値",
+    "largeTxNoteDesc": "大口支出メールはプロフィール設定の1日の支出上限を使います（金額 ≥ 日次上限）。",
+    "openProfileSettings": "プロフィール設定を開く",
+    "timingsTitle": "メール送信タイミング",
+    "timingsDescription": "サーバー設定（表示のみ）。サイレント時間はUTCです。",
+    "billDue": "請求期限前",
+    "billDueValue": "{{days}} 日前 · 期限当日: {{onDue}}",
+    "billOverdue": "請求延滞",
+    "billOverdueValue": "期限後 {{days}} 日",
+    "goalDeadline": "貯蓄目標の期限",
+    "goalDeadlineValue": "{{days}} 日以内",
+    "quietHours": "サイレント時間 (UTC)",
+    "quietHoursValue": "{{start}}:00 – {{end}}:00",
+    "templateTypes": "メール種類",
+    "yes": "あり",
+    "no": "なし",
+    "historyTitle": "送信履歴",
+    "historyDescription": "アカウント向けに作成されたメール（保留・送信済み・失敗・スキップ）。",
+    "emptyTitle": "メールはまだありません",
+    "emptyDesc": "システムがメールを送ると、ここに表示されます。",
+    "loadMore": "さらに読み込む",
+    "createdAt": "作成",
+    "featureDisabledTitle": "管理者によりメール無効",
+    "featureDisabledDesc": "サーバーのメール機能がオフです。メール通知を期待していた場合はサポートへ連絡してください。",
+    "filter": {
+      "placeholder": "ステータスで絞り込み",
+      "all": "すべてのステータス",
+      "sent": "送信済み",
+      "pending": "保留",
+      "failed": "失敗",
+      "skipped": "スキップ"
+    },
+    "success": {
+      "saved": "メール設定を保存しました"
+    },
+    "error": {
+      "loadSettings": "メール設定の読み込みに失敗しました",
+      "loadHistory": "メール履歴の読み込みに失敗しました",
+      "saveFailed": "メール設定の保存に失敗しました"
+    }
   }
 }

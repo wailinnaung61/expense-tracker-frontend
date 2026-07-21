@@ -28,6 +28,7 @@ import Settings from "@/pages/settings"
 import Investments from "@/pages/investments"
 import Categories from "@/pages/categories"
 import NotificationsPage from "@/pages/notifications/NotificationsPage"
+import EmailSentPage from "@/pages/email-sent"
 
 // Route Components
 import { ProtectedRoute } from "@/components/ProtectedRoute"
@@ -71,6 +72,7 @@ export default function Router() {
             <Route path="/user" element={<Accounts />} />
             <Route path="/setting" element={<Settings />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/email-sent" element={<EmailSentPage />} />
           </Route>
         </Route>
 

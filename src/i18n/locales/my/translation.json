@@ -1375,5 +1375,55 @@
       "amount": "လစဉ် ပမာဏ",
       "days": "ရက်ရေ"
     }
+  },
+  "emailSent": {
+    "title": "ပို့ပြီးသောအီးမေးလ်",
+    "subtitle": "အီးမေးလ် သတိပေးချက်များ လက်ခံမည့် ဆက်တင်နှင့် ပို့ပြီးသား အီးမေးလ် မှတ်တမ်းကို ကြည့်ရှုနိုင်သည်။",
+    "settingsTitle": "အီးမေးလ် ချန်နယ်",
+    "settingsDescription": "အီးမေးလ်သည် ရွေးချယ်နိုင်သည်။ အမျိုးအစား ခလုတ်များသည် ခေါင်းလောင်း သတိပေးချက်နှင့် အီးမေးလ် နှစ်ခုလုံးအတွက် အကျုံးဝင်သည်။",
+    "masterToggle": "အီးမေးလ် ပို့ပေးပါ",
+    "masterToggleHint": "ပင်မ ခလုတ် — သင် ဖွင့်မထားမချင်း ပုံသေ ပိတ်ထားသည်",
+    "categoriesTitle": "ဘာတွေ အကြောင်း သတိပေးမလဲ",
+    "categoriesHint": "Settings → Notifications နှင့် တူညီသည် (ခေါင်းလောင်း + အီးမေးလ်)",
+    "largeTxNoteTitle": "ငွေပမာဏကြီး သတ်မှတ်ချက်",
+    "largeTxNoteDesc": "ငွေပမာဏကြီး အီးမေးလ်များသည် Profile Settings ရှိ နေ့စဉ် သုံးစွဲကန့်သတ်ချက်ကို သုံးသည် (ပမာဏ ≥ နေ့စဉ် ကန့်သတ်ချက်)။",
+    "openProfileSettings": "Profile Settings ဖွင့်မည်",
+    "timingsTitle": "အီးမေးလ် ပို့မည့် အချိန်",
+    "timingsDescription": "ဆာဗာ ဆက်တင် (ဖတ်ရန်သာ)။ Quiet hours သည် UTC ဖြစ်သည်။",
+    "billDue": "ငွေပေးချေရန် ရက်နီး",
+    "billDueValue": "{{days}} ရက် ကြို · ရက်နေ့တွင်: {{onDue}}",
+    "billOverdue": "ငွေပေးချေရန် ကျော်",
+    "billOverdueValue": "ရက်ကျော်ပြီး {{days}} ရက်",
+    "goalDeadline": "စုငွေ ရည်မှန်းချက် နောက်ဆုံးရက်",
+    "goalDeadlineValue": "{{days}} ရက် အတွင်း",
+    "quietHours": "Quiet hours (UTC)",
+    "quietHoursValue": "{{start}}:00 – {{end}}:00",
+    "templateTypes": "အီးမေးလ် အမျိုးအစားများ",
+    "yes": "ရှိ",
+    "no": "မရှိ",
+    "historyTitle": "ပို့ပြီး မှတ်တမ်း",
+    "historyDescription": "သင့်အကောင့်အတွက် ဖန်တီးထားသော အီးမေးလ်များ (Pending / Sent / Failed / Skipped)။",
+    "emptyTitle": "အီးမေးလ် မရှိသေးပါ",
+    "emptyDesc": "စနစ်က အီးမေးလ် ပို့သောအခါ ဤနေရာတွင် ပေါ်လာမည်။",
+    "loadMore": "ပိုမို ဖတ်မည်",
+    "createdAt": "ဖန်တီးချိန်",
+    "featureDisabledTitle": "Admin က အီးမေးလ် ပိတ်ထားသည်",
+    "featureDisabledDesc": "ဆာဗာ အီးမေးလ် လုပ်ဆောင်ချက် ပိတ်ထားသည်။ အီးမေးလ် သတိပေးချက် မျှော်လင့်ထားပါက support သို့ ဆက်သွယ်ပါ။",
+    "filter": {
+      "placeholder": "အခြေအနေဖြင့် စစ်ထုတ်မည်",
+      "all": "အခြေအနေအားလုံး",
+      "sent": "ပို့ပြီး",
+      "pending": "စောင့်ဆိုင်း",
+      "failed": "မအောင်မြင်",
+      "skipped": "ကျော်သွား"
+    },
+    "success": {
+      "saved": "အီးမေးလ် ဆက်တင် သိမ်းပြီးပါပြီ"
+    },
+    "error": {
+      "loadSettings": "အီးမေးလ် ဆက်တင် ဖတ်၍မရပါ",
+      "loadHistory": "အီးမေးလ် မှတ်တမ်း ဖတ်၍မရပါ",
+      "saveFailed": "အီးမေးလ် ဆက်တင် သိမ်း၍မရပါ"
+    }
   }
 }

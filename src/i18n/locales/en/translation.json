@@ -1374,5 +1374,55 @@
       "amount": "Monthly amount",
       "days": "Days in month"
     }
+  },
+  "emailSent": {
+    "title": "Email Sent",
+    "subtitle": "Opt in to email alerts and review messages already sent to your inbox.",
+    "settingsTitle": "Email channel",
+    "settingsDescription": "Email is optional. Category switches apply to both bell notifications and email.",
+    "masterToggle": "Send me emails",
+    "masterToggleHint": "Master switch — off by default until you opt in",
+    "categoriesTitle": "What to notify about",
+    "categoriesHint": "Same preferences as Settings → Notifications (bell + email)",
+    "largeTxNoteTitle": "Large transaction threshold",
+    "largeTxNoteDesc": "Emails for large expenses use your Daily Spending Limit from Profile Settings (amount ≥ daily limit).",
+    "openProfileSettings": "Open Profile Settings",
+    "timingsTitle": "When we email",
+    "timingsDescription": "Configured by the server (read-only). Quiet hours use UTC.",
+    "billDue": "Bill due",
+    "billDueValue": "{{days}} day(s) before · on due date: {{onDue}}",
+    "billOverdue": "Bill overdue",
+    "billOverdueValue": "{{days}} day(s) after due",
+    "goalDeadline": "Saving goal deadline",
+    "goalDeadlineValue": "Within {{days}} day(s)",
+    "quietHours": "Quiet hours (UTC)",
+    "quietHoursValue": "{{start}}:00 – {{end}}:00",
+    "templateTypes": "Email types",
+    "yes": "yes",
+    "no": "no",
+    "historyTitle": "Sent history",
+    "historyDescription": "Emails created for your account (pending, sent, failed, or skipped).",
+    "emptyTitle": "No emails yet",
+    "emptyDesc": "When the system sends you an email, it will show up here.",
+    "loadMore": "Load more",
+    "createdAt": "Created",
+    "featureDisabledTitle": "Email disabled by admin",
+    "featureDisabledDesc": "The server email feature is turned off. Contact support if you expected email alerts.",
+    "filter": {
+      "placeholder": "Filter by status",
+      "all": "All statuses",
+      "sent": "Sent",
+      "pending": "Pending",
+      "failed": "Failed",
+      "skipped": "Skipped"
+    },
+    "success": {
+      "saved": "Email preferences saved"
+    },
+    "error": {
+      "loadSettings": "Failed to load email settings",
+      "loadHistory": "Failed to load email history",
+      "saveFailed": "Failed to save email preferences"
+    }
   }
 }

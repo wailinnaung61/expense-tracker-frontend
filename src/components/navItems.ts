@@ -12,6 +12,7 @@ import {
   LineChart,
   type LucideIcon,
   CreditCard,
+  Mail,
 } from 'lucide-react'
 
 export interface NavItem {
@@ -54,6 +55,11 @@ export const iconMap: Record<string, LucideIcon> = {
 
   // Notifications
   notifications: Bell,
+
+  // Email sent
+  emailsent: Mail,
+  'email-sent': Mail,
+  email_sent: Mail,
 
   // Referrals / Users
   referrals: Users,
