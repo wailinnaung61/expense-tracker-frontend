@@ -511,7 +511,8 @@ export function BudgetCategories({
                     </Button>
                   </div>
 
-                  {(category.usagePercent >= 100 || allocatedAmount < category.spent) && (
+                  {category.alertsEnabled &&
+                    (category.usagePercent >= 100 || allocatedAmount < category.spent) && (
                     <div className="mt-4 rounded-2xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/50 p-3 text-sm text-red-700 dark:text-red-300">
                       <div className="flex items-start gap-2">
                         <AlertTriangle className="mt-0.5 h-4 w-4" />
