@@ -379,23 +379,27 @@ export default function EmailSentPage() {
               <div className="text-xs uppercase tracking-wide text-muted-foreground">
                 {t("emailSent.billDue")}
               </div>
-              <p className="mt-1 text-sm font-medium">
-                {t("emailSent.billDueValue", {
-                  days: settings.timings.recurringDueDaysBefore.join(", ") || "—",
-                  onDue: settings.timings.recurringDueOnDueDate
-                    ? t("emailSent.yes")
-                    : t("emailSent.no"),
-                })}
+              <p className="mt-1 text-sm font-medium leading-relaxed">
+                {settings.timings.recurringDueDaysBefore.length > 0
+                  ? t("emailSent.billDueValue", {
+                      days: settings.timings.recurringDueDaysBefore.join(", "),
+                      onDue: settings.timings.recurringDueOnDueDate
+                        ? t("emailSent.billDueAlsoOnDueDate")
+                        : "",
+                    })
+                  : t("emailSent.notConfigured")}
               </p>
             </div>
             <div className="rounded-xl border bg-card px-4 py-3">
               <div className="text-xs uppercase tracking-wide text-muted-foreground">
                 {t("emailSent.billOverdue")}
               </div>
-              <p className="mt-1 text-sm font-medium">
-                {t("emailSent.billOverdueValue", {
-                  days: settings.timings.recurringOverdueDaysAfter.join(", ") || "—",
-                })}
+              <p className="mt-1 text-sm font-medium leading-relaxed">
+                {settings.timings.recurringOverdueDaysAfter.length > 0
+                  ? t("emailSent.billOverdueValue", {
+                      days: settings.timings.recurringOverdueDaysAfter.join(", "),
+                    })
+                  : t("emailSent.notConfigured")}
               </p>
             </div>
             <div className="rounded-xl border bg-card px-4 py-3">

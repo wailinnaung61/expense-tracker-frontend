@@ -24,7 +24,11 @@ function asStringArray(value: unknown): string[] {
 
 function asNumberArray(value: unknown): number[] {
   if (!Array.isArray(value)) return [];
-  return value.map((v) => asNumber(v)).filter((n) => Number.isFinite(n));
+  const nums = value
+    .map((v) => asNumber(v, Number.NaN))
+    .filter((n) => Number.isFinite(n));
+  // API/config sometimes repeats values (e.g. [7,3,1,7,3,1]) — show unique only.
+  return [...new Set(nums)].sort((a, b) => b - a);
 }
 
 function normalizeSettings(raw: EmailSettingsResponse): EmailSettingsResponse {
