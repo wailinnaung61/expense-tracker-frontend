@@ -7,6 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   CategoryCombobox,
   CATEGORY_COMBOBOX_ALL_VALUE,
 } from "@/components/categories/category-combobox";
@@ -380,48 +385,98 @@ export function BudgetCategories({
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border bg-muted/20 px-4 py-3">
-                    <div>
-                      <Label
-                        htmlFor={`reserved-${category.budgetCategoryId}`}
-                        className="text-sm font-medium text-foreground"
-                      >
-                        {t("budget.categories.reserveFixed")}
-                      </Label>
-                      <p className="text-xs text-muted-foreground">
-                        {t("budget.categories.reserveFixedHint")}
-                      </p>
+                  <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <div
+                      className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2 transition-colors ${
+                        category.isReserved
+                          ? "border-amber-200 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/40"
+                          : "border-border bg-muted/15"
+                      }`}
+                    >
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <Wallet
+                          className={`h-3.5 w-3.5 shrink-0 ${
+                            category.isReserved
+                              ? "text-amber-600 dark:text-amber-400"
+                              : "text-muted-foreground"
+                          }`}
+                        />
+                        <Label
+                          htmlFor={`reserved-${category.budgetCategoryId}`}
+                          className="truncate text-xs font-medium text-foreground"
+                        >
+                          {t("budget.categories.reserveFixed")}
+                        </Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              className="shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+                              aria-label={t("budget.categories.reserveFixedHint")}
+                            >
+                              <Info className="h-3.5 w-3.5" />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-56 text-xs">
+                            {t("budget.categories.reserveFixedHint")}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Switch
+                        id={`reserved-${category.budgetCategoryId}`}
+                        checked={category.isReserved}
+                        disabled={savingCategoryId === category.budgetCategoryId}
+                        onCheckedChange={(checked) =>
+                          onToggleReserved(category.budgetCategoryId, checked)
+                        }
+                      />
                     </div>
-                    <Switch
-                      id={`reserved-${category.budgetCategoryId}`}
-                      checked={category.isReserved}
-                      disabled={savingCategoryId === category.budgetCategoryId}
-                      onCheckedChange={(checked) =>
-                        onToggleReserved(category.budgetCategoryId, checked)
-                      }
-                    />
-                  </div>
 
-                  <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border bg-muted/20 px-4 py-3">
-                    <div>
-                      <Label
-                        htmlFor={`alerts-${category.budgetCategoryId}`}
-                        className="text-sm font-medium text-foreground"
-                      >
-                        {t("budget.categories.budgetAlerts")}
-                      </Label>
-                      <p className="text-xs text-muted-foreground">
-                        {t("budget.categories.budgetAlertsHint")}
-                      </p>
+                    <div
+                      className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2 transition-colors ${
+                        category.alertsEnabled
+                          ? "border-sky-200 bg-sky-50/80 dark:border-sky-800 dark:bg-sky-950/40"
+                          : "border-border bg-muted/15"
+                      }`}
+                    >
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <Bell
+                          className={`h-3.5 w-3.5 shrink-0 ${
+                            category.alertsEnabled
+                              ? "text-sky-600 dark:text-sky-400"
+                              : "text-muted-foreground"
+                          }`}
+                        />
+                        <Label
+                          htmlFor={`alerts-${category.budgetCategoryId}`}
+                          className="truncate text-xs font-medium text-foreground"
+                        >
+                          {t("budget.categories.budgetAlerts")}
+                        </Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              className="shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+                              aria-label={t("budget.categories.budgetAlertsHint")}
+                            >
+                              <Info className="h-3.5 w-3.5" />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-56 text-xs">
+                            {t("budget.categories.budgetAlertsHint")}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Switch
+                        id={`alerts-${category.budgetCategoryId}`}
+                        checked={category.alertsEnabled}
+                        disabled={savingCategoryId === category.budgetCategoryId}
+                        onCheckedChange={(checked) =>
+                          onToggleAlertsEnabled(category.budgetCategoryId, checked)
+                        }
+                      />
                     </div>
-                    <Switch
-                      id={`alerts-${category.budgetCategoryId}`}
-                      checked={category.alertsEnabled}
-                      disabled={savingCategoryId === category.budgetCategoryId}
-                      onCheckedChange={(checked) =>
-                        onToggleAlertsEnabled(category.budgetCategoryId, checked)
-                      }
-                    />
                   </div>
 
                   <div className="mt-4 space-y-2">
@@ -558,7 +613,20 @@ export function BudgetCategories({
                       >
                         {cat.displayName}
                       </span>
-                      <div className="flex items-center gap-2">
+                      <div
+                        className={`flex items-center gap-1.5 rounded-lg border px-2 py-1 ${
+                          isReserved
+                            ? "border-amber-200 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/40"
+                            : "border-border bg-muted/10"
+                        }`}
+                      >
+                        <Wallet
+                          className={`h-3.5 w-3.5 ${
+                            isReserved
+                              ? "text-amber-600 dark:text-amber-400"
+                              : "text-muted-foreground"
+                          }`}
+                        />
                         <Label
                           htmlFor={`add-reserved-${cat.categoryId}`}
                           className="text-xs text-muted-foreground whitespace-nowrap"
@@ -576,8 +644,20 @@ export function BudgetCategories({
                           }
                         />
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Bell className="h-3.5 w-3.5 text-muted-foreground" />
+                      <div
+                        className={`flex items-center gap-1.5 rounded-lg border px-2 py-1 ${
+                          alertsEnabled
+                            ? "border-sky-200 bg-sky-50/80 dark:border-sky-800 dark:bg-sky-950/40"
+                            : "border-border bg-muted/10"
+                        }`}
+                      >
+                        <Bell
+                          className={`h-3.5 w-3.5 ${
+                            alertsEnabled
+                              ? "text-sky-600 dark:text-sky-400"
+                              : "text-muted-foreground"
+                          }`}
+                        />
                         <Label
                           htmlFor={`add-alerts-${cat.categoryId}`}
                           className="text-xs text-muted-foreground whitespace-nowrap"

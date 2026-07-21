@@ -49,15 +49,23 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import {
   AlertTriangle,
+  Bell,
   CalendarIcon,
   GripVertical,
+  Info,
   Maximize2,
   Minimize2,
   Minus,
   Plus,
   Target,
+  Wallet,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function dateFromYyyyMmDd(value: string): Date | undefined {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
@@ -213,45 +221,95 @@ function SortableCategoryItem({
               </p>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-3 rounded-xl border bg-muted/20 px-3 py-2">
-            <div>
-              <Label
-                htmlFor={`reserved-${category.categoryId}`}
-                className="text-sm font-medium"
-              >
-                {t("budget.categories.reserveFixed")}
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                {t("budget.categories.reserveFixedHint")}
-              </p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div
+              className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2 ${
+                draft.isReserved
+                  ? "border-amber-200 bg-amber-50/80 dark:border-amber-800 dark:bg-amber-950/40"
+                  : "border-border bg-muted/15"
+              }`}
+            >
+              <div className="flex min-w-0 items-center gap-1.5">
+                <Wallet
+                  className={`h-3.5 w-3.5 shrink-0 ${
+                    draft.isReserved
+                      ? "text-amber-600 dark:text-amber-400"
+                      : "text-muted-foreground"
+                  }`}
+                />
+                <Label
+                  htmlFor={`reserved-${category.categoryId}`}
+                  className="truncate text-xs font-medium"
+                >
+                  {t("budget.categories.reserveFixed")}
+                </Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+                      aria-label={t("budget.categories.reserveFixedHint")}
+                    >
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-56 text-xs">
+                    {t("budget.categories.reserveFixedHint")}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Switch
+                id={`reserved-${category.categoryId}`}
+                checked={draft.isReserved}
+                onCheckedChange={(checked) =>
+                  onUpdateDraft(category.categoryId, "isReserved", checked)
+                }
+              />
             </div>
-            <Switch
-              id={`reserved-${category.categoryId}`}
-              checked={draft.isReserved}
-              onCheckedChange={(checked) =>
-                onUpdateDraft(category.categoryId, "isReserved", checked)
-              }
-            />
-          </div>
-          <div className="flex items-center justify-between gap-3 rounded-xl border bg-muted/20 px-3 py-2">
-            <div>
-              <Label
-                htmlFor={`alerts-${category.categoryId}`}
-                className="text-sm font-medium"
-              >
-                {t("budget.categories.budgetAlerts")}
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                {t("budget.categories.budgetAlertsHint")}
-              </p>
+            <div
+              className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2 ${
+                draft.alertsEnabled
+                  ? "border-sky-200 bg-sky-50/80 dark:border-sky-800 dark:bg-sky-950/40"
+                  : "border-border bg-muted/15"
+              }`}
+            >
+              <div className="flex min-w-0 items-center gap-1.5">
+                <Bell
+                  className={`h-3.5 w-3.5 shrink-0 ${
+                    draft.alertsEnabled
+                      ? "text-sky-600 dark:text-sky-400"
+                      : "text-muted-foreground"
+                  }`}
+                />
+                <Label
+                  htmlFor={`alerts-${category.categoryId}`}
+                  className="truncate text-xs font-medium"
+                >
+                  {t("budget.categories.budgetAlerts")}
+                </Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+                      aria-label={t("budget.categories.budgetAlertsHint")}
+                    >
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-56 text-xs">
+                    {t("budget.categories.budgetAlertsHint")}
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Switch
+                id={`alerts-${category.categoryId}`}
+                checked={draft.alertsEnabled}
+                onCheckedChange={(checked) =>
+                  onUpdateDraft(category.categoryId, "alertsEnabled", checked)
+                }
+              />
             </div>
-            <Switch
-              id={`alerts-${category.categoryId}`}
-              checked={draft.alertsEnabled}
-              onCheckedChange={(checked) =>
-                onUpdateDraft(category.categoryId, "alertsEnabled", checked)
-              }
-            />
           </div>
         </div>
       )}
