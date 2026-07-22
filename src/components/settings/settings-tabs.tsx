@@ -1,15 +1,49 @@
-import { ProfileSettings } from "@/components/settings/profile-settings";
 import { AppearanceSettings } from "@/components/settings/appearance-settings";
+import { EmailSentSettings } from "@/components/settings/email-sent-settings";
 import { NotificationSettings } from "@/components/settings/notification-settings";
+import { ProfileSettings } from "@/components/settings/profile-settings";
+import { SecuritySettings } from "@/components/settings/security-settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SecuritySettings } from "./security-settings";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+
+const TAB_VALUES = [
+  "profile",
+  "appearance",
+  "notifications",
+  "email",
+  "security",
+] as const;
+
+type SettingsTab = (typeof TAB_VALUES)[number];
+
+function parseTab(value: string | null): SettingsTab {
+  if (value && (TAB_VALUES as readonly string[]).includes(value)) {
+    return value as SettingsTab;
+  }
+  return "profile";
+}
 
 export function SettingsTabs() {
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [tab, setTab] = useState<SettingsTab>(() =>
+    parseTab(searchParams.get("tab"))
+  );
+
+  useEffect(() => {
+    setTab(parseTab(searchParams.get("tab")));
+  }, [searchParams]);
+
+  const handleTabChange = (value: string) => {
+    const next = parseTab(value);
+    setTab(next);
+    setSearchParams(next === "profile" ? {} : { tab: next }, { replace: true });
+  };
 
   return (
-    <Tabs defaultValue="profile" className="space-y-6">
+    <Tabs value={tab} onValueChange={handleTabChange} className="space-y-6">
       <div className="overflow-x-auto whitespace-nowrap pb-2">
         <TabsList className="flex bg-muteed border p-px h-11 border-border rounded-md text-foreground w-fit">
           <TabsTrigger
@@ -31,6 +65,12 @@ export function SettingsTabs() {
             {t("settings.tabs.notifications")}
           </TabsTrigger>
           <TabsTrigger
+            value="email"
+            className="h-10 bg-muted rounded-none me-px"
+          >
+            {t("settings.tabs.email")}
+          </TabsTrigger>
+          <TabsTrigger
             value="security"
             className="h-10 bg-muted rounded-none"
           >
@@ -46,6 +86,9 @@ export function SettingsTabs() {
       </TabsContent>
       <TabsContent value="notifications">
         <NotificationSettings />
+      </TabsContent>
+      <TabsContent value="email">
+        <EmailSentSettings />
       </TabsContent>
       <TabsContent value="security">
         <SecuritySettings />

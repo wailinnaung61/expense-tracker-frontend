@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Bell, Mail, Wallet, Target, Receipt, Calendar, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Bell, Wallet, Target, Receipt, Calendar, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useState, useEffect } from "react";
 import { profileService } from "@/services/profileService";
@@ -239,40 +239,6 @@ export function NotificationSettings() {
               checked={settings.paymentFailures}
               disabled={saving}
               onCheckedChange={() => handleToggle("paymentFailures")}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* System Notifications */}
-      <Card>
-        <CardHeader className="pb-4 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5 text-primary" />
-            {t("settings.notifications.systemTitle")}
-          </CardTitle>
-          <CardDescription>
-            {t("settings.notifications.systemDescription")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <Mail className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-              <div>
-                <Label htmlFor="exports">
-                  {t("settings.notifications.exports")}
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  {t("settings.notifications.exportsHint")}
-                </p>
-              </div>
-            </div>
-            <Switch
-              id="exports"
-              checked={settings.exports}
-              disabled={saving}
-              onCheckedChange={() => handleToggle("exports")}
             />
           </div>
         </CardContent>
