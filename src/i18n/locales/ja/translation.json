@@ -882,7 +882,16 @@
       "verifyEmailDescription": "メールに送信された確認コードを入力してください",
       "verificationCode": "確認コード",
       "resendCode": "コードを再送信",
-      "verifyEmail": "メールを確認"
+      "verifyEmail": "メールを確認",
+      "uploadPhoto": "写真をアップロード",
+      "removePhoto": "写真を削除",
+      "chooseCartoon": "カートゥーンを選ぶ",
+      "avatarHint": "JPEG / PNG / WebP / GIF · 最大 2 MB",
+      "avatarUpdated": "プロフィール画像を更新しました",
+      "avatarRemoved": "写真を削除し、カートゥーンに戻しました",
+      "avatarUpdateError": "プロフィール画像の更新に失敗しました",
+      "avatarInvalidType": "JPEG、PNG、WebP、または GIF を選んでください",
+      "avatarTooLarge": "画像は 2 MB 以下にしてください"
     },
     "security": {
       "changePasswordTitle": "パスワード",

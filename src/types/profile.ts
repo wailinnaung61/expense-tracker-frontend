@@ -10,6 +10,21 @@ export interface NotificationPreferences {
   exports: boolean
 }
 
+export type ProfileAvatarSource = "preset" | "upload"
+
+export interface ProfileAvatar {
+  source: ProfileAvatarSource | string
+  presetId: string | null
+  url: string
+}
+
+export interface AvatarPreset {
+  id: string
+  label: string
+  accentColor: string
+  url: string
+}
+
 export interface ProfileResponse {
   userId: string
   userName: string
@@ -25,6 +40,7 @@ export interface ProfileResponse {
   /** Master opt-in for SMTP email channel (also on GET/PUT /api/email-settings). */
   notifyEmailEnabled: boolean
   notificationPreferences: NotificationPreferences
+  avatar?: ProfileAvatar | null
   createdAt: string
   updatedAt: string | null
   lastLoginAt: string | null
@@ -37,6 +53,12 @@ export interface UpdateProfileRequest {
   dailyLimit?: number
   notifyEmailEnabled?: boolean
   notificationPreferences?: NotificationPreferences
+  /** Optional: set cartoon preset while saving profile settings. */
+  avatarPresetId?: string
+}
+
+export interface SelectAvatarPresetRequest {
+  presetId: string
 }
 
 // Supported currencies from backend

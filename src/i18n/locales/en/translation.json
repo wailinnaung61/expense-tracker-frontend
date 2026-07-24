@@ -882,7 +882,16 @@
       "verifyEmailDescription": "Enter the verification code sent to your email",
       "verificationCode": "Verification Code",
       "resendCode": "Resend Code",
-      "verifyEmail": "Verify Email"
+      "verifyEmail": "Verify Email",
+      "uploadPhoto": "Upload photo",
+      "removePhoto": "Remove photo",
+      "chooseCartoon": "Choose a cartoon",
+      "avatarHint": "JPEG, PNG, WebP, or GIF · max 2 MB",
+      "avatarUpdated": "Profile picture updated",
+      "avatarRemoved": "Photo removed — back to cartoon",
+      "avatarUpdateError": "Failed to update profile picture",
+      "avatarInvalidType": "Please choose a JPEG, PNG, WebP, or GIF image",
+      "avatarTooLarge": "Image must be 2 MB or smaller"
     },
     "security": {
       "changePasswordTitle": "Password",

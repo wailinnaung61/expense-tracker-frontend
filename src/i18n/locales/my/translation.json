@@ -882,7 +882,16 @@
       "verifyEmailDescription": "သင်၏ အီးမေးလ်ထံသို့ ပို့ပြီးသည့် အတည်ပြုချက်ကုဒ်များကို ရိုက်ထည့်ပါ",
       "verificationCode": "အတည်ပြုချက် ကုဒ်များ",
       "resendCode": "ကုဒ်ပြန်ပို့ပါ",
-      "verifyEmail": "အီးမေးလ် အတည်ပြုပါ"
+      "verifyEmail": "အီးမေးလ် အတည်ပြုပါ",
+      "uploadPhoto": "ဓာတ်ပုံ တင်မည်",
+      "removePhoto": "ဓာတ်ပုံ ဖယ်ရှားမည်",
+      "chooseCartoon": "ကာတွန်း ရွေးမည်",
+      "avatarHint": "JPEG / PNG / WebP / GIF · အများဆုံး 2 MB",
+      "avatarUpdated": "ပရိုဖိုင်ပုံ အပ်ဒိတ်လုပ်ပြီးပါပြီ",
+      "avatarRemoved": "ဓာတ်ပုံ ဖယ်ရှားပြီး ကာတွန်းသို့ ပြန်ထားပါပြီ",
+      "avatarUpdateError": "ပရိုဖိုင်ပုံ အပ်ဒိတ် မအောင်မြင်ပါ",
+      "avatarInvalidType": "JPEG၊ PNG၊ WebP သို့မဟုတ် GIF ရွေးပါ",
+      "avatarTooLarge": "ပုံသည် 2 MB ထက် မကျော်ရပါ"
     },
     "security": {
       "changePasswordTitle": "စကားဝှက်",

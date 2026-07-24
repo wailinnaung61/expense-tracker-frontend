@@ -24,8 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Mail, Lock } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Loader2, Mail, Lock, Trash2, Upload } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -33,9 +33,17 @@ import { profileService } from "@/services/profileService";
 import { authService } from "@/services/authService";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "react-toastify";
-import type { ProfileResponse, UpdateProfileFormData } from "@/types/profile";
+import type {
+  AvatarPreset,
+  ProfileResponse,
+  UpdateProfileFormData,
+} from "@/types/profile";
 import { updateProfileSchema, SUPPORTED_CURRENCIES, SUPPORTED_LOCALES } from "@/types/profile";
 import { useTranslation } from "@/hooks/useTranslation";
+import { cn } from "@/lib/utils";
+
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+const ACCEPTED_AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 // Auth profile validation schema (userName as displayName, email)
 const authProfileSchema = z.object({
@@ -50,11 +58,14 @@ export function ProfileSettings() {
   const { user, fetchUser } = useAuth();
   const { t } = useTranslation();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
+  const [presets, setPresets] = useState<AvatarPreset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
   const [emailVerificationOpen, setEmailVerificationOpen] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [pendingEmailVerification, setPendingEmailVerification] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Combined form data type
   type CombinedFormData = AuthProfileFormData & UpdateProfileFormData;
@@ -94,8 +105,12 @@ export function ProfileSettings() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await profileService.getProfile();
+        const [data, presetList] = await Promise.all([
+          profileService.getProfile(),
+          profileService.getAvatarPresets().catch(() => [] as AvatarPreset[]),
+        ]);
         setProfile(data);
+        setPresets(presetList);
         
         // DO NOT sync locale with i18n - locale is ONLY for notification language
         // UI language is controlled separately by the language switcher
@@ -118,6 +133,68 @@ export function ProfileSettings() {
     };
     fetchProfile();
   }, []);
+
+  const applyProfileAvatar = (updated: ProfileResponse) => {
+    setProfile(updated);
+  };
+
+  const handleSelectPreset = async (presetId: string) => {
+    if (avatarBusy) return;
+    setAvatarBusy(true);
+    try {
+      const updated = await profileService.selectAvatarPreset({ presetId });
+      applyProfileAvatar(updated);
+      toast.success(t("settings.profile.avatarUpdated"));
+    } catch (error: any) {
+      toast.error(error?.message || t("settings.profile.avatarUpdateError"));
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!ACCEPTED_AVATAR_TYPES.includes(file.type)) {
+      toast.error(t("settings.profile.avatarInvalidType"));
+      return;
+    }
+    if (file.size > MAX_AVATAR_BYTES) {
+      toast.error(t("settings.profile.avatarTooLarge"));
+      return;
+    }
+
+    setAvatarBusy(true);
+    try {
+      const updated = await profileService.uploadAvatar(file);
+      applyProfileAvatar(updated);
+      toast.success(t("settings.profile.avatarUpdated"));
+    } catch (error: any) {
+      toast.error(error?.message || t("settings.profile.avatarUpdateError"));
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const handleRemoveUpload = async () => {
+    if (avatarBusy) return;
+    setAvatarBusy(true);
+    try {
+      const updated = await profileService.removeAvatar();
+      applyProfileAvatar(updated);
+      toast.success(t("settings.profile.avatarRemoved"));
+    } catch (error: any) {
+      toast.error(error?.message || t("settings.profile.avatarUpdateError"));
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
 
   // Combined form submit handler
   const onSubmit = async (data: CombinedFormData) => {
@@ -242,22 +319,99 @@ export function ProfileSettings() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Avatar Section */}
-            <div className="flex items-center gap-5 rounded-2xl border bg-muted/20 p-4 sm:gap-6 sm:p-5">
-              <div className="rounded-full bg-linear-to-br from-primary/20 via-primary/10 to-transparent p-[3px] shadow-sm">
-                <Avatar className="h-20 w-20 border border-white/60 dark:border-slate-700">
-                  <AvatarImage src="" alt={displayName} />
-                  <AvatarFallback className="bg-linear-to-br from-primary to-primary/80 text-xl font-semibold text-primary-foreground">
-                    {avatarInitials}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              <div className="min-w-0 flex-1 space-y-1">
-                <h3 className="truncate text-lg font-semibold">{displayName}</h3>
-                <p className="truncate text-sm text-muted-foreground">{displayEmail}</p>
-                <div className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
-                  {t("settings.profile.accountDetails")}
+            <div className="space-y-4 rounded-2xl border bg-muted/20 p-4 sm:p-5">
+              <div className="flex items-center gap-5 sm:gap-6">
+                <div className="rounded-full bg-linear-to-br from-primary/20 via-primary/10 to-transparent p-[3px] shadow-sm">
+                  <Avatar className="h-20 w-20 border border-white/60 dark:border-slate-700">
+                    <AvatarImage
+                      src={profile?.avatar?.url || ""}
+                      alt={displayName}
+                      key={profile?.avatar?.url || "fallback"}
+                    />
+                    <AvatarFallback className="bg-linear-to-br from-primary to-primary/80 text-xl font-semibold text-primary-foreground">
+                      {avatarInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="min-w-0 flex-1 space-y-2">
+                  <h3 className="truncate text-lg font-semibold">{displayName}</h3>
+                  <p className="truncate text-sm text-muted-foreground">{displayEmail}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={avatarBusy}
+                      onClick={handleUploadClick}
+                    >
+                      {avatarBusy ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="mr-2 h-4 w-4" />
+                      )}
+                      {t("settings.profile.uploadPhoto")}
+                    </Button>
+                    {profile?.avatar?.source === "upload" && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        disabled={avatarBusy}
+                        onClick={() => void handleRemoveUpload()}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {t("settings.profile.removePhoto")}
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {t("settings.profile.avatarHint")}
+                  </p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    onChange={(e) => void handleFileChange(e)}
+                  />
                 </div>
               </div>
+
+              {presets.length > 0 && (
+                <div className="space-y-2">
+                  <Label>{t("settings.profile.chooseCartoon")}</Label>
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+                    {presets.map((preset) => {
+                      const selected =
+                        profile?.avatar?.source === "preset" &&
+                        profile.avatar.presetId === preset.id;
+                      return (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          disabled={avatarBusy}
+                          title={preset.label}
+                          onClick={() => void handleSelectPreset(preset.id)}
+                          className={cn(
+                            "relative aspect-square overflow-hidden rounded-xl border-2 bg-background transition-all hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                            selected
+                              ? "border-primary ring-2 ring-primary/30"
+                              : "border-transparent hover:border-muted-foreground/30"
+                          )}
+                          style={{ backgroundColor: `${preset.accentColor}22` }}
+                        >
+                          <img
+                            src={preset.url}
+                            alt={preset.label}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

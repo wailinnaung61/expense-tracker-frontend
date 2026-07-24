@@ -116,10 +116,16 @@ export const apiClient = {
     const language = localStorage.getItem("i18nextLng") || "ja";
 
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
       "Accept-Language": language,
       ...(options.headers as Record<string, string>),
     };
+
+    // Let the browser set multipart boundary for FormData uploads.
+    const isFormData =
+      typeof FormData !== "undefined" && options.body instanceof FormData;
+    if (!isFormData && !headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
