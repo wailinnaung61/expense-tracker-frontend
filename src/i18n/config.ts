@@ -31,7 +31,7 @@ i18n
   // Initialize i18next
   .init({
     resources,
-    lng: 'ja', // Default for first-time visitors (no saved preference)
+    lng: 'en', // Default for first-time visitors (no saved preference)
     fallbackLng: 'en', // Missing translation keys
     supportedLngs: ['en', 'my', 'ja'], // Supported languages
     debug: false, // Set to true for debugging
