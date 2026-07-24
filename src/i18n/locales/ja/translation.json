@@ -1274,7 +1274,17 @@
     "customDateRequired": "開始日と終了日を選択してください。",
     "customDateInvalid": "開始日は終了日より前でなければなりません。",
     "customDateMax24": "日付範囲は24か月を超えることはできません。",
-    "customDateMax24Tip": "最大範囲は24か月です。"
+    "customDateMax24Tip": "最大範囲は24か月です。",
+    "todaySpent": "今日の支出",
+    "todaySpentHint": "本日記録された完了済みの支出",
+    "todaySpentVsLimit": "1日の支出上限との比較",
+    "todaySpentVsBudget": "今日の予算ペースとの比較",
+    "todaySpentRemaining": "本日あと {{amount}}",
+    "todaySpentOver": "本日の目安を {{amount}} 超過",
+    "todaySpentError": "今日の支出を読み込めませんでした",
+    "ofLimit": "/ {{amount}}",
+    "viewTransactions": "取引を見る",
+    "setDailyLimit": "1日の上限を設定"
   },
   "reports": {
     "title": "レポート",

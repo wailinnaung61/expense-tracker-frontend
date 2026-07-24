@@ -7,6 +7,7 @@ import { SavingsSnapshot } from "@/components/dashboard/SavingsSnapshot";
 import { InvestmentSnapshot } from "@/components/dashboard/InvestmentSnapshot";
 import { RecentTransactionsCard } from "@/components/dashboard/RecentTransactionsCard";
 import { UpcomingBillsCard } from "@/components/dashboard/UpcomingBillsCard";
+import { TodaySpentCard } from "@/components/dashboard/TodaySpentCard";
 import { dashboardService } from "@/services/dashboardService";
 import { profileService } from "@/services/profileService";
 import { categoryService } from "@/services/categoryService";
@@ -41,6 +42,7 @@ export default function Home() {
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [todayRefreshKey, setTodayRefreshKey] = useState(0);
 
   const profileRef = useRef(profile);
   profileRef.current = profile;
@@ -136,6 +138,7 @@ export default function Home() {
   const handleMonthChange = useCallback((m: string) => setMonth(m), []);
 
   const handleRefresh = useCallback(() => {
+    setTodayRefreshKey((k) => k + 1);
     if (mode === "custom" && appliedStart && appliedEnd) {
       fetchCustomRange(appliedStart, appliedEnd);
     } else {
@@ -146,16 +149,17 @@ export default function Home() {
   useEffect(() => {
     const onChatbotRefresh = (event: Event) => {
       const { target } = (event as CustomEvent<ChatbotRefreshEventDetail>).detail;
-      if (
-        target === "transactions" ||
-        target === "summary" ||
-        target === "budget" ||
-        target === "savings" ||
-        target === "investments" ||
-        target === "categories" ||
-        target === "recurring_payments"
-      ) {
-        const q = queryRef.current;
+        if (
+          target === "transactions" ||
+          target === "summary" ||
+          target === "budget" ||
+          target === "savings" ||
+          target === "investments" ||
+          target === "categories" ||
+          target === "recurring_payments"
+        ) {
+          setTodayRefreshKey((k) => k + 1);
+          const q = queryRef.current;
         if (q.mode === "custom" && q.appliedStart && q.appliedEnd) {
           fetchCustomRange(q.appliedStart, q.appliedEnd);
         } else {
@@ -199,6 +203,13 @@ export default function Home() {
         onCustomEndChange={setCustomEnd}
         onApplyCustom={handleApplyCustom}
         customError={customError}
+      />
+
+      <TodaySpentCard
+        currency={currency}
+        dailyLimit={profile?.dailyLimit ?? 0}
+        dailyBudget={data.budget?.summary?.dailyBudget ?? 0}
+        refreshKey={todayRefreshKey}
       />
 
       <SummaryCards

@@ -1274,7 +1274,17 @@
     "customDateRequired": "စတင်ရက်နှင့် ကုန်ဆုံးရက် နှစ်ခုလုံး ရွေးချယ်ပါ။",
     "customDateInvalid": "စတင်ရက်သည် ကုန်ဆုံးရက်ထက် စောရမည်။",
     "customDateMax24": "ရက်စွဲအကွာအဝေးသည် ၂၄ လထက် ကျော်လွန်၍ မရပါ။",
-    "customDateMax24Tip": "အများဆုံး ၂၄ လအတွင်း ရွေးချယ်နိုင်ပါသည်။"
+    "customDateMax24Tip": "အများဆုံး ၂၄ လအတွင်း ရွေးချယ်နိုင်ပါသည်။",
+    "todaySpent": "ဒီနေ့ သုံးစွဲငွေ",
+    "todaySpentHint": "ဒီနေ့က မှတ်တမ်းတင်ထားသော ပြီးမြောက် အသုံးစရိတ်များ",
+    "todaySpentVsLimit": "နေ့စဉ် သုံးစွဲကန့်သတ်ချက်နှင့် နှိုင်းယှဉ်",
+    "todaySpentVsBudget": "ဒီနေ့ ဘတ်ဂျက် အရှိန်နှင့် နှိုင်းယှဉ်",
+    "todaySpentRemaining": "ဒီနေ့ ကျန် {{amount}}",
+    "todaySpentOver": "ဒီနေ့ ပစ်မှတ်ထက် {{amount}} ပို",
+    "todaySpentError": "ဒီနေ့ သုံးစွဲငွေ ဖတ်၍မရပါ",
+    "ofLimit": "/ {{amount}}",
+    "viewTransactions": "ငွေလွှဲမှုများ ကြည့်မည်",
+    "setDailyLimit": "နေ့စဉ် ကန့်သတ်ချက် သတ်မှတ်မည်"
   },
   "reports": {
     "title": "အစီရင်ခံစာ",

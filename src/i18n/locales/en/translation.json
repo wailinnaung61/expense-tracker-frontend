@@ -1273,7 +1273,17 @@
     "customDateRequired": "Please select both start and end dates.",
     "customDateInvalid": "Start date must be before end date.",
     "customDateMax24": "Date range cannot exceed 24 months.",
-    "customDateMax24Tip": "Maximum range is 24 months."
+    "customDateMax24Tip": "Maximum range is 24 months.",
+    "todaySpent": "Today spent",
+    "todaySpentHint": "Completed expenses recorded today",
+    "todaySpentVsLimit": "Compared to your daily spending limit",
+    "todaySpentVsBudget": "Compared to today’s budget pace",
+    "todaySpentRemaining": "{{amount}} left today",
+    "todaySpentOver": "{{amount}} over today’s target",
+    "todaySpentError": "Couldn’t load today’s spending",
+    "ofLimit": "of {{amount}}",
+    "viewTransactions": "View transactions",
+    "setDailyLimit": "Set a daily limit"
   },
   "reports": {
     "title": "Reports",
