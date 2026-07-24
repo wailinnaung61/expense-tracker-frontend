@@ -891,7 +891,9 @@
       "avatarRemoved": "Photo removed — back to cartoon",
       "avatarUpdateError": "Failed to update profile picture",
       "avatarInvalidType": "Please choose a JPEG, PNG, WebP, or GIF image",
-      "avatarTooLarge": "Image must be 2 MB or smaller"
+      "avatarTooLarge": "Image must be 2 MB or smaller",
+      "cartoonDialogTitle": "Pick your cartoon",
+      "cartoonDialogDescription": "Choose a character that feels like you — you can change it anytime."
     },
     "security": {
       "changePasswordTitle": "Password",

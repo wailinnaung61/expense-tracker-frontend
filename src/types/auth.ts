@@ -103,6 +103,8 @@ export interface CognitoUser {
   dailyLimit: number
   currency: string
   menus: UserMenu[]
+  /** From profile avatar.url — used in header/sidebar. */
+  avatarUrl?: string | null
 }
 
 export interface UpdateProfileRequest {

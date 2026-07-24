@@ -891,7 +891,9 @@
       "avatarRemoved": "写真を削除し、カートゥーンに戻しました",
       "avatarUpdateError": "プロフィール画像の更新に失敗しました",
       "avatarInvalidType": "JPEG、PNG、WebP、または GIF を選んでください",
-      "avatarTooLarge": "画像は 2 MB 以下にしてください"
+      "avatarTooLarge": "画像は 2 MB 以下にしてください",
+      "cartoonDialogTitle": "カートゥーンを選ぶ",
+      "cartoonDialogDescription": "あなたらしいキャラクターを選んでください。いつでも変更できます。"
     },
     "security": {
       "changePasswordTitle": "パスワード",

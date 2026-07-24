@@ -55,13 +55,14 @@ const authProfileSchema = z.object({
 type AuthProfileFormData = z.infer<typeof authProfileSchema>;
 
 export function ProfileSettings() {
-  const { user, fetchUser } = useAuth();
+  const { user, fetchUser, setAvatarUrl } = useAuth();
   const { t } = useTranslation();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [presets, setPresets] = useState<AvatarPreset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
+  const [cartoonOpen, setCartoonOpen] = useState(false);
   const [emailVerificationOpen, setEmailVerificationOpen] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [pendingEmailVerification, setPendingEmailVerification] = useState(false);
@@ -136,6 +137,7 @@ export function ProfileSettings() {
 
   const applyProfileAvatar = (updated: ProfileResponse) => {
     setProfile(updated);
+    setAvatarUrl(updated.avatar?.url?.trim() || null);
   };
 
   const handleSelectPreset = async (presetId: string) => {
@@ -144,6 +146,7 @@ export function ProfileSettings() {
     try {
       const updated = await profileService.selectAvatarPreset({ presetId });
       applyProfileAvatar(updated);
+      setCartoonOpen(false);
       toast.success(t("settings.profile.avatarUpdated"));
     } catch (error: any) {
       toast.error(error?.message || t("settings.profile.avatarUpdateError"));
@@ -319,24 +322,39 @@ export function ProfileSettings() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Avatar Section */}
-            <div className="space-y-4 rounded-2xl border bg-muted/20 p-4 sm:p-5">
+            <div className="rounded-2xl border bg-muted/20 p-4 sm:p-5">
               <div className="flex items-center gap-5 sm:gap-6">
-                <div className="rounded-full bg-linear-to-br from-primary/20 via-primary/10 to-transparent p-[3px] shadow-sm">
+                <button
+                  type="button"
+                  className="rounded-full bg-linear-to-br from-primary/20 via-primary/10 to-transparent p-[3px] shadow-sm transition hover:scale-[1.02]"
+                  onClick={() => setCartoonOpen(true)}
+                  aria-label={t("settings.profile.chooseCartoon")}
+                >
                   <Avatar className="h-20 w-20 border border-white/60 dark:border-slate-700">
                     <AvatarImage
                       src={profile?.avatar?.url || ""}
                       alt={displayName}
                       key={profile?.avatar?.url || "fallback"}
+                      className="object-cover"
                     />
                     <AvatarFallback className="bg-linear-to-br from-primary to-primary/80 text-xl font-semibold text-primary-foreground">
                       {avatarInitials}
                     </AvatarFallback>
                   </Avatar>
-                </div>
+                </button>
                 <div className="min-w-0 flex-1 space-y-2">
                   <h3 className="truncate text-lg font-semibold">{displayName}</h3>
                   <p className="truncate text-sm text-muted-foreground">{displayEmail}</p>
                   <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="default"
+                      disabled={avatarBusy}
+                      onClick={() => setCartoonOpen(true)}
+                    >
+                      {t("settings.profile.chooseCartoon")}
+                    </Button>
                     <Button
                       type="button"
                       size="sm"
@@ -376,43 +394,66 @@ export function ProfileSettings() {
                   />
                 </div>
               </div>
-
-              {presets.length > 0 && (
-                <div className="space-y-2">
-                  <Label>{t("settings.profile.chooseCartoon")}</Label>
-                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
-                    {presets.map((preset) => {
-                      const selected =
-                        profile?.avatar?.source === "preset" &&
-                        profile.avatar.presetId === preset.id;
-                      return (
-                        <button
-                          key={preset.id}
-                          type="button"
-                          disabled={avatarBusy}
-                          title={preset.label}
-                          onClick={() => void handleSelectPreset(preset.id)}
-                          className={cn(
-                            "relative aspect-square overflow-hidden rounded-xl border-2 bg-background transition-all hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                            selected
-                              ? "border-primary ring-2 ring-primary/30"
-                              : "border-transparent hover:border-muted-foreground/30"
-                          )}
-                          style={{ backgroundColor: `${preset.accentColor}22` }}
-                        >
-                          <img
-                            src={preset.url}
-                            alt={preset.label}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                          />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
             </div>
+
+            <Dialog open={cartoonOpen} onOpenChange={setCartoonOpen}>
+              <DialogContent className="max-w-lg gap-0 overflow-hidden p-0 sm:rounded-2xl">
+                <div className="bg-linear-to-br from-sky-500/15 via-violet-500/10 to-amber-500/10 px-6 pb-4 pt-6">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl">
+                      {t("settings.profile.cartoonDialogTitle")}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {t("settings.profile.cartoonDialogDescription")}
+                    </DialogDescription>
+                  </DialogHeader>
+                </div>
+                <div className="grid grid-cols-4 gap-3 p-6">
+                  {presets.map((preset) => {
+                    const selected =
+                      profile?.avatar?.source === "preset" &&
+                      profile.avatar.presetId === preset.id;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        disabled={avatarBusy}
+                        title={preset.label}
+                        onClick={() => void handleSelectPreset(preset.id)}
+                        className={cn(
+                          "group relative aspect-square overflow-hidden rounded-2xl border-2 transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          selected
+                            ? "border-primary shadow-md ring-2 ring-primary/25"
+                            : "border-border/60 hover:border-primary/40"
+                        )}
+                        style={{ backgroundColor: `${preset.accentColor}28` }}
+                      >
+                        <img
+                          src={preset.url}
+                          alt={preset.label}
+                          className="h-full w-full object-cover transition group-hover:scale-105"
+                          loading="lazy"
+                        />
+                        {selected && (
+                          <span className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow">
+                            ✓
+                          </span>
+                        )}
+                        <span className="absolute inset-x-0 bottom-0 bg-black/35 px-1 py-0.5 text-center text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100">
+                          {preset.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {avatarBusy && (
+                  <div className="flex items-center justify-center gap-2 border-t px-6 py-3 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t("common.loading")}
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Account Details Section */}

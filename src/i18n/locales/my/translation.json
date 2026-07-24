@@ -891,7 +891,9 @@
       "avatarRemoved": "ဓာတ်ပုံ ဖယ်ရှားပြီး ကာတွန်းသို့ ပြန်ထားပါပြီ",
       "avatarUpdateError": "ပရိုဖိုင်ပုံ အပ်ဒိတ် မအောင်မြင်ပါ",
       "avatarInvalidType": "JPEG၊ PNG၊ WebP သို့မဟုတ် GIF ရွေးပါ",
-      "avatarTooLarge": "ပုံသည် 2 MB ထက် မကျော်ရပါ"
+      "avatarTooLarge": "ပုံသည် 2 MB ထက် မကျော်ရပါ",
+      "cartoonDialogTitle": "ကာတွန်း ရွေးမည်",
+      "cartoonDialogDescription": "သင့်နှင့်တူသော ဇာတ်ကောင်ကို ရွေးပါ — အချိန်မရွေး ပြောင်းနိုင်သည်။"
     },
     "security": {
       "changePasswordTitle": "စကားဝှက်",
